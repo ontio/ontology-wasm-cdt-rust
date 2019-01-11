@@ -1,0 +1,8 @@
+[package]
+name = "ontio-std"
+version = "0.1.0"
+authors = ["laizy <aochyi@126.com>"]
+edition = "2018"
+
+[dependencies]
+wee_alloc = "0.4"
