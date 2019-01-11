@@ -5,5 +5,7 @@ mod external {
 }
 
 pub fn debug(msg: &str) {
-    unsafe { external::debug(msg.as_ptr(), msg.len() as u32); }
+    unsafe {
+        external::debug(msg.as_ptr(), msg.len() as u32);
+    }
 }

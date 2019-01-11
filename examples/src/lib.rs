@@ -2,9 +2,6 @@
 
 extern crate ontio_std as ostd;
 
-use ostd::Box;
-use ostd::format;
-
 #[no_mangle]
 pub extern "C" fn add_one(x: i32) -> i32 {
     x + 1
@@ -20,18 +17,14 @@ fn add_5(a:i32, b:i32) ->i32 {
 	a + b + 4
 }
 
-#[no_mangle]
-pub fn add(a:i32, b:i32) ->i32 {
-    panic!("hhhehe");
-}
+use ostd::types::U256;
 
 #[no_mangle]
-pub fn boxed(a:i32) ->i32 {
-    let addr = ostd::runtime::address();
-    ostd::runtime::check_witness(&addr);
-    ostd::console::debug(&format!("hahh{:?}", addr));
-    let b = Box::new(a);
-    *b
+pub fn add() -> U256 {
+    let mut val: U256 = 1023.into();
+    for _ in 0..200 { val = val * 2.into() }
+
+    val
 }
 
 #[cfg(test)]

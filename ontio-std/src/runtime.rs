@@ -26,7 +26,7 @@ pub fn block_height() -> u64 {
 
 /// Get the address of current executing contract
 pub fn address() -> Address {
-    let mut addr: Address = [0;20];
+    let mut addr: Address = Address::zero();
     unsafe {
         external::selfaddress(addr.as_mut().as_mut_ptr());
     }
@@ -34,8 +34,8 @@ pub fn address() -> Address {
     addr
 }
 
-pub fn caller() ->Address {
-    let mut addr: Address = [0;20];
+pub fn caller() -> Address {
+    let mut addr: Address = Address::zero();
     unsafe {
         external::calleraddress(addr.as_mut().as_mut_ptr());
     }
@@ -43,9 +43,7 @@ pub fn caller() ->Address {
 }
 
 pub fn check_witness(addr: &Address) -> bool {
-    unsafe {
-        external::checkwitness(addr.as_ptr()) != 0
-    }
+    unsafe { external::checkwitness(addr.as_ptr()) != 0 }
 }
 
 /// Get input data from transaction or caller contract
@@ -65,6 +63,7 @@ pub fn input() -> Vec<u8> {
 
 /// return the result of execution and exit contract execution
 pub fn ret(data: &[u8]) -> ! {
-    unsafe { external::ret(data.as_ptr(), data.len() as u32); }
+    unsafe {
+        external::ret(data.as_ptr(), data.len() as u32);
+    }
 }
-
