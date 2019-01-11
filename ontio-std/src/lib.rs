@@ -1,11 +1,9 @@
-#![feature(panic_abort)]
 #![feature(lang_items)]
 #![feature(core_intrinsics)]
 #![feature(allocator_api)]
 #![feature(alloc)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-extern crate panic_abort;
 extern crate alloc;
 
 #[cfg(not(feature = "std"))]
