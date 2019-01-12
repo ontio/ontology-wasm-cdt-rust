@@ -1,5 +1,5 @@
 use super::types::Address;
-use super::Vec;
+use super::{vec, Vec};
 
 mod env {
     extern "C" {
@@ -11,7 +11,40 @@ mod env {
         pub fn ret(ptr: *const u8, len: u32) -> !;
         pub fn input_length() -> u32;
         pub fn get_input(dst: *mut u8);
+
+        pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
+        pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
     }
+}
+
+pub fn storage_write(key: &[u8], val: &[u8]) {
+    unsafe {
+        env::storage_write(key.as_ptr(), key.len() as u32, val.as_ptr(), val.len() as u32);
+    }
+}
+
+pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
+    const INITIAL:usize = 32;
+    let mut val = vec![0; INITIAL];
+    let size = unsafe {
+        env::storage_read(key.as_ptr(), key.len() as u32, val.as_mut_ptr(), val.len() as u32, 0)
+    };
+
+    if size == core::u32::MAX {
+        return None
+    }
+    let size = size as usize;
+    val.resize(size, 0);
+    if size > val.len() {
+        val.resize(size, 0);
+        let value = &mut val[INITIAL..];
+        debug_assert!(value.len() == size - INITIAL);
+        unsafe {
+            env::storage_read(key.as_ptr(), key.len() as u32, value.as_mut_ptr(), value.len() as u32, INITIAL as u32)
+        };
+    }
+
+    Some(val)
 }
 
 /// Get timestamp in current block

@@ -4,6 +4,8 @@
 #![feature(alloc)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+//#![feature(trace_macros)]
+
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "std"))] {
         extern crate wee_alloc;
@@ -34,7 +36,7 @@ extern crate alloc;
 
 pub use alloc::boxed::Box;
 pub use alloc::str;
-pub use alloc::string::String;
+pub use alloc::string::{self, String};
 pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
@@ -43,6 +45,7 @@ pub use core::cmp;
 pub mod abi;
 pub mod console;
 pub mod runtime;
+pub mod database;
 pub mod types;
 
 #[cfg(test)]
