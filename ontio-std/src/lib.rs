@@ -38,6 +38,9 @@ pub use alloc::string::String;
 pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
+pub use core::cmp;
+
+pub mod abi;
 pub mod console;
 pub mod runtime;
 pub mod types;
