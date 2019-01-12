@@ -64,4 +64,8 @@ impl Sink {
             self.write_u64(val);
         }
     }
+
+    pub fn into(self) -> Vec<u8> {
+        self.buf
+    }
 }

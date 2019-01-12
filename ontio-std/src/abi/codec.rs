@@ -3,7 +3,7 @@ use super::Error;
 use super::{Sink, Source};
 
 use crate::cmp;
-use crate::types::{Address, H256};
+use crate::types::{Address, H256, U256};
 use crate::{Vec, String};
 
 impl AbiCodec for u8 {
@@ -80,6 +80,20 @@ impl AbiCodec for H256 {
     }
 }
 
+impl AbiCodec for U256 {
+    fn decode(source: &mut Source) -> Result<Self, Error> {
+        let mut buf = [0; 32];
+        source.read_into(buf.as_mut())?;
+        Ok( U256::from_little_endian(&buf) )
+    }
+
+    fn encode(self, sink: &mut Sink) {
+        let mut buf = [0; 32];
+        self.to_little_endian(&mut buf);
+        sink.write_bytes(&buf)
+    }
+}
+
 // TODO: implement Vec<u8> for performence when specialization is ready
 impl<T: AbiCodec> AbiCodec for Vec<T> {
     fn decode(source: &mut Source) -> Result<Self, Error> {
@@ -138,3 +152,40 @@ impl_abi_codec_fixed_array!(
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
     27, 28, 29, 30, 31, 32
 );
+
+/// reference:
+/// 1. https://github.com/rust-lang/rust/issues/24830
+/// 2. https://github.com/rust-lang/rust/blob/8f5b5f94dcdb9884737dfbc8efd893d1d70f0b14/src/libcore/hash/mod.rs#L239
+/// 3. https://github.com/rust-num/num/pull/89/files
+macro_rules! for_each_tuple_ {
+    ($m:ident !!) => {
+        $m! { }
+    };
+    ($m:ident !! $h:ident, $($t:ident,)*) => {
+        $m! { $h $($t)* }
+        for_each_tuple_! { $m !! $($t,)* }
+    }
+}
+macro_rules! for_each_tuple {
+    ($($m:tt)*) => {
+        macro_rules! m { $($m)* }
+        for_each_tuple_! { m !! A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, }
+    }
+}
+
+//trace_macros!(true);
+for_each_tuple! {
+    ($($item:ident)*) => {
+        impl<$($item: AbiCodec),*> AbiCodec for ($($item,)*) {
+            fn decode(_source: &mut Source) -> Result<Self, Error> {
+                Ok(($(_source.read::<$item>()?,)*))
+            }
+
+            fn encode(self, _sink: &mut Sink) {
+                #[allow(non_snake_case)]
+                let ($($item,)*) = self;
+                $(_sink.write($item);)*
+            }
+        }
+    }
+}
