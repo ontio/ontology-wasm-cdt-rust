@@ -1,5 +1,5 @@
 [package]
-name = "demo"
+name = "token"
 version = "0.1.0"
 authors = ["laizy <aochyi@126.com>"]
 edition = "2018"
@@ -9,18 +9,8 @@ crate-type = ["cdylib"]
 path = "src/lib.rs"
 
 [dependencies]
-ontio-std = {path="../ontio-std"}
+ontio-std = {path="../../ontio-std"}
 
 [features]
 test = ["ontio-std/test"]
 
-[profile.release]
-panic = "abort"
-lto = true
-debug = true
-opt-level = "z"
-
-[workspace]
-members = [
-    "token"
-]
