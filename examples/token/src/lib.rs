@@ -1,7 +1,7 @@
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Sink, Source};
+use ostd::abi::{AbiCodec, Sink, Source};
 use ostd::types::{Address, U256};
 use ostd::{database, runtime};
 use ostd::{string::ToString, String};
@@ -33,6 +33,7 @@ fn transfer(from: Address, to: Address, amount: U256) -> bool {
         tobal = tobal + amount;
         database::put(from.as_ref(), frmbal);
         database::put(to.as_ref(), tobal);
+        notify(("Transfer".to_string(), from, to, amount));
         true
     }
 }
@@ -63,4 +64,10 @@ pub fn invoke() {
     }
 
     runtime::ret(&sink.into())
+}
+
+fn notify<T:AbiCodec>(msg: T) {
+    let mut sink = Sink::new(16);
+    sink.write(msg);
+    runtime::notify(&sink.into());
 }

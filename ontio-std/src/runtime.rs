@@ -9,6 +9,7 @@ mod env {
         pub fn calleraddress(dest: *mut u8);
         pub fn checkwitness(addr: *const u8) -> u32;
         pub fn ret(ptr: *const u8, len: u32) -> !;
+        pub fn notify(ptr: *const u8, len: u32);
         pub fn input_length() -> u32;
         pub fn get_input(dst: *mut u8);
 
@@ -98,5 +99,11 @@ pub fn input() -> Vec<u8> {
 pub fn ret(data: &[u8]) -> ! {
     unsafe {
         env::ret(data.as_ptr(), data.len() as u32);
+    }
+}
+
+pub fn notify(data: &[u8]) {
+    unsafe {
+        env::notify(data.as_ptr(), data.len() as u32);
     }
 }
