@@ -1,13 +1,9 @@
-use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
 
-use syn::ItemTrait;
-use syn::{Attribute, Field, Fields, Ident, Item, ItemStruct, Path, Type, Visibility};
-
-pub fn quote(item: Item) -> proc_macro2::TokenStream {
+pub fn quote(item: syn::Item) -> proc_macro2::TokenStream {
     match item {
-        Item::Trait(item_trait) => {
+        syn::Item::Trait(item_trait) => {
             //            println!("trait: {:?}", item_trait);
             let contract = Contract::from_item_trait(item_trait);
             //            println!("contract: {:?}", contract);
@@ -27,7 +23,7 @@ pub(crate) struct Contract {
 }
 
 impl Contract {
-    pub(crate) fn from_item_trait(item_trait: ItemTrait) -> Self {
+    pub(crate) fn from_item_trait(item_trait: syn::ItemTrait) -> Self {
         Contract {
             name: item_trait.ident,
             fields: item_trait
