@@ -47,6 +47,9 @@ pub mod console;
 pub mod runtime;
 pub mod database;
 pub mod types;
+pub mod abi_codegen {
+    pub use ontio_codegen::contract;
+}
 
 #[cfg(test)]
 mod tests {

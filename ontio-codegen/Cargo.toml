@@ -1,0 +1,20 @@
+[package]
+name = "ontio-codegen"
+version = "0.1.0"
+authors = ["laizy <aochyi@126.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "0.15.24", features = ["full", "extra-traits"] }
+quote = "0.6"
+proc-macro2 = "0.4.24"
+
+[dev-dependencies]
+ontio-std  = {path="../ontio-std"}
+
+[features]
+test = ["ontio-std/test"]
+

@@ -17,3 +17,7 @@ pub trait AbiCodec: Sized {
 
     fn encode(self, sink: &mut Sink);
 }
+
+pub trait Dispatcher {
+    fn dispatch(&mut self, payload: &[u8]) -> crate::Vec<u8>;
+}

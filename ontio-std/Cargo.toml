@@ -10,6 +10,7 @@ bigint = { version = "4.4", default-features = false }
 fixed-hash = { version = "0.3", default-features = false }
 cfg-if = "0.1"
 byteorder = { version = "1", default-features = false }
+ontio-codegen = { path = "../ontio-codegen"}
 
 [features]
 std = []

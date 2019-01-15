@@ -18,9 +18,10 @@ test = ["ontio-std/test"]
 panic = "abort"
 lto = true
 debug = true
-opt-level = "z"
+opt-level = "s"
 
 [workspace]
 members = [
-    "token"
+    "token",
+    "token-codegen"
 ]
