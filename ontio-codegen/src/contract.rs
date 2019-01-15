@@ -4,11 +4,13 @@ use quote::quote;
 pub fn quote(item: syn::Item) -> proc_macro2::TokenStream {
     match item {
         syn::Item::Trait(item_trait) => {
-            //            println!("trait: {:?}", item_trait);
             let contract = Contract::from_item_trait(item_trait);
-            //            println!("contract: {:?}", contract);
-            generate_dispacher(&contract)
-            //            quote!().into()
+            let disp = generate_dispacher(&contract);
+            let trait_and_event = generate_event(&contract);
+            quote! {
+                #trait_and_event
+                #disp
+            }
         }
         _ => {
             panic!("`#[contract]` can only be used on a trait");
@@ -73,10 +75,14 @@ struct ContractAction {
     name: syn::Ident,
     params: Vec<(syn::Pat, syn::Type)>,
     ret: Option<syn::Type>,
+    method: syn::TraitItemMethod,
 }
 
 impl ContractAction {
     fn from_trait_method(method: syn::TraitItemMethod) -> Self {
+        let mut m = method.clone();
+        m.attrs = Vec::new();
+
         let params = method
             .sig
             .decl
@@ -97,6 +103,7 @@ impl ContractAction {
             name: method.sig.ident,
             params: params,
             ret: ret,
+            method: m,
         }
     }
 }
@@ -106,6 +113,7 @@ struct ContractEvent {
     name: syn::Ident,
     method_sig: syn::MethodSig,
     params: Vec<(syn::Pat, syn::Type)>,
+    default: Option<syn::Block>,
 }
 
 impl ContractEvent {
@@ -125,6 +133,7 @@ impl ContractEvent {
             name: method.sig.ident.clone(),
             method_sig: method.sig,
             params: params,
+            default: method.default,
         }
     }
 }
@@ -163,11 +172,13 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
 
     let contract_name = &contract.name;
 
+    let dispatcher_name = syn::Ident::new(&format!("{}Dispatcher",contract_name), Span::call_site());
+
     quote! {
-        pub struct Dispacher<T:#contract_name> {
+        pub struct #dispatcher_name<T:#contract_name> {
             pub(crate) contract_instance: T,
         }
-        impl<T: #contract_name> Dispacher<T> {
+        impl<T: #contract_name> #dispatcher_name<T> {
             pub fn new(cont: T) -> Self {
                 Self{contract_instance: cont}
             }
@@ -177,8 +188,8 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
             }
         }
 
-        impl<T: #contract_name> ontio_std::abi::Dispacher for Dispacher<T> {
-            fn dispatch(&mut self, payload: &[u8]) -> Vec<u8> {
+        impl<T: #contract_name> ontio_std::abi::Dispatcher for #dispatcher_name<T> {
+            fn dispatch(&mut self, payload: &[u8]) -> ontio_std::Vec<u8> {
                 let contract_instance = &mut self.contract_instance;
                 // todo: avoid bytes copy
                 let mut source = ontio_std::abi::Source::new(payload.to_vec());
@@ -192,3 +203,46 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
         }
     }
 }
+
+fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
+    let events: Vec<proc_macro2::TokenStream> = contract
+        .fields
+        .iter()
+        .map(|field| match field {
+            &ContractField::Event(ref event) => {
+                let event_sig = &event.method_sig;
+                let event_body = match &event.default {
+                    Some(body) => quote! { #body },
+                    None => {
+                        let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
+                        let args_name = event.params.iter().map(|&(ref pat, _)| quote! { #pat });
+                        quote! { {
+                            let mut sink = ontio_std::abi::Sink::new(16);
+                            #(sink.write::<#args_type>(#args_name);)*
+                            ontio_std::runtime::notify(&sink.into());
+                        } }
+                    }
+                };
+                quote! {
+                    #event_sig
+                    #event_body
+                }
+            }
+            &ContractField::Action(ref action) => {
+                let method = &action.method;
+                quote! { #method }
+            }
+            &ContractField::Unhandle(ref item) => quote! { #item },
+        })
+        .collect();
+
+    let contract_name = &contract.name;
+    quote! {
+        pub trait #contract_name {
+            #(#events)*
+        }
+
+    }
+}
+
+

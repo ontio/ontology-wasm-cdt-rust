@@ -1,4 +1,4 @@
-#![recursion_limit = "128"]
+#![recursion_limit = "256"]
 
 extern crate proc_macro;
 use proc_macro::TokenStream;
@@ -10,7 +10,6 @@ pub fn contract(_metadata: TokenStream, input: TokenStream) -> TokenStream {
     let item: syn::Item = syn::parse(input).unwrap();
     let stream = contract::quote(item);
 
-    println!("generated token stream {}", stream);
     stream.into()
 }
 
