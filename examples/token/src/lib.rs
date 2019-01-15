@@ -12,12 +12,12 @@ const SYMBOL: &'static str = "WTK";
 const TOTAL_SUPPLY: u64 = 100000000000;
 
 fn initialize() -> bool {
-    database::put(KEY_TOTAL_SUPPLY.as_bytes(), U256::from(TOTAL_SUPPLY));
+    database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
     true
 }
 
 fn balance_of(owner: &Address) -> U256 {
-    database::get(owner.as_ref()).unwrap_or(U256::zero())
+    database::get(owner).unwrap_or(U256::zero())
 }
 
 fn transfer(from: Address, to: Address, amount: U256) -> bool {
@@ -31,15 +31,15 @@ fn transfer(from: Address, to: Address, amount: U256) -> bool {
     } else {
         frmbal = frmbal - amount;
         tobal = tobal + amount;
-        database::put(from.as_ref(), frmbal);
-        database::put(to.as_ref(), tobal);
+        database::put(&from, frmbal);
+        database::put(&to, tobal);
         notify(("Transfer".to_string(), from, to, amount));
         true
     }
 }
 
 fn total_supply() -> U256 {
-    database::get(KEY_TOTAL_SUPPLY.as_bytes()).unwrap()
+    database::get(KEY_TOTAL_SUPPLY).unwrap()
 }
 
 #[no_mangle]
