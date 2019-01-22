@@ -14,4 +14,4 @@ ontio-codegen = { path = "../ontio-codegen"}
 
 [features]
 std = []
-test = ["std"]
+mock = ["std"]

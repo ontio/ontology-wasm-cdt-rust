@@ -51,6 +51,13 @@ pub mod abi_codegen {
     pub use ontio_codegen::contract;
 }
 
+cfg_if::cfg_if! {
+    if #[cfg(feature = "mock")] {
+        mod mock;
+        pub use self::mock::setup_runtime;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

@@ -1,0 +1,9 @@
+language: rust
+rust:
+  - nightly
+sudo: false
+cache: cargo
+
+script:
+  - bash ./.travis.build.sh
+
