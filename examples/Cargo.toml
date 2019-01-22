@@ -11,9 +11,6 @@ path = "src/lib.rs"
 [dependencies]
 ontio-std = {path="../ontio-std"}
 
-[features]
-test = ["ontio-std/test"]
-
 [profile.release]
 panic = "abort"
 lto = true

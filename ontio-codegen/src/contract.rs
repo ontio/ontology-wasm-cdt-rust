@@ -212,8 +212,10 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
             &ContractField::Event(ref event) => {
                 let event_sig = &event.method_sig;
                 let event_body = match &event.default {
-                    Some(body) => quote! { #body },
-                    None => {
+//                    Some(body) => quote! { #body },
+//                    None => {
+                    //disable default implementation
+                    _ => {
                         let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
                         let args_name = event.params.iter().map(|&(ref pat, _)| quote! { #pat });
                         quote! { {
@@ -224,6 +226,7 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
                     }
                 };
                 quote! {
+                    #[allow(non_snake_case)]
                     #event_sig
                     #event_body
                 }
