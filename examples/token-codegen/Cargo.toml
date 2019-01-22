@@ -12,4 +12,4 @@ path = "src/lib.rs"
 ontio-std = {path="../../ontio-std"}
 
 [features]
-test = ["ontio-std/mock"]
+mock = ["ontio-std/mock"]
