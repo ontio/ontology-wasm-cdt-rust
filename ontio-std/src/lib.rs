@@ -53,8 +53,9 @@ pub mod abi_codegen {
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "mock")] {
-        mod mock;
-        pub use self::mock::setup_runtime;
+        pub mod mock;
+//        pub use self::mock::setup_runtime;
+//        pub use self::mock::RuntimeBuilder;
     }
 }
 

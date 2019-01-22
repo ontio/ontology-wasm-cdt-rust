@@ -11,17 +11,19 @@ pub trait Runtime {
     fn address(&self) -> Address;
     fn caller(&self) -> Address;
     fn check_witness(&self, addr: &Address) -> bool;
+    fn notify(&self, msg: &[u8]);
     //    fn input() -> Vec<u8> ;
     //    fn ret(data: &[u8]) -> ! ;
 }
 
 #[derive(Default)]
-pub struct RuntimeImpl {
-    storage: RefCell<HashMap<Vec<u8>, Vec<u8>>>,
-    timestamp: u64,
-    block_height: u64,
-    caller: Address,
-    witness: Vec<Address>,
+pub(crate) struct RuntimeImpl {
+    pub(crate) storage: RefCell<HashMap<Vec<u8>, Vec<u8>>>,
+    pub(crate) timestamp: u64,
+    pub(crate) block_height: u64,
+    pub(crate) caller: Address,
+    pub(crate) witness: Vec<Address>,
+    pub(crate) notify: RefCell<Vec<Vec<u8>>>,
 }
 
 impl Runtime for RuntimeImpl {
@@ -51,6 +53,10 @@ impl Runtime for RuntimeImpl {
 
     fn check_witness(&self, addr: &Address) -> bool {
         self.witness.iter().position(|wit| wit == addr).is_some()
+    }
+
+    fn notify(&self, msg: &[u8]) {
+        self.notify.borrow_mut().push(msg.to_vec());
     }
 }
 
@@ -118,6 +124,13 @@ mod env {
         let key = slice::from_raw_parts(key, klen as usize);
         let val = slice::from_raw_parts(val, vlen as usize);
         RUNTIME.with(|r| r.borrow().storage_write(key, val));
+    }
+
+    #[no_mangle]
+    pub unsafe fn notify(ptr: *const u8, len: u32) {
+        let msg = slice::from_raw_parts(ptr, len as usize);
+        RUNTIME.with(|r| r.borrow().notify(msg));
+
     }
 
 //        pub fn ret(ptr: *const u8, len: u32) -> !;

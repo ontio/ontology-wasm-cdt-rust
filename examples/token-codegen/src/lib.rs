@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(not(feature="mock"), no_std)]
+//#![no_std]
 extern crate ontio_std as ostd;
 
 use ostd::abi::Dispatcher;
