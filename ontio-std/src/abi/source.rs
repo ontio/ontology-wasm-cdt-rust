@@ -1,4 +1,4 @@
-use super::AbiCodec;
+use super::Decoder;
 use super::Error;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
@@ -25,7 +25,7 @@ impl Source {
         Self { buf: data, pos: 0 }
     }
 
-    pub fn read<T: AbiCodec>(&mut self) -> Result<T, Error> {
+    pub fn read<T: Decoder>(&mut self) -> Result<T, Error> {
         T::decode(self)
     }
 

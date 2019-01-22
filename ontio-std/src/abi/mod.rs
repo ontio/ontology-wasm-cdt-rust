@@ -12,9 +12,11 @@ pub enum Error {
     InvalidUtf8,
 }
 
-pub trait AbiCodec: Sized {
+pub trait Decoder:Sized {
     fn decode(source: &mut Source) -> Result<Self, Error>;
+}
 
+pub trait Encoder {
     fn encode(self, sink: &mut Sink);
 }
 
