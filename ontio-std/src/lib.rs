@@ -40,6 +40,12 @@ pub use alloc::string::{self, String};
 pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
+pub mod prelude {
+    pub use alloc::prelude::*;
+    pub use core::prelude::v1::*;
+    pub use crate::types::{H256, Address, U256};
+}
+
 pub use core::cmp;
 
 pub mod abi;
