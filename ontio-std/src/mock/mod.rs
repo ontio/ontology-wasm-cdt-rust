@@ -7,7 +7,7 @@ use self::runtime::RuntimeImpl;
 use crate::types::Address;
 use std::collections::HashMap;
 use std::cell::RefCell;
-use crate::abi::{AbiCodec, Sink};
+use crate::abi::{Encoder, Sink};
 
 #[cfg(test)]
 mod tests {
@@ -27,7 +27,7 @@ pub struct RuntimeBuilder {
 }
 
 impl RuntimeBuilder {
-    pub fn storage_put<K: AsRef<[u8]>, T:AbiCodec>(mut self, key: K, val: T) ->Self {
+    pub fn storage_put<K: AsRef<[u8]>, T:Encoder>(mut self, key: K, val: T) ->Self {
         let mut sink = Sink::new(12);
         sink.write(val);
         self.storage.insert(key.as_ref().to_vec(), sink.into());

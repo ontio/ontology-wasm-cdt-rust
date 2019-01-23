@@ -1,4 +1,4 @@
-use super::AbiCodec;
+use super::Encoder;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
 
@@ -13,7 +13,7 @@ impl Sink {
         }
     }
 
-    pub fn write<T: AbiCodec>(&mut self, val: T) {
+    pub fn write<T: Encoder>(&mut self, val: T) {
         val.encode(self)
     }
 

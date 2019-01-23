@@ -53,8 +53,8 @@ impl MyToken for MyTokenInstance {
         } else {
             frmbal = frmbal - amount;
             tobal = tobal + amount;
-            database::put(&utils::gen_balance_key(&from), frmbal);
-            database::put(&utils::gen_balance_key(&to), tobal);
+            database::put(&utils::gen_balance_key(&from), &frmbal);
+            database::put(&utils::gen_balance_key(&to), &tobal);
             self.Transfer(from, to, amount);
             true
         }
