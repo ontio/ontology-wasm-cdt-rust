@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "ontio-std",
+    "ontio-codegen",
+    "examples",
+    "examples/token",
+    "examples/token-codegen",
+]
+
+[profile.release]
+panic = "abort"
+lto = true
+debug = true
+opt-level = "s"
+
