@@ -2,10 +2,9 @@
 //#![no_std]
 extern crate ontio_std as ostd;
 
+use ostd::prelude::*;
 use ostd::abi::Dispatcher;
-use ostd::types::{Address, U256};
 use ostd::{database, runtime};
-use ostd::{Vec, string::ToString, String};
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const TOTAL_SUPPLY: u64 = 100000000000;
@@ -75,10 +74,7 @@ pub fn invoke() {
 mod utils {
     use super::*;
     pub fn gen_balance_key(addr: &Address) -> Vec<u8> {
-        let mut key =  KEY_BALANCE.as_bytes().to_vec();
-        key.extend_from_slice(addr.as_ref());
-
-        key
+        [KEY_BALANCE.as_bytes(), addr.as_ref()].concat()
     }
 }
 
