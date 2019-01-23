@@ -11,14 +11,3 @@ path = "src/lib.rs"
 [dependencies]
 ontio-std = {path="../ontio-std"}
 
-[profile.release]
-panic = "abort"
-lto = true
-debug = true
-opt-level = "s"
-
-[workspace]
-members = [
-    "token",
-    "token-codegen"
-]
