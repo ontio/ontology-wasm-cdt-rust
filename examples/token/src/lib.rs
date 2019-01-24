@@ -1,7 +1,7 @@
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{AbiCodec, Sink, Source};
+use ostd::abi::{Encoder, Sink, Source};
 use ostd::types::{Address, U256};
 use ostd::{database, runtime};
 use ostd::{string::ToString, String};
@@ -66,7 +66,7 @@ pub fn invoke() {
     runtime::ret(&sink.into())
 }
 
-fn notify<T:AbiCodec>(msg: T) {
+fn notify<T:Encoder>(msg: T) {
     let mut sink = Sink::new(16);
     sink.write(msg);
     runtime::notify(&sink.into());

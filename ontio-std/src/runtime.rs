@@ -15,12 +15,19 @@ mod env {
 
         pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
         pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
+        pub fn storage_delete(key: *const u8, klen: u32);
     }
 }
 
 pub fn storage_write(key: &[u8], val: &[u8]) {
     unsafe {
         env::storage_write(key.as_ptr(), key.len() as u32, val.as_ptr(), val.len() as u32);
+    }
+}
+
+pub fn storage_delete(key: &[u8]) {
+    unsafe {
+        env::storage_delete(key.as_ptr(), key.len() as u32);
     }
 }
 
