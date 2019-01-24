@@ -14,3 +14,7 @@ pub fn put<K: AsRef<[u8]>, T:Encoder>(key: K, val: T) {
 
     runtime::storage_write(key.as_ref(), &sink.into());
 }
+
+pub fn delete<K: AsRef<[u8]>>(key: K) {
+    runtime::storage_delete(key.as_ref());
+}

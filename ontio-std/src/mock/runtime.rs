@@ -6,6 +6,7 @@ use std::collections::HashMap;
 pub trait Runtime {
     fn storage_write(&self, key: &[u8], val: &[u8]);
     fn storage_read(&self, key: &[u8]) -> Option<Vec<u8>>;
+    fn storage_delete(&self, key: &[u8]) ;
     fn timestamp(&self) -> u64;
     fn block_height(&self) -> u64;
     fn address(&self) -> Address;
@@ -33,6 +34,10 @@ impl Runtime for RuntimeImpl {
 
     fn storage_read(&self, key: &[u8]) -> Option<Vec<u8>> {
         self.storage.borrow().get(key).map(|val| val.to_vec())
+    }
+
+    fn storage_delete(&self, key: &[u8]) {
+        self.storage.borrow_mut().remove(key);
     }
 
     fn timestamp(&self) -> u64 {
@@ -124,6 +129,12 @@ mod env {
         let key = slice::from_raw_parts(key, klen as usize);
         let val = slice::from_raw_parts(val, vlen as usize);
         RUNTIME.with(|r| r.borrow().storage_write(key, val));
+    }
+
+    #[no_mangle]
+    pub unsafe fn storage_delete(key: *const u8, klen: u32) {
+        let key = slice::from_raw_parts(key, klen as usize);
+        RUNTIME.with(|r| r.borrow().storage_delete(key));
     }
 
     #[no_mangle]
