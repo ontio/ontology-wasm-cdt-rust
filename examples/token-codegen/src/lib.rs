@@ -66,7 +66,7 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
-    fn approve(&mut self, approves: Address, receiver: Address, amount:U256) -> bool {
+    fn approve(&mut self, approves: Address, receiver: Address, amount: U256) -> bool {
         if runtime::check_witness(&approves) == false {
             return false;
         }
@@ -79,7 +79,7 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
-    fn transfer_from(&mut self, receiver:Address,approves:Address, amount:U256) -> bool {
+    fn transfer_from(&mut self, receiver: Address, approves: Address, amount: U256) -> bool {
         if runtime::check_witness(&receiver) == false {
             return false;
         }
@@ -88,7 +88,7 @@ impl MyToken for MyTokenInstance {
             return false;
         }
         let mut approbal = self.balance_of(approves.clone());
-        if approbal < allow {
+        if approbal < amount {
             return false;
         }
         let mut receivbal = self.balance_of(receiver.clone());
