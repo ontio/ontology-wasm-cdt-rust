@@ -43,8 +43,7 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
     }
     let size = size as usize;
     val.resize(size, 0);
-    if size > val.len() {
-        val.resize(size, 0);
+    if size > INITIAL {
         let value = &mut val[INITIAL..];
         debug_assert!(value.len() == size - INITIAL);
         unsafe {
