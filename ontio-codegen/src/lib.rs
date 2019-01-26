@@ -28,8 +28,14 @@ mod tests {
         fn multi_param(&mut self, from: Address, to: Address, amount: U256) -> bool;
         fn ref_param(&mut self, owner: &Address) -> bool;
         fn slice_param(&mut self, addrs: &[Address]) -> bool;
+        fn mut_param(&mut self, owner: &mut Address) -> bool;
+        fn mut_slice_param(&mut self, owner: &mut [Address]) -> bool;
 
         #[event]
         fn Event(&self, from: Address, to: Address, amount: U256) {}
+        #[event]
+        fn RefParam(&self, from: &Address, to: Address, amount: U256) {}
+        #[event]
+        fn SliceParam(&self, from: &[Address]) {}
     }
 }
