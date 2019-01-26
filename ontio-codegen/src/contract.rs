@@ -147,8 +147,14 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
                 let args = action.params.iter().map(|&(_, ref ty)| {
                     match ty {
                         syn::Type::Reference(refer) => {
-                            let real = &refer.elem;
-                            quote! { &source.read::<#real>().expect(arg_decode_err) }
+                            let real = *refer.elem.clone();
+                            match real {
+                                syn::Type::Slice(slice) => {
+                                    let slice_elem = &slice.elem;
+                                    quote! { source.read::<Vec<#slice_elem>>().expect(arg_decode_err).as_slice() }
+                                }
+                                real => quote! { &source.read::<#real>().expect(arg_decode_err) },
+                            }
                         }
                         ty => {
                             quote! { source.read::<#ty>().expect(arg_decode_err) }

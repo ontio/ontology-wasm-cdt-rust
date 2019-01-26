@@ -27,6 +27,7 @@ mod tests {
         fn ref_self(&self) -> String;
         fn multi_param(&mut self, from: Address, to: Address, amount: U256) -> bool;
         fn ref_param(&mut self, owner: &Address) -> bool;
+        fn slice_param(&mut self, addrs: &[Address]) -> bool;
 
         #[event]
         fn Event(&self, from: Address, to: Address, amount: U256) {}
