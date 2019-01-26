@@ -19,4 +19,16 @@ mod tests {
     fn it_works() {
         assert_eq!(2 + 2, 4);
     }
+
+    use ontio_std::prelude::*;
+    #[ontio_std::abi_codegen::contract]
+    trait TestContract {
+        fn mut_self(&mut self, owner: Address) -> bool;
+        fn ref_self(&self) -> String;
+        fn multi_param(&mut self, from: Address, to: Address, amount: U256) -> bool;
+        fn ref_param(&mut self, owner: &Address) -> bool;
+
+        #[event]
+        fn Event(&self, from: Address, to: Address, amount: U256) {}
+    }
 }

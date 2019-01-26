@@ -144,12 +144,22 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
             &ContractField::Action(ref action) => {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
-                let args = action.params.iter().map(|&(_, ref ty)| quote! { #ty });
+                let args = action.params.iter().map(|&(_, ref ty)| {
+                    match ty {
+                        syn::Type::Reference(refer) => {
+                            let real = &refer.elem;
+                            quote! { &source.read::<#real>().expect(arg_decode_err) }
+                        }
+                        ty => {
+                            quote! { source.read::<#ty>().expect(arg_decode_err) }
+                        }
+                    }
+                });
                 match action.ret {
                     Some(_) => {
                         Some(quote!{
                             #action_literal => {
-                                let res = contract_instance.#action_name(#(source.read::<#args>().expect(arg_decode_err)),*);
+                                let res = contract_instance.#action_name(#(#args),*);
                                 let mut sink = ontio_std::abi::Sink::new(16);
                                 sink.write(res);
                                 sink.into()
