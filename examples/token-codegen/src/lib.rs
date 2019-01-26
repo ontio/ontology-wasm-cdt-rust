@@ -13,30 +13,30 @@ const KEY_APPROVE : &'static str = "a";
 
 #[ostd::abi_codegen::contract]
 pub trait MyToken {
-    fn initialize(&mut self, owner: Address) -> bool;
+    fn initialize(&mut self, owner: &Address) -> bool;
     fn name(&self) -> String;
-    fn balance_of(&self, owner: Address) -> U256;
-    fn transfer(&mut self, from: Address, to: Address, amount: U256) -> bool;
-    fn approve(&mut self, approves: Address, receiver: Address, amount:U256) -> bool;
-    fn transfer_from(&mut self, receiver:Address,approves:Address, amount:U256) -> bool;
-    fn allowance(&mut self, approves:Address, receiver:Address) -> U256;
+    fn balance_of(&self, owner: &Address) -> U256;
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool;
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount:U256) -> bool;
+    fn transfer_from(&mut self, receiver: &Address,approves: &Address, amount:U256) -> bool;
+    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256;
     fn total_supply(&self) -> U256;
 
     #[event]
-    fn Transfer(&self, from: Address, to: Address, amount: U256) {}
+    fn Transfer(&self, from: &Address, to: &Address, amount: U256) {}
     #[event]
-    fn Approve(&self, approves:Address, receiver:Address, amount:U256) {}
+    fn Approve(&self, approves:&Address, receiver: &Address, amount: U256) {}
 }
 
 pub(crate) struct MyTokenInstance;
 
 impl MyToken for MyTokenInstance {
-    fn initialize(&mut self, owner:Address) -> bool {
+    fn initialize(&mut self, owner:&Address) -> bool {
         if database::get::<_, U256>(KEY_TOTAL_SUPPLY).is_some() {
             return false
         }
         database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
-        database::put(&utils::gen_balance_key(&owner), U256::from(TOTAL_SUPPLY));
+        database::put(&utils::gen_balance_key(owner), U256::from(TOTAL_SUPPLY));
         true
     }
 
@@ -44,63 +44,63 @@ impl MyToken for MyTokenInstance {
         "wasm_token".to_string()
     }
 
-    fn balance_of(&self, owner: Address) -> U256 {
-        database::get(&utils::gen_balance_key(&owner)).unwrap_or(U256::zero())
+    fn balance_of(&self, owner: &Address) -> U256 {
+        database::get(&utils::gen_balance_key(owner)).unwrap_or(U256::zero())
     }
 
-    fn transfer(&mut self, from: Address, to: Address, amount: U256) -> bool {
-        if runtime::check_witness(&from) == false {
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool {
+        if runtime::check_witness(from) == false {
             return false;
         }
-        let mut frmbal = self.balance_of(from.clone());
-        let mut tobal = self.balance_of(to.clone());
+        let mut frmbal = self.balance_of(from);
+        let mut tobal = self.balance_of(to);
         if amount == 0.into() || frmbal < amount {
             false
         } else {
             frmbal = frmbal - amount;
             tobal = tobal + amount;
-            database::put(&utils::gen_balance_key(&from), &frmbal);
-            database::put(&utils::gen_balance_key(&to), &tobal);
+            database::put(&utils::gen_balance_key(from), &frmbal);
+            database::put(&utils::gen_balance_key(to), &tobal);
             self.Transfer(from, to, amount);
             true
         }
     }
-    fn approve(&mut self, approves: Address, receiver: Address, amount: U256) -> bool {
-        if runtime::check_witness(&approves) == false {
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U256) -> bool {
+        if runtime::check_witness(approves) == false {
             return false;
         }
-        let apprbal = self.balance_of(approves.clone());
+        let apprbal = self.balance_of(approves);
         if apprbal < amount {
             return false;
         } else {
-            database::put(&utils::gen_approve_key(&approves, &receiver), amount);
+            database::put(&utils::gen_approve_key(approves, receiver), amount);
             self.Approve(approves, receiver, amount);
             true
         }
     }
-    fn transfer_from(&mut self, receiver: Address, approves: Address, amount: U256) -> bool {
-        if runtime::check_witness(&receiver) == false {
+    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U256) -> bool {
+        if runtime::check_witness(receiver) == false {
             return false;
         }
-        let mut allow = self.allowance(approves.clone(), receiver.clone());
+        let mut allow = self.allowance(approves, receiver);
         if allow < amount {
             return false;
         }
-        let mut approbal = self.balance_of(approves.clone());
+        let mut approbal = self.balance_of(approves);
         if approbal < amount {
             return false;
         }
-        let mut receivbal = self.balance_of(receiver.clone());
+        let mut receivbal = self.balance_of(receiver);
         receivbal = receivbal + amount;
         approbal = approbal - amount;
         allow = allow - amount;
-        database::put(utils::gen_approve_key(&approves, &receiver), allow);
-        database::put(utils::gen_balance_key(&approves), approbal);
-        database::put(utils::gen_balance_key(&receiver), receivbal);
+        database::put(utils::gen_approve_key(approves, receiver), allow);
+        database::put(utils::gen_balance_key(approves), approbal);
+        database::put(utils::gen_balance_key(receiver), receivbal);
         true
     }
-    fn allowance(&mut self, approves:Address, receiver:Address) -> U256 {
-        database::get(&utils::gen_approve_key(&approves, &receiver)).unwrap_or(U256::zero())
+    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256 {
+        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or(U256::zero())
     }
     fn total_supply(&self) -> U256 {
         database::get(KEY_TOTAL_SUPPLY).unwrap()
