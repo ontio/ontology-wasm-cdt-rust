@@ -17,6 +17,7 @@ pub trait MyToken {
     fn name(&self) -> String;
     fn balance_of(&self, owner: &Address) -> U256;
     fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool;
+    fn transfer_multi(&mut self, states:&[(Address, Address, U256)]) -> bool;
     fn approve(&mut self, approves: &Address, receiver: &Address, amount:U256) -> bool;
     fn transfer_from(&mut self, receiver: &Address,approves: &Address, amount:U256) -> bool;
     fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256;
@@ -65,6 +66,18 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
+    fn transfer_multi(&mut self, states:&[(Address, Address, U256)]) -> bool {
+        if states.is_empty() {
+            return false;
+        }
+        for state in states.iter() {
+            if self.transfer(&state.0, &state.1, state.2) == false {
+                panic!("transfer failed, from:{}, to:{}, amount:{}", state.0, state.1, state.2);
+            }
+        }
+        true
+    }
+
     fn approve(&mut self, approves: &Address, receiver: &Address, amount: U256) -> bool {
         if runtime::check_witness(approves) == false {
             return false;
