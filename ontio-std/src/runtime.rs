@@ -12,11 +12,37 @@ mod env {
         pub fn notify(ptr: *const u8, len: u32);
         pub fn input_length() -> u32;
         pub fn get_input(dst: *mut u8);
+        pub fn call_contract(addr: *const u8, input_ptr: *const u8, input_len: u32) -> i32;
+        pub fn call_output_length() -> u32;
+        pub fn get_call_output(dst: *mut u8);
 
         pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
         pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
         pub fn storage_delete(key: *const u8, klen: u32);
     }
+}
+
+//todo : return result
+pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
+    let res = unsafe {
+        env::call_contract(addr.as_ref().as_ptr(), input.as_ptr(), input.len() as u32)
+    };
+    if res < 0 {
+        return None;
+    }
+    let size =  unsafe {
+        env::call_output_length()
+    };
+
+    let mut output = vec![0u8; size as usize];
+    if size != 0 {
+        let value = &mut output[..];
+        unsafe {
+            env::get_call_output(value.as_mut_ptr());
+        }
+    }
+
+    Some(output)
 }
 
 pub fn storage_write(key: &[u8], val: &[u8]) {
