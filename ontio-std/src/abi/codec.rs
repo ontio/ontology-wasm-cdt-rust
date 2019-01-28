@@ -192,6 +192,11 @@ impl Encoder for String {
         self.as_str().encode(sink)
     }
 }
+impl Encoder for &String {
+    fn encode(self, sink: &mut Sink) {
+        self.as_str().encode(sink)
+    }
+}
 
 macro_rules! impl_abi_codec_fixed_array {
     () => {};
