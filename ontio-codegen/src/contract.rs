@@ -1,5 +1,6 @@
 use proc_macro2::Span;
 use quote::quote;
+use quote::ToTokens;
 
 pub fn quote(item: syn::Item) -> proc_macro2::TokenStream {
     match item {
@@ -155,6 +156,13 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
                                     match mutability {
                                         Some(_) => quote! { source.read::<Vec<#slice_elem>>().expect(arg_decode_err).as_mut_slice() },
                                         None => quote! { source.read::<Vec<#slice_elem>>().expect(arg_decode_err).as_slice() },
+                                    }
+                                }
+                                syn::Type::Path(ref path) => {
+                                    if path.clone().into_token_stream().to_string() == "str" {
+                                        quote! { source.read::<String>().expect(arg_decode_err).as_str() }
+                                    } else {
+                                        quote! { &#mutability source.read::<#real>().expect(arg_decode_err) }
                                     }
                                 }
                                 real => quote! { &#mutability source.read::<#real>().expect(arg_decode_err) },

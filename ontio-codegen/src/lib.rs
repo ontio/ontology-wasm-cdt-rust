@@ -30,6 +30,7 @@ mod tests {
         fn slice_param(&mut self, addrs: &[Address]) -> bool;
         fn mut_param(&mut self, owner: &mut Address) -> bool;
         fn mut_slice_param(&mut self, owner: &mut [Address]) -> bool;
+        fn str_param(&mut self, owner: &str) -> bool;
 
         #[event]
         fn Event(&self, from: Address, to: Address, amount: U256) {}
