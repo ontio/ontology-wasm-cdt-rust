@@ -34,7 +34,7 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
         env::call_output_length()
     };
 
-    let mut output = vec![0u8; size];
+    let mut output = vec![0u8; size as usize];
     if size != 0 {
         let value = &mut output[..];
         unsafe {
