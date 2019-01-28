@@ -2,6 +2,7 @@
 extern crate ontio_std as ostd;
 use ostd::prelude::*;
 use ostd::abi::Dispatcher;
+use ostd::format;
 use ostd::{database, runtime};
 use ostd::abi::Encoder;
 use sha2::Digest;

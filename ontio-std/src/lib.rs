@@ -43,6 +43,7 @@ pub use alloc::{format, vec};
 pub mod prelude {
     pub use alloc::prelude::*;
     pub use core::prelude::v1::*;
+    pub use alloc::{format, vec};
     pub use crate::types::{H256, Address, U256};
 }
 

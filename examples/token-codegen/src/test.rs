@@ -57,7 +57,7 @@ fn transfer_multi() {
     let owner = &Address::random();
     let alice = &Address::random();
     let bob = &Address::random();
-    setup_runtime(RuntimeBuilder::default().append_witness(owner).append_witness(alice).build());
+    build_runtime().witness(&[owner, alice]);
     let mut token = MyTokenInstance;
     assert!(token.initialize(owner));
     let states = [(owner.clone(), alice.clone(), U256::from(1)),(owner.clone(),bob.clone(),U256::from(2))];

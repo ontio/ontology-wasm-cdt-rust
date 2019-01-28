@@ -1,6 +1,6 @@
 use crate::{Oep5Token, Oep5TokenInstance};
 use ontio_std::types::{U256, Address};
-use ontio_std::mock::{setup_runtime, RuntimeBuilder};
+use ontio_std::mock::build_runtime;
 
 #[test]
 fn initialize() {
@@ -29,7 +29,7 @@ fn transfer() {
     let token_id = token.query_token_id_by_index(U256::from(1));
     assert_eq!(token.owner_of(token_id.clone()), owner.clone());
     let alice = Address::repeat_byte(1);
-    setup_runtime(RuntimeBuilder::default().append_witness(&owner).build());
+    build_runtime().witness(&[owner]);
     assert_eq!(token.transfer(&alice, token_id.clone()), true);
     assert_eq!(token.owner_of(token_id.clone()), alice);
 }
@@ -38,7 +38,7 @@ fn transfer() {
 fn transfer_multi() {
     let mut token = Oep5TokenInstance;
     let owner = Address::zero();
-    setup_runtime(RuntimeBuilder::default().append_witness(&owner).build());
+    build_runtime().witness(&[owner]);
     assert_eq!(token.initialize(&owner), true);
     let alice = Address::repeat_byte(1);
     let bob = Address::repeat_byte(2);
@@ -57,7 +57,7 @@ fn approve() {
     let mut token = Oep5TokenInstance;
     let owner = Address::zero();
     let alice = Address::repeat_byte(1);
-    setup_runtime(RuntimeBuilder::default().append_witness(&owner).append_witness(&alice).build());
+    build_runtime().witness(&[owner, alice]);
     assert_eq!(token.initialize(&owner), true);
     let token_id = token.query_token_id_by_index(U256::from(1));
     assert_eq!(token.approve(&alice, token_id.clone()), true);
