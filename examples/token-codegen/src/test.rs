@@ -1,6 +1,6 @@
 use crate::{MyToken, MyTokenInstance};
 use ontio_std::types::{U256, Address};
-use ontio_std::mock::{setup_runtime, RuntimeBuilder};
+use ontio_std::mock::{build_runtime};
 
 #[test]
 fn get_total_supply() {
@@ -25,7 +25,7 @@ fn transfer_no_witness() {
 fn transfer() {
     let owner = &Address::random();
     let b = &Address::random();
-    setup_runtime(RuntimeBuilder::default().append_witness(owner).build());
+    build_runtime().witness(&[owner]);
     let mut token = MyTokenInstance;
     assert!(token.initialize(owner));
 
@@ -40,13 +40,15 @@ fn transfer() {
 fn approve() {
     let owner = &Address::random();
     let alice = &Address::random();
-    setup_runtime(RuntimeBuilder::default().append_witness(owner).append_witness(alice).build());
     let mut token = MyTokenInstance;
+    let handle = build_runtime();
+    handle.witness(&[owner]);
     assert!(token.initialize(owner));
     assert!(token.approve(owner, alice, U256::from(100)));
     assert_eq!(token.allowance(owner, alice), U256::from(100));
+    assert!(!token.transfer_from(alice, owner, U256::from(100)));
+    handle.witness(&[alice]);
     assert!(token.transfer_from(alice, owner, U256::from(100)));
     assert_eq!(token.allowance(owner, alice), U256::from(0));
 }
-
 

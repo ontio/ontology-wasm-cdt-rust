@@ -24,8 +24,9 @@ mod env {
 
 //todo : return result
 pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
+    let addr: &[u8] =addr.as_ref();
     let res = unsafe {
-        env::call_contract(addr.as_ref().as_ptr(), input.as_ptr(), input.len() as u32)
+        env::call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32)
     };
     if res < 0 {
         return None;
