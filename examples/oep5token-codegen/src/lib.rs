@@ -1,13 +1,10 @@
 #![cfg_attr(not(feature="mock"), no_std)]
-//#![no_std]
 extern crate ontio_std as ostd;
 use ostd::prelude::*;
 use ostd::abi::Dispatcher;
-use ostd::types::{Address, U256};
 use ostd::{database, runtime};
-use ostd::{Vec, string::ToString, String};
 use ostd::abi::Encoder;
-use crypto::digest::Digest;
+use sha2::Digest;
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const INITED: &'static str = "Initialized";
@@ -144,9 +141,9 @@ mod utils {
         [prefix.as_ref(), sink.into().as_slice()].concat()
     }
     pub fn sha256<D: AsRef<[u8]>>(data: D) -> String {
-        let mut hasher = crypto::sha2::Sha256::new();
+        let mut hasher = sha2::Sha256::new();
         hasher.input(data.as_ref());
-        hasher.result_str()
+        format!("{:?}",H256::from_slice(hasher.result().as_slice()))
     }
 }
 
