@@ -1,10 +1,13 @@
 #![cfg_attr(not(feature="mock"), no_std)]
-//#![no_std]
+#![feature(proc_macro_hygiene)]
+
 extern crate ontio_std as ostd;
 
 use ostd::prelude::*;
 use ostd::abi::Dispatcher;
 use ostd::{database, runtime};
+
+const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const TOTAL_SUPPLY: u64 = 100000000000;

@@ -58,6 +58,8 @@ pub mod abi_codegen {
     pub use ontio_codegen::contract;
 }
 
+pub use ontio_codegen::base58;
+
 cfg_if::cfg_if! {
     if #[cfg(feature = "mock")] {
         pub mod mock;

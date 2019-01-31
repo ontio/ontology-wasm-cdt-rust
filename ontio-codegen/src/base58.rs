@@ -12,6 +12,8 @@ pub fn dhash256<D: AsRef<[u8]>>(data: D) -> [u8;32] {
 }
 
 const CHARS: &'static str = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+#[allow(dead_code)]
 pub fn encode_base58(val : &[u8;20]) -> String {
     let mut data = [0u8;25];
     data[0] = 23;
@@ -39,7 +41,7 @@ pub fn encode_base58(val : &[u8;20]) -> String {
 }
 
 pub fn decode_base58(val: &str) -> Result<[u8;20], String> {
-    let mut temp = val.as_bytes().to_vec();
+    let temp = val.as_bytes().to_vec();
     let new_val = String::from_utf8(temp).unwrap();
     let b58 = BigUint::from(58u32);
     let mut bigint: BigUint = Zero::zero();
