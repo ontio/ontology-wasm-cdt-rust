@@ -63,11 +63,15 @@ pub fn decode_base58(val: &str) -> Option<[u8;20]> {
             break
         }
     }
-    let mut origin_data_vec= origin_data.as_slice().to_vec();
-    origin_data_vec.reverse();
-    let mut origin_data_slice = origin_data_vec.as_slice();
-    let hash = dhash256(&origin_data_slice[..21]);
-    assert_eq!(&origin_data_slice[21..], &hash[0..4]);
+    origin_data.reverse();
+    let mut origin_data_slice = origin_data.as_slice();
+    if origin_data.len() != 25 {
+        return None;
+    }
+    let hash = dhash256(&origin_data[..21]);
+    if &origin_data[21..] != &hash[0..4] {
+        return None;
+    }
     let mut res = [0u8;20];
     res.copy_from_slice(&origin_data_slice[1..21]);
     Some(res)
