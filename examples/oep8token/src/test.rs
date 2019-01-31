@@ -46,6 +46,10 @@ fn transfer() {
     assert!(token.transfer(&owner, &alice, U256::from(10), token_id_1.clone()));
     assert_eq!(token.balance_of(&owner, token_id_1.clone()), U256::from(100000) - U256::from(10));
     assert_eq!(token.balance_of(&alice, token_id_1.clone()), U256::from(10));
+    let bob = Address::random();
+    let states = [(owner, alice,U256::from(1000), token_id_1.clone()), (owner, bob,U256::from(1000), token_id_1.clone())];
+    assert!(token.transfer_multi(&states));
+    assert_eq!(token.balance_of(&bob, token_id_1.clone()), U256::from(1000));
 }
 
 #[test]
@@ -57,7 +61,27 @@ fn approve() {
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     assert!(token.approve(&owner, &alice, U256::from(10), token_id_1.clone()));
+    assert_eq!(token.allowance(&owner,&alice, token_id_1.clone()), U256::from(10));
     assert!(token.transfer_from(&alice,&owner, &alice, U256::from(10), token_id_1.clone()));
+    assert_eq!(token.allowance(&owner,&alice, token_id_1.clone()), U256::from(0));
+    assert_eq!(token.balance_of(&alice, token_id_1.clone()), U256::from(10));
 }
+
+#[test]
+fn approve_multi() {
+    let mut token = Oep8TokenInstance;
+    let owner = Address::zero();
+    let alice = Address::random();
+    build_runtime().witness(&[owner, alice]);
+    assert!(token.init());
+    let token_id_1 = format!("{}", 1);
+    let states = [(owner, alice,U256::from(10000), token_id_1.clone())];
+    assert!(token.approve_multi(&states));
+    let transfer_from_state = [(alice, owner,alice,U256::from(100), token_id_1.clone())];
+    assert!(token.transfer_from_multi(&transfer_from_state));
+    assert_eq!(token.balance_of(&alice, token_id_1.clone()), U256::from(100));
+}
+
+
 
 

@@ -119,6 +119,8 @@ impl Oep8Token for Oep8TokenInstance {
         database::put(&utils::concat(token_id.clone(), (BALANCE,from)), fromval - amount);
         let toval = self.balance_of(to, token_id.clone());
         database::put(&utils::concat(token_id.clone(), (BALANCE, to)), toval + amount);
+        let approve_key = utils::concat(token_id, (APPROVE, from, spender));
+        database::put(&approve_key, approval-amount);
         true
     }
     fn approve_multi(&mut self, obj:&[(Address, Address, U256, String)]) -> bool {
