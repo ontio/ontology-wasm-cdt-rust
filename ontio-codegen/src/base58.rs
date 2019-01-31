@@ -38,7 +38,7 @@ pub fn encode_base58(val : &[u8;20]) -> String {
     String::from_utf8(chars).unwrap()
 }
 
-pub fn decode_base58(val: &str) -> Option<[u8;20]> {
+pub fn decode_base58(val: &str) -> Result<[u8;20], String> {
     let mut temp = val.as_bytes().to_vec();
     let new_val = String::from_utf8(temp).unwrap();
     let b58 = BigUint::from(58u32);
@@ -46,7 +46,7 @@ pub fn decode_base58(val: &str) -> Option<[u8;20]> {
     for c in new_val.chars() {
         match CHARS.find(c) {
             None => {
-                return None
+                return Err("invalid char".to_string())
             },
             Some(x) => {
                 bigint = bigint * &b58 + x.to_biguint().unwrap();
@@ -64,17 +64,16 @@ pub fn decode_base58(val: &str) -> Option<[u8;20]> {
         }
     }
     origin_data.reverse();
-    let mut origin_data_slice = origin_data.as_slice();
     if origin_data.len() != 25 {
-        return None;
+        return Err("error length".to_string());
     }
     let hash = dhash256(&origin_data[..21]);
     if &origin_data[21..] != &hash[0..4] {
-        return None;
+        return Err("Hash check failed".to_string());
     }
     let mut res = [0u8;20];
-    res.copy_from_slice(&origin_data_slice[1..21]);
-    Some(res)
+    res.copy_from_slice(&origin_data[1..21]);
+    Ok(res)
 }
 
 #[test]
