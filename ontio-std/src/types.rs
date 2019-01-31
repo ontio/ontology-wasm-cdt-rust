@@ -24,3 +24,15 @@ impl AsRef<H256> for H256 {
 pub type Address = H160;
 
 pub use bigint::U256;
+
+impl H160 {
+    pub const fn new(val: [u8;20]) -> Self {
+        H160(val)
+    }
+}
+
+impl H256 {
+    pub const fn new(val: [u8;32]) -> Self {
+        H256(val)
+    }
+}
