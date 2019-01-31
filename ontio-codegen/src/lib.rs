@@ -4,6 +4,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 
 mod contract;
+mod base58;
 
 #[proc_macro_attribute]
 pub fn contract(_metadata: TokenStream, input: TokenStream) -> TokenStream {
