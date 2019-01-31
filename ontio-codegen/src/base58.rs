@@ -1,5 +1,5 @@
 use sha2::{Sha256, Digest};
-use num::bigint::BigUint;
+use num::bigint::{ToBigUint, BigUint};
 use num::traits::Zero;
 use num::traits::cast::ToPrimitive;
 use num::integer::Integer;
@@ -19,10 +19,10 @@ pub fn encode_base58(val : &[u8;20]) -> String {
     let hash = dhash256(&data[..21]);
     data[21..].copy_from_slice(&hash[0..4]);
     let b256 = BigUint::from(256u32);
+
     let mut bigint = data.iter().fold(BigUint::from(0u32), |sum, v| {
         sum*&b256 + v
     });
-
     let b58 = BigUint::from(58u32);
     let mut chars = Vec::with_capacity(20);
     loop {
@@ -39,11 +39,43 @@ pub fn encode_base58(val : &[u8;20]) -> String {
 }
 
 pub fn decode_base58(val: &str) -> Option<[u8;20]> {
-    //todo
-    None
+    let mut temp = val.as_bytes().to_vec();
+    let new_val = String::from_utf8(temp).unwrap();
+    let b58 = BigUint::from(58u32);
+    let mut bigint: BigUint = Zero::zero();
+    for c in new_val.chars() {
+        match CHARS.find(c) {
+            None => {
+                return None
+            },
+            Some(x) => {
+                bigint = bigint * &b58 + x.to_biguint().unwrap();
+            }
+        }
+    }
+    let b256 = BigUint::from(256u32);
+    let mut origin_data = Vec::with_capacity(25);
+    loop {
+        let (left, c) = bigint.div_rem(&b256);
+        bigint = left;
+        origin_data.push(c.to_u8().unwrap_or_default());
+        if bigint.is_zero() {
+            break
+        }
+    }
+    let mut origin_data_vec= origin_data.as_slice().to_vec();
+    origin_data_vec.reverse();
+    let mut origin_data_slice = origin_data_vec.as_slice();
+    let hash = dhash256(&origin_data_slice[..21]);
+    assert_eq!(&origin_data_slice[21..], &hash[0..4]);
+    let mut res = [0u8;20];
+    res.copy_from_slice(&origin_data_slice[1..21]);
+    Some(res)
 }
 
 #[test]
 fn base58_encode() {
     assert_eq!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM", encode_base58(&[0;20]));
+    assert_eq!([0;20], decode_base58(encode_base58(&[0;20]).as_str()).unwrap());
+
 }
