@@ -11,6 +11,8 @@ proc-macro = true
 syn = { version = "0.15.24", features = ["full", "extra-traits"] }
 quote = "0.6"
 proc-macro2 = "0.4.24"
+sha2 = { version = "0.8", default-features = false }
+num = { version = "0.2"}
 
 [dev-dependencies]
 ontio-std  = {path="../ontio-std"}
