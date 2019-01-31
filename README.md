@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.com/laizy/ontio-cdk.svg?branch=master)](https://travis-ci.com/laizy/ontio-cdk)
 
+[English](README_EN.md) | 中文
+
 `ontio-cdk`是用于使用rust开发面向ontology的WebAssembly智能合约工具套件, 包含合约编写的标准库，链上交互的运行时api，合约接口abi生成插件，
 合约测试框架等。
 
