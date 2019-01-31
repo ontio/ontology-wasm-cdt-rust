@@ -12,11 +12,12 @@ pub fn dhash256<D: AsRef<[u8]>>(data: D) -> [u8;32] {
 }
 
 const CHARS: &'static str = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const PREFIX : u8 = 23;
 
 #[allow(dead_code)]
 pub fn encode_base58(val : &[u8;20]) -> String {
     let mut data = [0u8;25];
-    data[0] = 23;
+    data[0] = PREFIX;
     data[1..21].copy_from_slice(val);
     let hash = dhash256(&data[..21]);
     data[21..].copy_from_slice(&hash[0..4]);
@@ -69,6 +70,10 @@ pub fn decode_base58(val: &str) -> Result<[u8;20], String> {
     if origin_data.len() != 25 {
         return Err(format!("error length, expected: {}, got: {}", 25, origin_data.len()));
     }
+    if origin_data[0] != PREFIX {
+        return Err(format!("prefix mismatch, expected: {}, got: {}", PREFIX, origin_data[0]));
+    }
+
     let hash = dhash256(&origin_data[..21]);
     if &origin_data[21..] != &hash[0..4] {
         return Err(format!("hash check failed, expected:{:?}, got: {:?}", &origin_data[21..], &hash[0..4]));
