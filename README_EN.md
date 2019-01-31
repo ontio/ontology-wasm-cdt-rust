@@ -71,9 +71,9 @@ pub fn invoke() {
 cargo build --release --target wasm32-unknown-unknown
 ```
 
-## Code generation macro
+## Procedural Macros
 
-The contract is usually written from the byte array of the input parameter to parse the specific call method and call parameters, then jump to the corresponding function to execute, and finally serialize the execution result into a byte array return. This is similar to how the web server retrieves the byte stream from the network, parses out the specific request, executes the corresponding handler function, and serializes the result into a byte stream that is sent back to the network. Therefore, such fixed and cumbersome work can be handled in the same way as the web development framework, so that the contract developers focus on the development of the contract itself. `ontio_std` provides code generation macros that automatically generate auxiliary code at compile time based on the contract interface. The basic contract structure of a code generation macro is as follows:
+The contract is usually written from the byte array of the input parameter to parse the specific call method and call parameters, then jump to the corresponding function to execute, and finally serialize the execution result into a byte array and return. This is similar to how the web server retrieves the byte stream from the network, parses out the specific request, executes the corresponding handler function, and serializes the result into a byte stream that is sent back to the network. Therefore, such fixed and cumbersome work can be handled in the same way as the web development framework, so that the contract developers focus on the development of the contract itself. `ontio_std` provides code generation macros that automatically generate auxiliary code at compile time based on the contract interface. The basic contract structure of a code generation macro is as follows:
 
 ```rust
 #[ontio_std::abi_codegen::contract]
@@ -127,3 +127,20 @@ To use the test function, you need to set the feature in Cargo.toml:
 mock = ["ontio-std/mock"]
 ```
 After writing the test case, run the contract test using `cargo test --features=mock`.
+
+## License
+
+This project is licensed under the [MIT license](LICENSE).
+
+### Third party software
+
+To quickly explore the feasibility of wasm contract development, initial development is based on the work make by third parties:
+
+* `contract` macro and some api design is based on
+  [pwasm-std](https://github.com/paritytech/pwasm-std) licensed under the MIT license or the Apache License (Version 2.0).
+* contract test feature includes copies and modifications of [pwasm-test](https://github.com/paritytech/pwasm-test) 
+
+See the source code files for more details.
+
+Copies of third party licenses can be found in [LICENSE-THIRD-PARTY](LICENSE-THIRD-PARTY).
+
