@@ -46,7 +46,7 @@ pub fn decode_base58(val: &str) -> Result<[u8;20], String> {
     for c in new_val.chars() {
         match CHARS.find(c) {
             None => {
-                return Err("invalid char".to_string())
+                return Err(format!("invalid char: {}", c))
             },
             Some(x) => {
                 bigint = bigint * &b58 + x.to_biguint().unwrap();
@@ -65,11 +65,11 @@ pub fn decode_base58(val: &str) -> Result<[u8;20], String> {
     }
     origin_data.reverse();
     if origin_data.len() != 25 {
-        return Err("error length".to_string());
+        return Err(format!("error length, expected: {}, got: {}", 25, origin_data.len()));
     }
     let hash = dhash256(&origin_data[..21]);
     if &origin_data[21..] != &hash[0..4] {
-        return Err("Hash check failed".to_string());
+        return Err(format!("hash check failed, expected:{:?}, got: {:?}", &origin_data[21..], &hash[0..4]));
     }
     let mut res = [0u8;20];
     res.copy_from_slice(&origin_data[1..21]);
