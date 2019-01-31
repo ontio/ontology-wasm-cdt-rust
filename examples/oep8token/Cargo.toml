@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 ontio-std = {path="../../ontio-std"}
+rust-base58 = "0.0.4"
 
 [features]
 mock = ["ontio-std/mock"]

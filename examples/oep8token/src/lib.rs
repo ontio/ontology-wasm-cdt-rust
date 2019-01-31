@@ -6,7 +6,6 @@ use ostd::{database, runtime};
 use ostd::abi::Encoder;
 
 
-static ADMIN:[u8;20] = [];
 const INITED:&'static str = "Initialized";
 //const TOKEN_ID_LIST: [u8; 5]= [1,2,3,4,5];
 const NAME:&'static str = "name";
@@ -45,7 +44,8 @@ impl Oep8Token for Oep8TokenInstance {
         if database::get::<_,bool>(INITED).unwrap_or_default() == true {
             return false;
         } else {
-            assert!(runtime::check_witness(&ADMIN));
+            let admin = Address::zero();
+            assert!(runtime::check_witness(&admin));
             assert!(self.create_multi_type_token());
             database::put(INITED, true)
         }
@@ -114,11 +114,11 @@ impl Oep8Token for Oep8TokenInstance {
         assert!(amount > U256::zero());
         assert_eq!(runtime::check_witness(spender), true);
         let approval = self.allowance(from, spender, token_id.clone());
-        assert!(amount < approval);
+        assert!(amount <= approval);
         let fromval = self.balance_of(from, token_id.clone());
         database::put(&utils::concat(token_id.clone(), (BALANCE,from)), fromval - amount);
         let toval = self.balance_of(to, token_id.clone());
-        database::put(utils::concat(token_id.clone(), (BALANCE, to)), toval + amount);
+        database::put(&utils::concat(token_id.clone(), (BALANCE, to)), toval + amount);
         true
     }
     fn approve_multi(&mut self, obj:&[(Address, Address, U256, String)]) -> bool {
@@ -150,16 +150,16 @@ impl Oep8Token for Oep8TokenInstance {
         let token_name_list = ["TokenNameFirst", "TokenNameSecond", "TokenNameThird", "TokenNameFourth", "TokenNameFifth"];
         let token_symbol_list = ["TNF", "TNS", "TNH", "TNO", "TNI"];
         let token_supply_list = [U256::from(100000), U256::from(200000), U256::from(300000), U256::from(400000), U256::from(500000)];
-        for index in 0..4 {
+        for index in 0..5 {
             let token_name = token_name_list[index];
             let token_symbol = token_symbol_list[index];
             let token_total_supply = token_supply_list[index];
-            let token_id =  format!("{}", index);
+            let token_id =  format!("{}", index+1);
             database::put(&utils::concat(token_id.clone(), NAME), token_name);
             database::put(&utils::concat(token_id.clone(), SYMBOL), token_symbol);
             database::put(&utils::concat(token_id.clone(), TOTAL_SUPPLY), token_total_supply);
-            database::put(&utils::concat(token_id.clone(), (BALANCE, ADMIN)), token_total_supply);
-            self.Transfer(&Address::zero(), &ADMIN, token_total_supply, token_id);
+            database::put(&utils::concat(token_id.clone(), (BALANCE, Address::zero())), token_total_supply);
+            self.Transfer(&Address::zero(), &Address::zero(), token_total_supply, token_id);
         }
         true
     }
