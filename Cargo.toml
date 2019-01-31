@@ -6,6 +6,7 @@ members = [
     "examples/token",
     "examples/token-codegen",
     "examples/oep5token",
+    "examples/oep8token",
 ]
 
 [profile.release]
