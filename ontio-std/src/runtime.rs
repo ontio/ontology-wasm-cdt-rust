@@ -100,7 +100,7 @@ pub fn address() -> Address {
 
     addr
 }
-//return Caller's contract address
+///return Caller's contract address
 pub fn caller() -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
@@ -108,7 +108,7 @@ pub fn caller() -> Address {
     }
     addr
 }
-//Check signature
+///Check signature
 pub fn check_witness(addr: &Address) -> bool {
     unsafe { env::checkwitness(addr.as_ptr()) != 0 }
 }
@@ -134,7 +134,7 @@ pub fn ret(data: &[u8]) -> ! {
         env::ret(data.as_ptr(), data.len() as u32);
     }
 }
-//Save event
+///Save event
 pub fn notify(data: &[u8]) {
     unsafe {
         env::notify(data.as_ptr(), data.len() as u32);
