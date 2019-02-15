@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature="mock"), no_std)]
+#![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
 use ostd::prelude::*;
 use ostd::abi::Dispatcher;
@@ -13,6 +14,7 @@ const SYMBOL:&'static str = "Symbol";
 const BALANCE:&'static str = "Balance";
 const TOTAL_SUPPLY:&'static str = "TotalSupply";
 const APPROVE:&'static str = "Approve";
+const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 #[ostd::abi_codegen::contract]
 pub trait Oep8Token {
@@ -44,8 +46,7 @@ impl Oep8Token for Oep8TokenInstance {
         if database::get::<_,bool>(INITED).unwrap_or_default() == true {
             return false;
         } else {
-            let admin = Address::zero();
-            assert!(runtime::check_witness(&admin));
+            assert!(runtime::check_witness(&_ADDR_EMPTY));
             assert!(self.create_multi_type_token());
             database::put(INITED, true)
         }
@@ -160,8 +161,8 @@ impl Oep8Token for Oep8TokenInstance {
             database::put(&utils::concat(token_id.clone(), NAME), token_name);
             database::put(&utils::concat(token_id.clone(), SYMBOL), token_symbol);
             database::put(&utils::concat(token_id.clone(), TOTAL_SUPPLY), token_total_supply);
-            database::put(&utils::concat(token_id.clone(), (BALANCE, Address::zero())), token_total_supply);
-            self.Transfer(&Address::zero(), &Address::zero(), token_total_supply, token_id);
+            database::put(&utils::concat(token_id.clone(), (BALANCE, _ADDR_EMPTY)), token_total_supply);
+            self.Transfer(&_ADDR_EMPTY, &_ADDR_EMPTY, token_total_supply, token_id);
         }
         true
     }

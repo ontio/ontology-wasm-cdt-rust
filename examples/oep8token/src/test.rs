@@ -6,7 +6,7 @@ use ontio_std::mock::build_runtime;
 #[test]
 fn init() {
     let mut token = Oep8TokenInstance;
-    let owner = Address::zero();
+    let owner:Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     build_runtime().witness(&[owner]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
@@ -38,7 +38,7 @@ fn init() {
 #[test]
 fn transfer() {
     let mut token = Oep8TokenInstance;
-    let owner = Address::zero();
+    let owner:Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     build_runtime().witness(&[owner]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
@@ -55,7 +55,7 @@ fn transfer() {
 #[test]
 fn approve() {
     let mut token = Oep8TokenInstance;
-    let owner = Address::zero();
+    let owner:Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     let alice = Address::random();
     build_runtime().witness(&[owner, alice]);
     assert!(token.init());
@@ -70,7 +70,7 @@ fn approve() {
 #[test]
 fn approve_multi() {
     let mut token = Oep8TokenInstance;
-    let owner = Address::zero();
+    let owner:Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     let alice = Address::random();
     build_runtime().witness(&[owner, alice]);
     assert!(token.init());
