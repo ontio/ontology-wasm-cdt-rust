@@ -1,4 +1,4 @@
-use super::types::Address;
+use super::types::{Address, H256};
 use super::{vec, Vec};
 
 mod env {
@@ -15,6 +15,8 @@ mod env {
         pub fn call_contract(addr: *const u8, input_ptr: *const u8, input_len: u32) -> i32;
         pub fn call_output_length() -> u32;
         pub fn get_call_output(dst: *mut u8);
+        pub fn current_block_hash(dest: *mut u8);
+        pub fn current_tx_hash(dest: *mut u8);
 
         pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
         pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
@@ -100,7 +102,7 @@ pub fn address() -> Address {
 
     addr
 }
-
+///return Caller's contract address
 pub fn caller() -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
@@ -108,7 +110,23 @@ pub fn caller() -> Address {
     }
     addr
 }
-
+///return current block hash
+pub fn current_block_hash() -> H256 {
+    let mut blockhash = H256::zero();
+    unsafe {
+        env::current_block_hash(blockhash.as_mut().as_mut_ptr());
+    }
+    blockhash
+}
+///return current tx hash
+pub fn current_tx_hash() -> H256 {
+    let mut txhash = H256::zero();
+    unsafe {
+        env::current_tx_hash(txhash.as_mut().as_mut_ptr());
+    }
+    txhash
+}
+///Check signature
 pub fn check_witness(addr: &Address) -> bool {
     unsafe { env::checkwitness(addr.as_ptr()) != 0 }
 }
@@ -134,7 +152,7 @@ pub fn ret(data: &[u8]) -> ! {
         env::ret(data.as_ptr(), data.len() as u32);
     }
 }
-
+///Save event
 pub fn notify(data: &[u8]) {
     unsafe {
         env::notify(data.as_ptr(), data.len() as u32);
