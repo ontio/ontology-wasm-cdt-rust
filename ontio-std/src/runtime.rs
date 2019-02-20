@@ -114,7 +114,7 @@ pub fn caller() -> Address {
 pub fn current_block_hash() -> H256 {
     let mut blockhash = H256::zero();
     unsafe {
-        env::get_current_block_hash(blockhash.as_mut().as_mut_ptr());
+        env::current_block_hash(blockhash.as_mut().as_mut_ptr());
     }
     blockhash
 }
@@ -122,7 +122,7 @@ pub fn current_block_hash() -> H256 {
 pub fn current_tx_hash() -> H256 {
     let mut txhash = H256::zero();
     unsafe {
-        env::get_current_tx_hash(txhash.as_mut().as_mut_ptr());
+        env::current_tx_hash(txhash.as_mut().as_mut_ptr());
     }
     txhash
 }
