@@ -66,7 +66,7 @@ pub fn invoke() {
     runtime::ret(&sink.into())
 }
 
-fn notify<T:Encoder>(msg: T) {
+fn notify<T: Encoder>(msg: T) {
     let mut sink = Sink::new(16);
     sink.write(msg);
     runtime::notify(&sink.into());

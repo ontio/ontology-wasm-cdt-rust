@@ -1,15 +1,16 @@
-use super::{Encoder, Decoder};
 use super::Error;
+use super::{Decoder, Encoder};
 use super::{Sink, Source};
 
 use crate::cmp;
 use crate::types::{Address, H256, U256};
-use crate::{Vec, String};
+use crate::{String, Vec};
 
 impl Decoder for u8 {
     fn decode(source: &mut Source) -> Result<Self, Error> {
         source.read_byte()
-    }}
+    }
+}
 
 impl Encoder for u8 {
     fn encode(&self, sink: &mut Sink) {
@@ -28,7 +29,6 @@ impl Encoder for u16 {
         sink.write_u16(*self)
     }
 }
-
 
 impl Decoder for u32 {
     fn decode(source: &mut Source) -> Result<Self, Error> {
@@ -123,7 +123,10 @@ impl<T: Decoder> Decoder for Vec<T> {
     }
 }
 
-impl<T> Encoder for &[T] where T: Encoder {
+impl<T> Encoder for &[T]
+where
+    T: Encoder,
+{
     fn encode(&self, sink: &mut Sink) {
         sink.write_varuint(self.len() as u64);
         for item in *self {
@@ -153,7 +156,7 @@ impl Encoder for String {
     }
 }
 
-impl<T:Encoder> Encoder for &T {
+impl<T: Encoder> Encoder for &T {
     fn encode(&self, sink: &mut Sink) {
         (*self).encode(sink)
     }

@@ -1,6 +1,6 @@
 use crate::{MyToken, MyTokenInstance};
-use ontio_std::types::{U256, Address};
-use ontio_std::mock::{build_runtime};
+use ontio_std::mock::build_runtime;
+use ontio_std::types::{Address, U256};
 
 #[test]
 fn get_total_supply() {
@@ -60,10 +60,11 @@ fn transfer_multi() {
     build_runtime().witness(&[owner, alice]);
     let mut token = MyTokenInstance;
     assert!(token.initialize(owner));
-    let states = [(owner.clone(), alice.clone(), U256::from(1)),(owner.clone(),bob.clone(),U256::from(2))];
+    let states = [
+        (owner.clone(), alice.clone(), U256::from(1)),
+        (owner.clone(), bob.clone(), U256::from(2)),
+    ];
     assert_eq!(token.transfer_multi(&states), true);
-    assert_eq!(token.balance_of(&alice),U256::from(1));
-    assert_eq!(token.balance_of(&bob),U256::from(2));
+    assert_eq!(token.balance_of(&alice), U256::from(1));
+    assert_eq!(token.balance_of(&bob), U256::from(2));
 }
-
-

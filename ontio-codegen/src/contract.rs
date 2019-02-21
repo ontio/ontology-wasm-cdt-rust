@@ -29,11 +29,7 @@ impl Contract {
     pub(crate) fn from_item_trait(item_trait: syn::ItemTrait) -> Self {
         Contract {
             name: item_trait.ident,
-            fields: item_trait
-                .items
-                .into_iter()
-                .map(ContractField::from_trait_item)
-                .collect(),
+            fields: item_trait.items.into_iter().map(ContractField::from_trait_item).collect(),
         }
     }
 }
@@ -48,8 +44,7 @@ enum ContractField {
 fn is_event(method: &syn::TraitItemMethod) -> bool {
     method.attrs.iter().any(|attr| {
         if attr.style == syn::AttrStyle::Outer {
-            attr.path
-                .is_ident(syn::Ident::new("event", Span::call_site()))
+            attr.path.is_ident(syn::Ident::new("event", Span::call_site()))
         } else {
             false
         }
@@ -100,12 +95,7 @@ impl ContractAction {
             syn::ReturnType::Type(_, ty) => Some(*ty),
         };
 
-        ContractAction {
-            name: method.sig.ident,
-            params: params,
-            ret: ret,
-            method: m,
-        }
+        ContractAction { name: method.sig.ident, params: params, ret: ret, method: m }
     }
 }
 
@@ -200,7 +190,8 @@ fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
 
     let contract_name = &contract.name;
 
-    let dispatcher_name = syn::Ident::new(&format!("{}Dispatcher",contract_name), Span::call_site());
+    let dispatcher_name =
+        syn::Ident::new(&format!("{}Dispatcher", contract_name), Span::call_site());
 
     quote! {
         pub struct #dispatcher_name<T:#contract_name> {
@@ -240,8 +231,8 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
             &ContractField::Event(ref event) => {
                 let event_sig = &event.method_sig;
                 let event_body = match &event.default {
-//                    Some(body) => quote! { #body },
-//                    None => {
+                    //                    Some(body) => quote! { #body },
+                    //                    None => {
                     //disable default implementation
                     _ => {
                         let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
@@ -275,5 +266,3 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
 
     }
 }
-
-

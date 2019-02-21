@@ -41,18 +41,18 @@ pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
 pub mod prelude {
+    pub use crate::types::{Address, H256, U256};
     pub use alloc::prelude::*;
-    pub use core::prelude::v1::*;
     pub use alloc::{format, vec};
-    pub use crate::types::{H256, Address, U256};
+    pub use core::prelude::v1::*;
 }
 
 pub use core::cmp;
 
 pub mod abi;
 pub mod console;
-pub mod runtime;
 pub mod database;
+pub mod runtime;
 pub mod types;
 pub mod abi_codegen {
     pub use ontio_codegen::contract;
