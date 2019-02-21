@@ -18,7 +18,8 @@ mod env {
         pub fn current_block_hash(dest: *mut u8);
         pub fn current_tx_hash(dest: *mut u8);
 
-        pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
+        pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32)
+            -> u32;
         pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
         pub fn storage_delete(key: *const u8, klen: u32);
     }
@@ -26,16 +27,12 @@ mod env {
 
 //todo : return result
 pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
-    let addr: &[u8] =addr.as_ref();
-    let res = unsafe {
-        env::call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32)
-    };
+    let addr: &[u8] = addr.as_ref();
+    let res = unsafe { env::call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
     if res < 0 {
         return None;
     }
-    let size =  unsafe {
-        env::call_output_length()
-    };
+    let size = unsafe { env::call_output_length() };
 
     let mut output = vec![0u8; size as usize];
     if size != 0 {
@@ -61,14 +58,14 @@ pub fn storage_delete(key: &[u8]) {
 }
 
 pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
-    const INITIAL:usize = 32;
+    const INITIAL: usize = 32;
     let mut val = vec![0; INITIAL];
     let size = unsafe {
         env::storage_read(key.as_ptr(), key.len() as u32, val.as_mut_ptr(), val.len() as u32, 0)
     };
 
     if size == core::u32::MAX {
-        return None
+        return None;
     }
     let size = size as usize;
     val.resize(size, 0);
@@ -76,7 +73,13 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
         let value = &mut val[INITIAL..];
         debug_assert!(value.len() == size - INITIAL);
         unsafe {
-            env::storage_read(key.as_ptr(), key.len() as u32, value.as_mut_ptr(), value.len() as u32, INITIAL as u32)
+            env::storage_read(
+                key.as_ptr(),
+                key.len() as u32,
+                value.as_mut_ptr(),
+                value.len() as u32,
+                INITIAL as u32,
+            )
         };
     }
 

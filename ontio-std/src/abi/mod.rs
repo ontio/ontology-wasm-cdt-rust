@@ -12,7 +12,7 @@ pub enum Error {
     InvalidUtf8,
 }
 
-pub trait Decoder:Sized {
+pub trait Decoder: Sized {
     fn decode(source: &mut Source) -> Result<Self, Error>;
 }
 

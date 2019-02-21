@@ -8,9 +8,7 @@ pub struct Sink {
 
 impl Sink {
     pub fn new(cap: usize) -> Self {
-        Sink {
-            buf: Vec::with_capacity(cap),
-        }
+        Sink { buf: Vec::with_capacity(cap) }
     }
 
     pub fn write<T: Encoder>(&mut self, val: T) {

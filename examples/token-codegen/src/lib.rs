@@ -1,18 +1,18 @@
-#![cfg_attr(not(feature="mock"), no_std)]
+#![cfg_attr(not(feature = "mock"), no_std)]
 #![feature(proc_macro_hygiene)]
 
 extern crate ontio_std as ostd;
 
-use ostd::prelude::*;
 use ostd::abi::Dispatcher;
+use ostd::prelude::*;
 use ostd::{database, runtime};
 
 const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const TOTAL_SUPPLY: u64 = 100000000000;
-const KEY_BALANCE : &'static str = "b";
-const KEY_APPROVE : &'static str = "a";
+const KEY_BALANCE: &'static str = "b";
+const KEY_APPROVE: &'static str = "a";
 
 #[ostd::abi_codegen::contract]
 pub trait MyToken {
@@ -20,31 +20,31 @@ pub trait MyToken {
     fn name(&self) -> String;
     fn balance_of(&self, owner: &Address) -> U256;
     fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool;
-    fn transfer_multi(&mut self, states:&[(Address, Address, U256)]) -> bool;
-    fn approve(&mut self, approves: &Address, receiver: &Address, amount:U256) -> bool;
-    fn transfer_from(&mut self, receiver: &Address,approves: &Address, amount:U256) -> bool;
+    fn transfer_multi(&mut self, states: &[(Address, Address, U256)]) -> bool;
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U256) -> bool;
+    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U256) -> bool;
     fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256;
     fn total_supply(&self) -> U256;
 
     #[event]
     fn Transfer(&self, from: &Address, to: &Address, amount: U256) {}
     #[event]
-    fn Approve(&self, approves:&Address, receiver: &Address, amount: U256) {}
+    fn Approve(&self, approves: &Address, receiver: &Address, amount: U256) {}
 }
 
 pub(crate) struct MyTokenInstance;
 
 impl MyToken for MyTokenInstance {
-    fn initialize(&mut self, owner:&Address) -> bool {
+    fn initialize(&mut self, owner: &Address) -> bool {
         if database::get::<_, U256>(KEY_TOTAL_SUPPLY).is_some() {
-            return false
+            return false;
         }
         database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
         database::put(&utils::gen_balance_key(owner), U256::from(TOTAL_SUPPLY));
         true
     }
 
-    fn name(&self) ->String {
+    fn name(&self) -> String {
         "wasm_token".to_string()
     }
 
@@ -69,7 +69,7 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
-    fn transfer_multi(&mut self, states:&[(Address, Address, U256)]) -> bool {
+    fn transfer_multi(&mut self, states: &[(Address, Address, U256)]) -> bool {
         if states.is_empty() {
             return false;
         }
@@ -134,8 +134,8 @@ mod utils {
     pub fn gen_balance_key(addr: &Address) -> Vec<u8> {
         [KEY_BALANCE.as_bytes(), addr.as_ref()].concat()
     }
-    pub fn gen_approve_key(approves:&Address, receiver:&Address) -> Vec<u8> {
-        let mut key:Vec<u8> = KEY_APPROVE.as_bytes().to_vec();
+    pub fn gen_approve_key(approves: &Address, receiver: &Address) -> Vec<u8> {
+        let mut key: Vec<u8> = KEY_APPROVE.as_bytes().to_vec();
         key.extend_from_slice(approves.as_ref());
         key.extend_from_slice(receiver.as_ref());
         key

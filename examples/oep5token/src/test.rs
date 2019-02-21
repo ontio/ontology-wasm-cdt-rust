@@ -1,6 +1,6 @@
 use crate::{Oep5Token, Oep5TokenInstance};
-use ontio_std::types::{U256, Address};
 use ontio_std::mock::build_runtime;
+use ontio_std::types::{Address, U256};
 
 #[test]
 fn initialize() {
@@ -46,7 +46,7 @@ fn transfer_multi() {
     let token_id_2 = token.query_token_id_by_index(U256::from(2));
     assert_eq!(token.owner_of(token_id_1.clone()), owner);
     assert_eq!(token.owner_of(token_id_2.clone()), owner);
-    let states = [(alice.clone(),token_id_1.clone()),(bob.clone(), token_id_2.clone())];
+    let states = [(alice.clone(), token_id_1.clone()), (bob.clone(), token_id_2.clone())];
     assert_eq!(token.transfer_multi(&states), true);
     assert_eq!(token.owner_of(token_id_1.clone()), alice);
     assert_eq!(token.owner_of(token_id_2.clone()), bob);
@@ -66,4 +66,3 @@ fn approve() {
     assert_eq!(token.take_ownership(token_id.clone()), true);
     assert_eq!(token.owner_of(token_id.clone()), alice.clone());
 }
-
