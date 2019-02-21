@@ -12,12 +12,7 @@ impl Decoder for u8 {
     }}
 
 impl Encoder for u8 {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_byte(self)
-    }
-}
-impl Encoder for &u8 {
-    fn encode(self, sink: &mut Sink) {
+    fn encode(&self, sink: &mut Sink) {
         sink.write_byte(*self)
     }
 }
@@ -29,16 +24,11 @@ impl Decoder for u16 {
 }
 
 impl Encoder for u16 {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_u16(self)
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_u16(*self)
     }
 }
 
-impl Encoder for &u16 {
-    fn encode(self, sink: &mut Sink) {
-        (*self).encode(sink)
-    }
-}
 
 impl Decoder for u32 {
     fn decode(source: &mut Source) -> Result<Self, Error> {
@@ -47,14 +37,8 @@ impl Decoder for u32 {
 }
 
 impl Encoder for u32 {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_u32(self)
-    }
-}
-
-impl Encoder for &u32 {
-    fn encode(self, sink: &mut Sink) {
-        (*self).encode(sink)
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_u32(*self)
     }
 }
 
@@ -65,14 +49,8 @@ impl Decoder for u64 {
 }
 
 impl Encoder for u64 {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_u64(self)
-    }
-}
-
-impl Encoder for &u64 {
-    fn encode(self, sink: &mut Sink) {
-        (*self).encode(sink)
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_u64(*self)
     }
 }
 
@@ -83,14 +61,8 @@ impl Decoder for bool {
 }
 
 impl Encoder for bool {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_bool(self)
-    }
-}
-
-impl Encoder for &bool {
-    fn encode(self, sink: &mut Sink) {
-        (*self).encode(sink)
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_bool(*self)
     }
 }
 
@@ -102,15 +74,9 @@ impl Decoder for Address {
     }
 }
 
-impl Encoder for &Address {
-    fn encode(self, sink: &mut Sink) {
-        sink.write_bytes(self.as_ref())
-    }
-}
-
 impl Encoder for Address {
-    fn encode(self, sink: &mut Sink) {
-        (&self).encode(sink)
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_bytes(self.as_ref())
     }
 }
 
@@ -122,8 +88,8 @@ impl Decoder for H256 {
     }
 }
 
-impl Encoder for &H256 {
-    fn encode(self, sink: &mut Sink) {
+impl Encoder for H256 {
+    fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(self.as_ref())
     }
 }
@@ -136,17 +102,11 @@ impl Decoder for U256 {
     }
 }
 
-impl Encoder for &U256 {
-    fn encode(self, sink: &mut Sink) {
+impl Encoder for U256 {
+    fn encode(&self, sink: &mut Sink) {
         let mut buf = [0; 32];
         self.to_little_endian(&mut buf);
         sink.write_bytes(&buf)
-    }
-}
-
-impl Encoder for U256 {
-    fn encode(self, sink: &mut Sink) {
-        (&self).encode(sink)
     }
 }
 
@@ -163,10 +123,10 @@ impl<T: Decoder> Decoder for Vec<T> {
     }
 }
 
-impl<T> Encoder for &[T] where for<'a> &'a T: Encoder {
-    fn encode(self, sink: &mut Sink) {
+impl<T> Encoder for &[T] where T: Encoder {
+    fn encode(&self, sink: &mut Sink) {
         sink.write_varuint(self.len() as u64);
-        for item in self {
+        for item in *self {
             sink.write(item);
         }
     }
@@ -181,20 +141,21 @@ impl Decoder for String {
 }
 
 impl Encoder for &str {
-    fn encode(self, sink: &mut Sink) {
+    fn encode(&self, sink: &mut Sink) {
         sink.write_varuint(self.len() as u64);
         sink.write_bytes(self.as_bytes());
     }
 }
 
 impl Encoder for String {
-    fn encode(self, sink: &mut Sink) {
+    fn encode(&self, sink: &mut Sink) {
         self.as_str().encode(sink)
     }
 }
-impl Encoder for &String {
-    fn encode(self, sink: &mut Sink) {
-        self.as_str().encode(sink)
+
+impl<T:Encoder> Encoder for &T {
+    fn encode(&self, sink: &mut Sink) {
+        (*self).encode(sink)
     }
 }
 
@@ -210,8 +171,8 @@ macro_rules! impl_abi_codec_fixed_array {
         }
 
         impl Encoder for [u8; $num] {
-            fn encode(self, sink: &mut Sink) {
-                sink.write_bytes(&self)
+            fn encode(&self, sink: &mut Sink) {
+                sink.write_bytes(self)
             }
         }
     } ;
@@ -256,7 +217,7 @@ for_each_tuple! {
         }
 
         impl<$($item: Encoder),*> Encoder for ($($item,)*) {
-            fn encode(self, _sink: &mut Sink) {
+            fn encode(&self, _sink: &mut Sink) {
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
                 $(_sink.write($item);)*

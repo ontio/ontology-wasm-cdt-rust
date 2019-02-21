@@ -17,7 +17,7 @@ pub trait Decoder:Sized {
 }
 
 pub trait Encoder {
-    fn encode(self, sink: &mut Sink);
+    fn encode(&self, sink: &mut Sink);
 }
 
 pub trait Dispatcher {
