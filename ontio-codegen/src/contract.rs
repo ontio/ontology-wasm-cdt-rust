@@ -95,7 +95,7 @@ impl ContractAction {
             syn::ReturnType::Type(_, ty) => Some(*ty),
         };
 
-        ContractAction { name: method.sig.ident, params: params, ret: ret, method: m }
+        ContractAction { name: method.sig.ident, params, ret, method: m }
     }
 }
 
@@ -115,15 +115,15 @@ impl ContractEvent {
             .inputs
             .iter()
             .filter_map(|arg| match arg {
-                &syn::FnArg::SelfRef(_) | &syn::FnArg::SelfValue(_) => None,
-                &syn::FnArg::Captured(ref capt) => Some((capt.pat.clone(), capt.ty.clone())),
+                syn::FnArg::SelfRef(_) | syn::FnArg::SelfValue(_) => None,
+                syn::FnArg::Captured(ref capt) => Some((capt.pat.clone(), capt.ty.clone())),
                 _ => panic!("unsupported FnArg type"),
             })
             .collect();
         ContractEvent {
             name: method.sig.ident.clone(),
             method_sig: method.sig,
-            params: params,
+            params,
             default: method.default,
         }
     }
@@ -132,7 +132,7 @@ impl ContractEvent {
 fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
     let actions: Vec<proc_macro2::TokenStream> = contract.fields.iter().filter_map(|field| {
         match field {
-            &ContractField::Action(ref action) => {
+            ContractField::Action(ref action) => {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
                 let args = action.params.iter().map(|&(_, ref ty)| {
@@ -228,7 +228,7 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
         .fields
         .iter()
         .map(|field| match field {
-            &ContractField::Event(ref event) => {
+            ContractField::Event(ref event) => {
                 let event_sig = &event.method_sig;
                 let event_body = match &event.default {
                     //                    Some(body) => quote! { #body },
@@ -250,11 +250,11 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
                     #event_body
                 }
             }
-            &ContractField::Action(ref action) => {
+            ContractField::Action(ref action) => {
                 let method = &action.method;
                 quote! { #method }
             }
-            &ContractField::Unhandle(ref item) => quote! { #item },
+            ContractField::Unhandle(ref item) => quote! { #item },
         })
         .collect();
 
