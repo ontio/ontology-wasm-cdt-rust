@@ -11,13 +11,13 @@ construct_fixed_hash! {
 
 impl AsRef<H160> for H160 {
     fn as_ref(&self) -> &H160 {
-        return self;
+        self
     }
 }
 
 impl AsRef<H256> for H256 {
     fn as_ref(&self) -> &H256 {
-        return self;
+        self
     }
 }
 impl H256 {
@@ -65,7 +65,7 @@ pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
         if temp[end - 1] >= 0x80 {
             res.push(0);
         }
-        return res;
+        res
     } else {
         vec![0]
     }
@@ -83,21 +83,22 @@ pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
         if temp[end - 1] < 0x80 {
             res.push(255);
         }
-        return res;
+
+        res
     } else {
         vec![255]
     }
 }
 
 pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
-    if buf.len() == 0 {
+    if buf.is_empty() {
         return 0;
     }
     let neg = buf[buf.len() - 1] >= 0x80;
     let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
 
     let mut result = [0u8; 16];
-    if (buf.len() > 16 && neg == true) || (buf.len() > 17 && neg == false) {
+    if (buf.len() > 16 && neg) || (buf.len() > 17 && !neg) {
         return default;
     }
     if buf.len() == 17 && buf[16] != 0 {

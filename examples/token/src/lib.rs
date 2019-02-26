@@ -8,7 +8,7 @@ use ostd::{database, runtime};
 const KEY_TOTAL_SUPPLY: &str = "total_supply";
 const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
-const TOTAL_SUPPLY: U128 = 100000000000;
+const TOTAL_SUPPLY: U128 = 100_000_000_000;
 
 fn initialize() -> bool {
     database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);

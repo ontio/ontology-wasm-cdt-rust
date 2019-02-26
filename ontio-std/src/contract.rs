@@ -13,7 +13,7 @@ pub mod ont {
     const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 
     pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
-        let state = [TransferParam { from: from.clone(), to: to.clone(), amount: val }];
+        let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, state.as_ref())
     }
 
@@ -47,7 +47,7 @@ pub mod ong {
     const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
 
     pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
-        let state = [TransferParam { from: from.clone(), to: to.clone(), amount: val }];
+        let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, state.as_ref())
     }
 
@@ -92,7 +92,7 @@ pub(crate) mod util {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
-            if data.len() != 0 {
+            if !data.is_empty() {
                 return true;
             }
         }
@@ -112,7 +112,7 @@ pub(crate) mod util {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
-            if data.len() != 0 {
+            if !data.is_empty() {
                 return true;
             }
         }
@@ -133,7 +133,7 @@ pub(crate) mod util {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
-            if data.len() != 0 {
+            if !data.is_empty() {
                 return true;
             }
         }
@@ -152,7 +152,7 @@ pub(crate) mod util {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
-            if data.len() != 0 {
+            if !data.is_empty() {
                 return u128_from_neo_bytes(&data);
             }
         }
@@ -168,7 +168,7 @@ pub(crate) mod util {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
-            if data.len() != 0 {
+            if !data.is_empty() {
                 return u128_from_neo_bytes(&data);
             }
         }

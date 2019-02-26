@@ -5,13 +5,13 @@ use ostd::abi::Encoder;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
-const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
-const INITED: &'static str = "Initialized";
-const PREFIX_INDEX: &'static str = "01";
-const PREFIX_APPROVE: &'static str = "03";
-const PREFIX_OWNER: &'static str = "04";
-const PREFIX_TOKEN_ID: &'static str = "05";
-const PREFIX_BALANCE: &'static str = "06";
+const KEY_TOTAL_SUPPLY: &str = "total_supply";
+const INITED: &str = "Initialized";
+const PREFIX_INDEX: &str = "01";
+const PREFIX_APPROVE: &str = "03";
+const PREFIX_OWNER: &str = "04";
+const PREFIX_TOKEN_ID: &str = "05";
+const PREFIX_BALANCE: &str = "06";
 
 #[ostd::macros::contract]
 pub trait Oep5Token {
@@ -37,9 +37,9 @@ pub(crate) struct Oep5TokenInstance;
 
 impl Oep5Token for Oep5TokenInstance {
     fn initialize(&mut self, owner: &Address) -> bool {
-        if database::get::<_, bool>(INITED).unwrap_or_default() == false {
+        if !database::get::<_, bool>(INITED).unwrap_or_default() {
             database::put(INITED, true);
-            if self.create_multi_tokens(owner) == true {
+            if self.create_multi_tokens(owner) {
                 return true;
             }
         }
@@ -63,11 +63,11 @@ impl Oep5Token for Oep5TokenInstance {
         database::get(&utils::concat(PREFIX_BALANCE, address)).unwrap_or_default()
     }
     fn owner_of(&self, token_id: String) -> Address {
-        database::get(&utils::concat(PREFIX_OWNER, &token_id)).unwrap_or(Address::zero())
+        database::get(&utils::concat(PREFIX_OWNER, &token_id)).unwrap_or_else(Address::zero)
     }
     fn transfer(&mut self, to: &Address, token_id: String) -> bool {
         let owner = self.owner_of(token_id.clone());
-        if runtime::check_witness(&owner) == false {
+        if !runtime::check_witness(&owner) {
             return false;
         }
         database::put(&utils::concat(PREFIX_OWNER, &token_id), to);
@@ -78,7 +78,7 @@ impl Oep5Token for Oep5TokenInstance {
             return false;
         }
         for state in states.iter() {
-            if self.transfer(&state.0, state.1.clone()) == false {
+            if !self.transfer(&state.0, state.1.clone()) {
                 panic!("transfer failed, to:{}, token_id:{}", state.0, state.1);
             }
         }
@@ -86,7 +86,7 @@ impl Oep5Token for Oep5TokenInstance {
     }
     fn approve(&mut self, to: &Address, token_id: String) -> bool {
         let owner = self.owner_of(token_id.clone());
-        if runtime::check_witness(&owner) == false {
+        if !runtime::check_witness(&owner) {
             return false;
         }
         database::put(&utils::concat(PREFIX_APPROVE, &token_id), to);
@@ -97,7 +97,7 @@ impl Oep5Token for Oep5TokenInstance {
     }
     fn take_ownership(&mut self, token_id: String) -> bool {
         let to = self.get_approved(token_id.clone());
-        if runtime::check_witness(&to) == false {
+        if !runtime::check_witness(&to) {
             return false;
         }
         database::put(&utils::concat(PREFIX_OWNER, &token_id), to);
@@ -109,7 +109,7 @@ impl Oep5Token for Oep5TokenInstance {
             ("HEART 2", "http://images.com/hearta.jpg"),
         ];
         for card in cards.iter() {
-            if self.create_one_token(card.0, card.1, "CARD", owner) == false {
+            if !self.create_one_token(card.0, card.1, "CARD", owner) {
                 return false;
             }
         }

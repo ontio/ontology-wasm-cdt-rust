@@ -2,8 +2,14 @@
 set -e
 set -x
 
-RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
+if rustup component add clippy;
+then
+	cargo clippy --all -- -Dwarnings;
+else
+	echo 'Skipping clippy';
+fi
 
+RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
 
 root_dir=$(pwd)
 

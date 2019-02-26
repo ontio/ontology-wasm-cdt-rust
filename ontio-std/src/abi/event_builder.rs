@@ -18,6 +18,12 @@ pub struct EventBuilder {
     num_entry: u32,
 }
 
+impl Default for EventBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EventBuilder {
     pub fn new() -> Self {
         let mut eb = EventBuilder { sink: Sink::new(DEFAULT_CAP), num_entry: 0 };

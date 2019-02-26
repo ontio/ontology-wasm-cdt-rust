@@ -6,7 +6,7 @@ use ostd::prelude::*;
 use ostd::runtime;
 
 fn say_hello() -> String {
-    return "hello world".to_string();
+    "hello world".to_string()
 }
 
 #[no_mangle]

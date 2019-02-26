@@ -9,10 +9,10 @@ use ostd::{database, runtime};
 
 const _ADDR_EMPTY: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
-const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
-const TOTAL_SUPPLY: U128 = 100000000000;
-const KEY_BALANCE: &'static str = "b";
-const KEY_APPROVE: &'static str = "a";
+const KEY_TOTAL_SUPPLY: &str = "total_supply";
+const TOTAL_SUPPLY: U128 = 100_000_000_000;
+const KEY_BALANCE: &str = "b";
+const KEY_APPROVE: &str = "a";
 
 #[ostd::macros::contract]
 pub trait MyToken {
@@ -39,8 +39,8 @@ impl MyToken for MyTokenInstance {
         if database::get::<_, U128>(KEY_TOTAL_SUPPLY).is_some() {
             return false;
         }
-        database::put(KEY_TOTAL_SUPPLY, U128::from(TOTAL_SUPPLY));
-        database::put(&utils::gen_balance_key(owner), U128::from(TOTAL_SUPPLY));
+        database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);
+        database::put(&utils::gen_balance_key(owner), TOTAL_SUPPLY);
         true
     }
 
@@ -53,7 +53,7 @@ impl MyToken for MyTokenInstance {
     }
 
     fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool {
-        if runtime::check_witness(from) == false {
+        if !runtime::check_witness(from) {
             return false;
         }
         let mut frmbal = self.balance_of(from);
@@ -61,8 +61,8 @@ impl MyToken for MyTokenInstance {
         if amount == 0 || frmbal < amount {
             false
         } else {
-            frmbal = frmbal - amount;
-            tobal = tobal + amount;
+            frmbal -= amount;
+            tobal += amount;
             database::put(&utils::gen_balance_key(from), &frmbal);
             database::put(&utils::gen_balance_key(to), &tobal);
             self.Transfer(from, to, amount);
@@ -74,7 +74,7 @@ impl MyToken for MyTokenInstance {
             return false;
         }
         for state in states.iter() {
-            if self.transfer(&state.0, &state.1, state.2) == false {
+            if !self.transfer(&state.0, &state.1, state.2) {
                 panic!("transfer failed, from:{}, to:{}, amount:{}", state.0, state.1, state.2);
             }
         }
@@ -82,12 +82,12 @@ impl MyToken for MyTokenInstance {
     }
 
     fn approve(&mut self, approves: &Address, receiver: &Address, amount: U128) -> bool {
-        if runtime::check_witness(approves) == false {
+        if !runtime::check_witness(approves) {
             return false;
         }
         let apprbal = self.balance_of(approves);
         if apprbal < amount {
-            return false;
+            false
         } else {
             database::put(&utils::gen_approve_key(approves, receiver), amount);
             self.Approve(approves, receiver, amount);
@@ -95,7 +95,7 @@ impl MyToken for MyTokenInstance {
         }
     }
     fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U128) -> bool {
-        if runtime::check_witness(receiver) == false {
+        if !runtime::check_witness(receiver) {
             return false;
         }
         let mut allow = self.allowance(approves, receiver);
@@ -107,9 +107,9 @@ impl MyToken for MyTokenInstance {
             return false;
         }
         let mut receivbal = self.balance_of(receiver);
-        receivbal = receivbal + amount;
-        approbal = approbal - amount;
-        allow = allow - amount;
+        receivbal += amount;
+        approbal -= amount;
+        allow -= amount;
         database::put(utils::gen_approve_key(approves, receiver), allow);
         database::put(utils::gen_balance_key(approves), approbal);
         database::put(utils::gen_balance_key(receiver), receivbal);

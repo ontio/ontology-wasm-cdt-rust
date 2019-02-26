@@ -38,7 +38,7 @@ unsafe impl GlobalAlloc for BumpAlloc {
             let need_page = (pos + need_bytes - inner.size + PAGE_SIZE - 1) / PAGE_SIZE;
             match alloc_pages(need_page) {
                 Some(p) => {
-                    if inner.pos == ptr::null_mut() {
+                    if inner.pos.is_null() {
                         inner.pos = p;
                     }
                     inner.size = (p as usize) + need_page * PAGE_SIZE;
