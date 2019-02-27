@@ -35,6 +35,7 @@ where
     index_size: Vec<(u32, u32)>,  //index, count
     cache: BTreeMap<u32, Vec<T>>, //index, vec
 }
+
 impl<T> Drop for List<T>
 where
     T: Encoder + Decoder,
@@ -43,6 +44,7 @@ where
         self.flush();
     }
 }
+
 impl<T> List<T>
 where
     T: Encoder + Decoder,
@@ -89,7 +91,15 @@ where
         }
     }
 
-    pub fn remove(&mut self, index: u32) {
+    pub fn pop(&mut self) -> Option<T> {
+        if self.size == 0 {
+            None
+        } else {
+            Some(self.remove(self.size - 1))
+        }
+    }
+
+    pub fn remove(&mut self, index: u32) -> T {
         if index >= self.size {
             panic!("index out of bound");
         } else {
@@ -105,8 +115,8 @@ where
             let mut bulk = &mut self.index_size[ind];
             let start = end - bulk.1;
             //if data in cache
-            if let Some(x) = self.cache.get_mut(&bulk.0) {
-                x.remove((index - start) as usize);
+            let val = if let Some(x) = self.cache.get_mut(&bulk.0) {
+                x.remove((index - start) as usize)
             } else {
                 //read data from database
                 let key = format!("{}{}", self.key, bulk.0);
@@ -117,9 +127,10 @@ where
                 for _ in 0..l {
                     temp.push(source.read().unwrap());
                 }
-                temp.remove((index - start) as usize);
+                let val = temp.remove((index - start) as usize);
                 self.cache.insert(bulk.0, temp);
-            }
+                val
+            };
             //update need_flush
             if !self.need_flush.contains(&bulk.0) {
                 self.need_flush.push(bulk.0);
@@ -128,9 +139,11 @@ where
             bulk.1 = bulk.1 - 1;
             //update list size
             self.size = self.size - 1;
+            val
         }
     }
-    pub fn append(&mut self, payload: T) {
+
+    pub fn push(&mut self, payload: T) {
         //if null list
         if self.index_size.is_empty() {
             //update cache
@@ -183,6 +196,7 @@ where
         }
         self.size = self.size + 1;
     }
+
     pub fn insert(&mut self, index: u32, payload: T) {
         if index >= self.size {
             panic!("index out of bound");
@@ -316,7 +330,7 @@ where
 fn test_insert() {
     let mut list: List<String> = List::new("key".to_string());
     for x in 0..90 {
-        list.append(format!("hello{}", x));
+        list.push(format!("hello{}", x));
     }
     list.insert(64, "hello90".to_string());
     assert_eq!(list.size, 91);
@@ -333,8 +347,8 @@ fn test_insert() {
 #[test]
 fn list_node() {
     let mut list: List<String> = List::new("key".to_string());
-    list.append("value".to_string());
-    list.append("sss".to_string());
+    list.push("value".to_string());
+    list.push("sss".to_string());
     //    list.append(123);
     assert_eq!(list.size, 2);
     if let Some(x) = list.get(1) {
@@ -357,7 +371,7 @@ fn list_node() {
 fn test_iter() {
     let mut list: List<String> = List::new("key".to_string());
     for x in 0..90 {
-        list.append(format!("hello{}", x));
+        list.push(format!("hello{}", x));
     }
     let iter = &mut list.iter();
     let mut i = 0;
@@ -373,4 +387,53 @@ fn test_iter() {
             break;
         }
     }
+}
+
+#[test]
+fn mock_test() {
+    for _n in 0..1000 {
+        let mut list : List<u64> = List::new("key".to_string());
+        let mut array = Vec::new();
+        for _i in 0..100 {
+            match rand::random::<u8>()  {
+                0..50 => {
+                    let val = rand::random();
+                    list.push(val);
+                    array.push(val);
+                }
+                51..100 => {
+                    if array.len() != 0 {
+                    let val = rand::random();
+                    let pos = rand::random::<usize>() % array.len();
+                    list.insert(pos as u32, val);
+                    array.insert(pos , val);
+                    }
+                }
+                101..150 => {
+                    if array.len() != 0 {
+                        let pos = rand::random::<usize>() % array.len();
+                        let val = list.get(pos as u32);
+                        assert_eq!(val, array.get(pos as usize));
+                    }
+                }
+                151..180 => {
+                    if array.len() != 0 {
+                        let pos = rand::random::<usize>() % array.len();
+                        list.remove(pos as u32);
+                        array.remove(pos );
+                    }
+                }
+                181..200 => {
+                    let mut temp = Vec::new();
+                    let mut iter = list.iter();
+                    while let Some(val) = iter.next() {
+                        temp.push(*val);
+                    }
+                    assert_eq!(temp, array);
+                }
+                _ => (),
+            }
+        }
+    }
+
 }
