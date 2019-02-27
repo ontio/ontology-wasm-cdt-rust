@@ -3,12 +3,14 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/ontio/ontology/core/payload"
 	sdkcom "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/ontio/ontology/smartcontract/states"
 )
 
+const VERSION_TRANSACTION = byte(0)
 
 type DemoContract struct {
 	contractAddr common.Address
@@ -32,15 +34,24 @@ func(this *DemoContract) Deploy(gasPrice, gasLimit uint64,
 	if err != nil {
 		return nil, fmt.Errorf("code hex decode error:%s", err)
 	}
-	tx := this.vm.NewDeployWasmVMCodeTransaction(gasPrice, gasLimit, &sdkcom.SmartContract{
-		Code:        invokeCode,
-		NeedStorage: needStorage,
-		Name:        name,
-		Version:     version,
-		Author:      author,
-		Email:       email,
-		Description: desc,
-	})
+	deployPayload := &payload.DeployCode{
+    		Code:        invokeCode,
+    		NeedStorage: needStorage,
+    		Name:        name,
+    		Version:     version,
+    		Author:      author,
+    		Email:       email,
+    		Description: desc,
+    	}
+    	tx := &types.MutableTransaction{
+    		Version:  VERSION_TRANSACTION,
+    		TxType:   types.Deploy,
+    		Nonce:    uint32(time.Now().Unix()),
+    		Payload:  deployPayload,
+    		GasPrice: gasPrice,
+    		GasLimit: gasLimit,
+    		Sigs:     make([]types.Sig, 0, 0),
+    	}
 	return tx, nil
 }
 
