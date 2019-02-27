@@ -123,6 +123,12 @@ impl<T: Decoder> Decoder for Vec<T> {
     }
 }
 
+impl<T: Encoder> Encoder for Vec<T> {
+    fn encode(&self, sink: &mut Sink) {
+        self.as_slice().encode(sink);
+    }
+}
+
 impl<T> Encoder for &[T]
 where
     T: Encoder,

@@ -10,7 +10,6 @@ use sha2::Digest;
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const INITED: &'static str = "Initialized";
 const PREFIX_INDEX: &'static str = "01";
-const KEY_TOKEN_ID: &'static str = "02";
 const PREFIX_APPROVE: &'static str = "03";
 const PREFIX_OWNER: &'static str = "04";
 const PREFIX_TOKEN_ID: &'static str = "05";
@@ -58,7 +57,7 @@ impl Oep5Token for Oep5TokenInstance {
         database::get(&utils::concat(PREFIX_INDEX, &idx)).unwrap_or_default()
     }
     fn query_token_by_id(&self, token_id: String) -> String {
-        let (id, name, image, token_type): (String, String, String, String) =
+        let (_, _, image, _): (String, String, String, String) =
             database::get(&utils::concat(PREFIX_TOKEN_ID, &token_id)).unwrap_or_default();
         image
     }
@@ -150,7 +149,7 @@ mod utils {
         [prefix.as_ref(), sink.into().as_slice()].concat()
     }
     pub fn sha256<D: AsRef<[u8]>>(data: D) -> String {
-        let mut hasher = sha2::Sha256::new();
+        let mut hasher = <sha2::Sha256 as Digest>::new();
         hasher.input(data.as_ref());
         format!("{:?}", H256::from_slice(hasher.result().as_slice()))
     }
