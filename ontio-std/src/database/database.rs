@@ -1,7 +1,6 @@
-use super::abi::{Decoder, Encoder, Error, Sink, Source};
+use super::abi::{Decoder, Encoder, Sink, Source};
 use super::prelude::*;
 use super::runtime;
-
 
 pub fn get<K: AsRef<[u8]>, T: Decoder>(key: K) -> Option<T> {
     runtime::storage_read(key.as_ref()).map(|val| {

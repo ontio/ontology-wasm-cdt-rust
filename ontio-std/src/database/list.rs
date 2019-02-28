@@ -1,26 +1,26 @@
 use super::abi::{Decoder, Encoder, Error, Sink, Source};
-use super::{database, runtime};
-use crate::{String, format, Vec};
+use super::database;
+use crate::{format, String, Vec};
 use alloc::collections::BTreeMap;
 
 //slice default size
 const INDEX_SIZE: u32 = 64;
 
 pub struct List<T>
-    where
-        T: Encoder + Decoder,
+where
+    T: Encoder + Decoder,
 {
     key: String,
     need_flush: Vec<u32>, //index,store all index which slice need update
-size: u32,
+    size: u32,
     next_key_id: u32,
     index_size: Vec<(u32, u32)>,  //index, count
-cache: BTreeMap<u32, Vec<T>>, //index, vec
+    cache: BTreeMap<u32, Vec<T>>, //index, vec
 }
 
 impl<T> Drop for List<T>
-    where
-        T: Encoder + Decoder,
+where
+    T: Encoder + Decoder,
 {
     fn drop(&mut self) {
         self.flush();
@@ -28,8 +28,8 @@ impl<T> Drop for List<T>
 }
 
 impl<T> List<T>
-    where
-        T: Encoder + Decoder,
+where
+    T: Encoder + Decoder,
 {
     fn encode(&self, sink: &mut Sink) {
         sink.write(self.next_key_id);
@@ -72,7 +72,9 @@ impl<T> List<T>
             }
         }
     }
-
+    pub fn len(&self) -> u32 {
+        self.size
+    }
     pub fn pop(&mut self) -> Option<T> {
         if self.size == 0 {
             None
@@ -276,16 +278,16 @@ impl<T> List<T>
 }
 
 pub struct Iterator<'a, T>
-    where
-        T: Encoder + Decoder,
+where
+    T: Encoder + Decoder,
 {
     cursor: u32,
     list: &'a mut List<T>,
 }
 
 impl<'a, T> Iterator<'a, T>
-    where
-        T: Encoder + Decoder,
+where
+    T: Encoder + Decoder,
 {
     fn new(cursor: u32, list: &mut List<T>) -> Iterator<T> {
         Iterator { cursor: cursor, list: list }
@@ -374,10 +376,10 @@ fn test_iter() {
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
-        let mut list : List<u64> = List::new("key".to_string());
+        let mut list: List<u64> = List::new("key".to_string());
         let mut array = Vec::new();
         for _i in 0..100 {
-            match rand::random::<u8>()  {
+            match rand::random::<u8>() {
                 0..50 => {
                     let val = rand::random();
                     list.push(val);
@@ -388,7 +390,7 @@ fn mock_test() {
                         let val = rand::random();
                         let pos = rand::random::<usize>() % array.len();
                         list.insert(pos as u32, val);
-                        array.insert(pos , val);
+                        array.insert(pos, val);
                     }
                 }
                 101..150 => {
@@ -402,7 +404,7 @@ fn mock_test() {
                     if array.len() != 0 {
                         let pos = rand::random::<usize>() % array.len();
                         list.remove(pos as u32);
-                        array.remove(pos );
+                        array.remove(pos);
                     }
                 }
                 181..200 => {
@@ -417,5 +419,4 @@ fn mock_test() {
             }
         }
     }
-
 }
