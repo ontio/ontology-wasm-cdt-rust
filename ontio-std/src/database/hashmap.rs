@@ -118,20 +118,6 @@ where
                 }
             }
         }
-        //        let mut remove_index = Vec::new();
-        //        {
-        //            let iter = &mut self.key_list.iter();
-        //            while let Some(key) = iter.next() {
-        //                if self.remove_list.contains(key) {
-        //                    self.remove_list.remove(index as usize);
-        //                    remove_index.push(index);
-        //                }
-        //                index += 1;
-        //            }
-        //        }
-        //        for index in remove_index {
-        //            self.key_list.remove(index);
-        //        }
         self.remove_list.clear();
         self.key_list.flush();
     }
@@ -227,4 +213,22 @@ fn iter() {
     m2.remove(&"hello0".to_string());
     assert_eq!(m2.size, 89);
     assert_eq!(m2.get(&"hello0".to_string()), None);
+}
+
+#[test]
+fn remove() {
+    let mut m = HashMap::new("test".to_string());
+    for i in 0..90 {
+        m.put(format!("hello{}", i), format!("world{}", i));
+    }
+    assert_eq!(m.size, 90);
+
+    for x in 0..30 {
+        m.remove(&format!("hello{}", x));
+    }
+    assert_eq!(m.size, 60);
+
+    for x in 0..30 {
+        assert_eq!(m.get(&format!("hello{}", x)), None);
+    }
 }
