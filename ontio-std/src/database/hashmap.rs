@@ -33,7 +33,7 @@ where
     K: AsRef<[u8]> + Encoder + Decoder + Ord + Clone,
     V: Encoder + Decoder + Clone,
 {
-    pub fn new(key: String) -> HashMap<K, V> {
+    pub(crate) fn new(key: String) -> HashMap<K, V> {
         let cache: BTreeMap<K, V> = BTreeMap::new();
         HashMap {
             size: 0,
@@ -53,19 +53,19 @@ where
     pub fn put(&mut self, key: K, value: V) {
         //push_key==true means database does not have the key
         //key can not be same in key list
-        let mut push_key = true;
-        if self.cache.contains_key(&key) {
-            push_key = false;
-        } else {
-            if let Some(_) = database::get::<_, V>(&key) {
-                push_key = false;
-            }
+        if !self.contains_key(&key) {
+            self.key_list.push(key.clone());
+            self.size += 1;
+        }
+        if self.remove_list.contains(&key) {
+            let ind = self.remove_list.iter().take_while(|x| {
+                *x != &key
+            }).count();
+            self.remove_list.remove(ind);
         }
         self.cache.insert(key.clone(), value);
-        self.need_flush.push(key.clone());
-        if push_key {
-            self.key_list.push(key);
-            self.size += 1;
+        if !self.need_flush.contains(&key) {
+            self.need_flush.push(key);
         }
     }
 
@@ -79,20 +79,35 @@ where
         }
         self.cache.get(&key)
     }
+    pub fn contains_key(&mut self, key:&K) -> bool {
+        if self.cache.contains_key(key) {
+            return true;
+        }
+        if self.remove_list.contains(key) {
+            return false;
+        } else {
+            if let Some(_data) = database::get::<_,V>(key) {
+                return true;
+            }
+        }
+        false
+    }
 
     pub fn remove(&mut self, key: &K) {
         if self.size < 1 {
             return;
         }
-        //if key in cache
-        if self.cache.contains_key(key) {
-            self.cache.remove(key);
-        }
-        database::delete(key);
         //store all remove key, when flush, will update key list
-        if !self.remove_list.contains(key) {
-            self.remove_list.push(key.clone());
-            self.size -= 1;
+        if self.contains_key(key) {
+            if !self.remove_list.contains(key) {
+                self.remove_list.push(key.clone());
+                self.size -= 1;
+            }
+            database::delete(key);
+            //if key in cache
+            if self.cache.contains_key(key) {
+                self.cache.remove(key);
+            }
         }
     }
     pub fn flush(&mut self) {
@@ -120,6 +135,20 @@ where
         }
         self.remove_list.clear();
         self.key_list.flush();
+    }
+
+    pub fn clear(&mut self) {
+        let size = self.key_list.len();
+        for i in 0..size {
+            if let Some(key) = self.key_list.get(i) {
+                database::delete(key);
+            }
+        }
+        self.key_list.clear();
+        self.need_flush.clear();
+        self.cache.clear();
+        self.remove_list.clear();
+        self.size = 0;
     }
 
     pub fn iter(&mut self) -> Iterator<K, V> {
@@ -248,17 +277,20 @@ fn iter_remove() {
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
-        let mut map:HashMap<String, u32> = HashMap::new("key".to_string());
+        let mut map:HashMap<String, u32> = HashMap::open("key".to_string());
+        map.clear();
         let mut bmap:BTreeMap<String, u32> = BTreeMap::new();
-        for _i in 0..100 {
-            match rand::random::<u8>() {
+        for _i in 0..1000 {
+            match rand::random::<u8>()%150 {
                 0..50 => {
-                    let val = rand::random();
+                    assert_eq!(map.size, bmap.len() as u32);
+                    let val = rand::random::<u32>() % 50;
                     map.put(format!("{}", val), val);
                     bmap.insert(format!("{}", val), val);
                 }
                 51..100 => {
                     if bmap.len() != 0 {
+                        assert_eq!(map.size, bmap.len() as u32);
                         let pos = rand::random::<usize>() % bmap.len();
                         let val = map.get(&format!("{}", pos));
                         assert_eq!(val, bmap.get(&format!("{}", pos)));
@@ -266,6 +298,7 @@ fn mock_test() {
                 }
                 101..150 => {
                     if bmap.len() != 0 {
+                        assert_eq!(map.size, bmap.len() as u32);
                         let pos = rand::random::<usize>() % bmap.len();
                         map.remove(&format!("{}", pos));
                         bmap.remove(&format!("{}", pos));

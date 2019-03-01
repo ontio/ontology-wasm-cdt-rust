@@ -50,7 +50,7 @@ where
         })
     }
 
-    pub fn new(key: String) -> List<T> {
+    pub(crate) fn new(key: String) -> List<T> {
         let need_flush: Vec<u32> = Vec::default();
         let index_count: Vec<(u32, u32)> = Vec::new();
         let cache: BTreeMap<u32, Vec<T>> = BTreeMap::new();
@@ -222,6 +222,19 @@ where
         }
     }
 
+    pub fn clear(&mut self) {
+        let index_size = self.index_size.to_vec();
+        for bulk in index_size {
+            let key = format!("{}{}", self.key, bulk.0);
+            database::delete(&key);
+        }
+        self.need_flush.clear();
+        self.next_key_id =0;
+        self.index_size.clear();
+        self.size = 0;
+        self.cache.clear();
+    }
+
     pub fn flush(&mut self) {
         if !self.need_flush.is_empty() {
             let need_flush = self.need_flush.to_vec();
@@ -248,8 +261,6 @@ where
 
     pub fn get(&mut self, index: u32) -> Option<&T> {
         if index >= self.size {
-            println!("index:{}", index);
-            println!("self.size:{}", self.size);
             panic!("[get] index out of bound")
         }
         let mut end = 0;
@@ -375,6 +386,16 @@ fn test_iter() {
     }
 }
 
+#[test]
+fn clear() {
+    let mut list: List<String> = List::open("key".to_string());
+    for x in 0..90 {
+        list.push(format!("hello{}", x));
+    }
+    assert_eq!(list.size, 90);
+    list.clear();
+    assert_eq!(list.size, 0);
+}
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
