@@ -62,10 +62,10 @@ where
             }
         }
         self.cache.insert(key.clone(), value);
-        self.size += 1;
         self.need_flush.push(key.clone());
         if push_key {
             self.key_list.push(key);
+            self.size += 1;
         }
     }
 
@@ -82,7 +82,7 @@ where
 
     pub fn remove(&mut self, key: &K) {
         if self.size < 1 {
-            panic!("null hashmap");
+            return;
         }
         //if key in cache
         if self.cache.contains_key(key) {
@@ -102,15 +102,16 @@ where
                 database::put(k, v);
             }
         }
-        let size = self.size;
-        let mut remove_size = self.remove_list.len();
+        let remove_size = self.remove_list.len() as u32;
+        let key_list_length = self.key_list.len();
+        let mut has_removed_num:u32 = 0;
         //all removed key store in remove_list
-        for ind in 0..size {
-            if let Some(data) = self.key_list.get(ind) {
-                if remove_size > 0 {
+        for ind in 0..key_list_length {
+            if let Some(data) = self.key_list.get(ind-has_removed_num) {
+                if remove_size > has_removed_num {
                     if self.remove_list.contains(data) {
-                        self.key_list.remove(ind);
-                        remove_size -= 1;
+                        self.key_list.remove(ind - has_removed_num);
+                        has_removed_num += 1;
                     }
                 } else {
                     break;
@@ -237,9 +238,41 @@ fn iter_remove() {
     for i in 0..10 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
-    m.remove(&"hello1".to_string());
-    let mut iter = m.iter();
-    while let Some((k, v)) = iter.next() {
-        println!("K:{}, v:{}", k, v);
+    assert_eq!(m.size, 10);
+    for i in 0..10 {
+        m.remove(&format!("hello{}", i));
+    }
+    assert_eq!(m.size, 0);
+}
+
+#[test]
+fn mock_test() {
+    for _n in 0..1000 {
+        let mut map:HashMap<String, u32> = HashMap::new("key".to_string());
+        let mut bmap:BTreeMap<String, u32> = BTreeMap::new();
+        for _i in 0..100 {
+            match rand::random::<u8>() {
+                0..50 => {
+                    let val = rand::random();
+                    map.put(format!("{}", val), val);
+                    bmap.insert(format!("{}", val), val);
+                }
+                51..100 => {
+                    if bmap.len() != 0 {
+                        let pos = rand::random::<usize>() % bmap.len();
+                        let val = map.get(&format!("{}", pos));
+                        assert_eq!(val, bmap.get(&format!("{}", pos)));
+                    }
+                }
+                101..150 => {
+                    if bmap.len() != 0 {
+                        let pos = rand::random::<usize>() % bmap.len();
+                        map.remove(&format!("{}", pos));
+                        bmap.remove(&format!("{}", pos));
+                    }
+                }
+                _ => (),
+            }
+        }
     }
 }

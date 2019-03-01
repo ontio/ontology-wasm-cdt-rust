@@ -85,7 +85,7 @@ where
 
     pub fn remove(&mut self, index: u32) -> T {
         if index >= self.size {
-            panic!("index out of bound");
+            panic!("[remove] index out of bound");
         } else {
             let mut end = 0;
             let ind = self
@@ -248,7 +248,9 @@ where
 
     pub fn get(&mut self, index: u32) -> Option<&T> {
         if index >= self.size {
-            panic!("index out of bound")
+            println!("index:{}", index);
+            println!("self.size:{}", self.size);
+            panic!("[get] index out of bound")
         }
         let mut end = 0;
         let ind = self
