@@ -2,10 +2,9 @@ use crate::abi::{Decoder, Encoder};
 use super::list::List;
 use crate::Vec;
 use alloc::collections::BTreeMap;
-use std::clone::Clone;
-use std::cmp::Ord;
-use std::convert::AsRef;
+use crate::prelude::*;
 use crate::database;
+use alloc::prelude::String;
 
 pub struct HashMap<K, V>
 where
@@ -230,5 +229,17 @@ fn remove() {
 
     for x in 0..30 {
         assert_eq!(m.get(&format!("hello{}", x)), None);
+    }
+}
+#[test]
+fn iter_remove() {
+    let mut m = HashMap::new("test".to_string());
+    for i in 0..10 {
+        m.put(format!("hello{}", i), format!("world{}", i));
+    }
+    m.remove(&"hello1".to_string());
+    let mut iter = m.iter();
+    while let Some((k, v)) = iter.next() {
+        println!("K:{}, v:{}", k, v);
     }
 }
