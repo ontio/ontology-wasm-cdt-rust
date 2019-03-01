@@ -177,7 +177,7 @@ where
 
 #[test]
 fn get() {
-    let mut m = HashMap::new("test".to_string());
+    let mut m:HashMap<String, String> = HashMap::new("test".to_string());
     for i in 0..90 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
