@@ -1,8 +1,8 @@
 mod hashmap;
 mod list;
 
-pub use self::list::List;
 pub use self::hashmap::HashMap;
+pub use self::list::List;
 
 use super::abi::{Decoder, Encoder, Sink, Source};
 use super::prelude::*;
