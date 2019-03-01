@@ -88,6 +88,7 @@ m.put(format!("hello{}", i), format!("world{}", i));
 
 ## 合约编译成字节码
 python合约通过smartx编译成字节码
+
 rust合约编译成字节码使用下面的命令
 ```rust
 cargo build --release --target wasm32-unknown-unknown
@@ -96,7 +97,7 @@ cargo build --release --target wasm32-unknown-unknown
 ```rust
 rustup target add wasm32-unknown-unknown
 ```
-##合约测试
+## 合约测试
 smartx工具支持python合约单步调试等功能
 
 rust合约测试比较方便，在合约文件中添加下面代码
@@ -106,7 +107,7 @@ mod test;
 ```
 然后就可以编写单独的测试文件，详情请查看`examples`目录下的合约例子
 
-##rust合约常用函数示例
+## rust合约常用函数示例
 1. base58编码的地址转换成Address对象实例
 ```rust
 const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
@@ -119,7 +120,7 @@ U256::from(1)
 
 ```rust
 use ostd::{database, runtime};
-runtime::check_witness(&owner)
+runtime::check_witness(&owner);
 ```
 4. 合约中可以直接用`assert_eq!`和`assert!`等判断条件是true还是false。
 5. rust合约中List的使用介绍
