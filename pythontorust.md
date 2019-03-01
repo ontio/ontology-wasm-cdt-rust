@@ -2,6 +2,7 @@
 
 ## 新建合约
 新建Python版本合约，建议开发者使用smartx在线开发工具进行开发测试。
+
 rust版本合约可以使用cargo命令新建合约。
 ```rust
 //创建rust合约示例
@@ -9,8 +10,11 @@ cargo new --lib helloworld
 ```
 ## 合约中函数跳转
 python 合约中main函数实现函数跳转
+
 rust 合约中invoke函数根据参数不同调用指定的函数
+
 示例
+
 python 版本合约main函数示例
 ```python
 def main(operation, args):
@@ -93,15 +97,14 @@ cargo build --release --target wasm32-unknown-unknown
 rustup target add wasm32-unknown-unknown
 ```
 ##合约测试
-python合约不支持本地测试
-rust合约测试比较方便
-在合约文件中添加下面代码
+smartx工具支持python合约单步调试等功能
+
+rust合约测试比较方便，在合约文件中添加下面代码
 ```rust
 #[cfg(test)]
 mod test;
 ```
-然后就可以编写单独的测试文件
-详情请查看examples目录下的合约例子
+然后就可以编写单独的测试文件，详情请查看`examples`目录下的合约例子
 
 ##rust合约常用函数示例
 1. base58编码的地址转换成Address对象实例
