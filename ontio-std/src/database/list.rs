@@ -2,14 +2,14 @@ use crate::abi::{Decoder, Encoder, Error, Sink, Source};
 use crate::database;
 use crate::{format, String, Vec};
 use alloc::collections::BTreeMap;
-use std::cmp::PartialEq;
+use crate::cmp::PartialEq;
 
 //slice default size
 const INDEX_SIZE: u32 = 64;
 
 pub struct List<T>
 where
-    T: Encoder + Decoder + PartialEq,
+    T: Encoder + Decoder,
 {
     key: String,
     need_flush: Vec<u32>, //index,store all index which slice need update
@@ -21,7 +21,7 @@ where
 
 impl<T> Drop for List<T>
 where
-    T: Encoder + Decoder + PartialEq,
+    T: Encoder + Decoder,
 {
     fn drop(&mut self) {
         self.flush();
@@ -29,8 +29,28 @@ where
 }
 
 impl<T> List<T>
+    where
+        T: Encoder + Decoder + PartialEq,
+{
+    pub(crate) fn contains(&mut self, value: &T) -> bool {
+        if self.size <=0 {
+            return false;
+        } else {
+            for i in 0..self.size {
+                if let Some(data) = self.get(i) {
+                    if data == value {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+}
+
+impl<T> List<T>
 where
-    T: Encoder + Decoder + PartialEq,
+    T: Encoder + Decoder,
 {
     fn encode(&self, sink: &mut Sink) {
         sink.write(self.next_key_id);
@@ -255,21 +275,6 @@ where
             database::put(&self.key, sink.into())
         }
     }
-    
-    pub(crate) fn contains(&mut self, value: &T) -> bool {
-        if self.size <=0 {
-            return false;
-        } else {
-            for i in 0..self.size {
-                if let Some(data) = self.get(i) {
-                    if data == value {
-                        return true;
-                    }
-                }
-            }
-        }
-        false
-    }
 
     pub fn iter(&mut self) -> Iterator<T> {
         Iterator::new(0, self)
@@ -308,7 +313,7 @@ where
 
 pub struct Iterator<'a, T>
 where
-    T: Encoder + Decoder + PartialEq,
+    T: Encoder + Decoder,
 {
     cursor: u32,
     list: &'a mut List<T>,
@@ -316,7 +321,7 @@ where
 
 impl<'a, T> Iterator<'a, T>
 where
-    T: Encoder + Decoder + PartialEq,
+    T: Encoder + Decoder,
 {
     fn new(cursor: u32, list: &mut List<T>) -> Iterator<T> {
         Iterator { cursor: cursor, list: list }
