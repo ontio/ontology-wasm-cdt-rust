@@ -12,6 +12,9 @@ cfg-if = "0.1"
 byteorder = { version = "1", default-features = false }
 ontio-codegen = { path = "../ontio-codegen"}
 
+[dev-dependencies]
+rand = "0.6"
+
 [features]
 std = []
 mock = ["std", "fixed-hash/default"]
