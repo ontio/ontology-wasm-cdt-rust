@@ -81,8 +81,8 @@ fn init(){
 ```
 HashMapStore使用示例
 ```rust
-use database::HashMap;
-let mut m = HashMap::open("test".to_string());
+use database::HashMapStore;
+let mut m = HashMapStore::open("test".to_string());
 m.put(format!("hello{}", i), format!("world{}", i));
 ```
 
@@ -148,7 +148,7 @@ let x = list.get(1);
 ```
 * 打开已经存在List
 ```rust
-let list: List<String> = List::open("key".to_string());
+let list: ListStore<String> = ListStore::open("key".to_string());
 ```
 * 遍历list
 ```rust
@@ -157,10 +157,10 @@ while let Some(data) = iter.next() {
 }
 ```
 
-6. HashMap使用介绍
-* 新建一个HashMap
+6. HashMapStore使用介绍
+* 新建一个HashMapStore
 ```rust
-let mut m:HashMap<String, String> = HashMap::new("test".to_string());
+let mut m:HashMapStore<String, String> = HashMapStore::open("test".to_string());
 ```
 
 * 添加元素
@@ -183,7 +183,7 @@ let mut m2: HashMap<String, String> = HashMap::open("test".to_string());
 m.remove("hello0");
 ```
 
-* 遍历HashMap
+* 遍历HashMapStore
 ```rust
 let mut iter = m.iter();
 let mut ind = 0;
