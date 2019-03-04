@@ -61,28 +61,28 @@ python 合约需要引入`Put` 和 `Get`保存和读取数据。
 Put(GetContext(), KEY, value)//GetContext用于获取合约上下文信息
 ```
 
-rust合约需要引入`database`模块中的`put`和`get`方法，此外，rust合约支持`List`和`Hashmap`数据类型，
-`List`和`HashMap`是对`Put`和`Get`的进一步封装，均支持遍历所有数据，方法执行结束自动保存功能。
+rust合约需要引入`database`模块中的`put`和`get`方法，此外，rust合约支持`ListStore`和`HashmapStore`数据类型，
+`ListStore`和`HashMapStore`是对`Put`和`Get`的进一步封装，均支持遍历所有数据，方法执行结束自动保存功能。
 
 rust合约中`put`和`get`方法示例
 ```rust
 database::put(INITED, true);
 database::get::<_, bool>(INITED).unwrap_or_default();
 ```
-List使用示例
+ListStore使用示例
 ```rust
 //引用database
-use database::List;
+use database::ListStore;
 fn init(){
-    let mut list: List<String> = List::new("key".to_string());//新建List实例
+    let mut list: ListStore<String> = ListStore::open("key".to_string());//新建List实例
     list.push("value".to_string());
     list.push("sss".to_string());
 }
 ```
-HashMap使用示例
+HashMapStore使用示例
 ```rust
 use database::HashMap;
-let mut m = HashMap::new("test".to_string());
+let mut m = HashMap::open("test".to_string());
 m.put(format!("hello{}", i), format!("world{}", i));
 ```
 
@@ -123,16 +123,18 @@ use ostd::{database, runtime};
 runtime::check_witness(&owner);
 ```
 4. 合约中可以直接用`assert_eq!`和`assert!`等判断条件是true还是false。
-5. rust合约中List的使用介绍
-* 新建一个List
+5. rust合约中ListStore的使用介绍
+* 新建或者打开已经存在的一个ListStore
 ```rust
-let mut list: List<String> = List::new("key".to_string());
+let mut list: ListStore<String> = ListStore::open("key".to_string());
 ```
+>Note:如果数据库
+
 * 添加元素
 ```rust
 list.push("value".to_string());
 ```
-List中添加的元素，需要调用flush方法才会保存到数据库中，当执行list的合约方法结束的时候合约会自动调用flush方法将list中的数据保存到数据库。
+ListStore中添加的元素，需要调用flush方法才会保存到数据库中，当执行list的合约方法结束的时候合约会自动调用flush方法将list中的数据保存到数据库。
 
 * 删除元素
 按照索引删除元素，所以需要用户知道要删除的元素的索引
