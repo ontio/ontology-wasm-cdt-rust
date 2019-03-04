@@ -3,6 +3,7 @@
 #![feature(allocator_api)]
 #![feature(alloc)]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![feature(exclusive_range_pattern)]
 
 //#![feature(trace_macros)]
 
