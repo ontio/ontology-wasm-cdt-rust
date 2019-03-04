@@ -79,7 +79,7 @@ where
         }
         self.cache.get(&key)
     }
-    pub fn contains_key(&mut self, key:&K) -> bool {
+    fn contains_key(&mut self, key:&K) -> bool {
         if self.cache.contains_key(key) {
             return true;
         }
