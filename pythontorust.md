@@ -9,9 +9,9 @@ rust版本合约可以使用cargo命令新建合约。
 cargo new --lib helloworld
 ```
 ## 合约入口函数
-python 合约中main函数实现函数跳转
+python 合约的入口函数是main函数, main函数中，会根据传进来的方法名的不同，跳转到响应的方法处执行。
 
-rust 合约中invoke函数根据参数不同调用指定的函数
+rust 合约的入口函数是invoke函数，invoke函数会根据传进来参数的不同跳转到响应的函数处执行。
 
 示例
 
@@ -59,7 +59,8 @@ const INITED: &str = "Initialized";
 python 合约需要引入`Put` 和 `Get`保存和读取数据。
 示例
 ```python
-Put(GetContext(), KEY, value)//GetContext用于获取合约上下文信息
+Put(GetContext(), KEY, value)//GetContext用于获取合约上下文信息, 数据已K-V键值对的形式保存。
+Get(GetContext(), KEY)//根据KEY获得value
 ```
 
 rust合约需要引入`database`模块中的`put`和`get`方法，此外，rust合约支持`ListStore`和`HashmapStore`数据类型，
@@ -75,9 +76,8 @@ ListStore使用示例
 //引用database
 use database::ListStore;
 fn init(){
-    let mut list: ListStore<String> = ListStore::open("key".to_string());//新建List实例
+    let mut list: ListStore<String> = ListStore::open("key".to_string());//新建List实例或者打开已经存在的数据，
     list.push("value".to_string());
-    list.push("sss".to_string());
 }
 ```
 HashMapStore使用示例
@@ -129,28 +129,27 @@ runtime::check_witness(&owner);
 ```rust
 let mut list: ListStore<String> = ListStore::open("key".to_string());
 ```
->Note:如果数据库
+>Note:创建ListStore的时候，传进来的"key"用来存储ListStore中的数据，所以开发者在使用`put`方法保存数据或者使用`delete`方法删除数据时，
+一定不要和ListStore使用同一个"key"。
 
 * 添加元素
 ```rust
 list.push("value".to_string());
 ```
-ListStore中添加的元素，需要调用flush方法才会保存到数据库中，当执行list的合约方法结束的时候合约会自动调用flush方法将list中的数据保存到数据库。
+ListStore中添加的元素，会先保存到缓存中，需要调用flush方法才会保存到数据库中，当执行list的合约方法结束的时候合约会自动调用flush方法将list中的数据保存到数据库。
 
 * 删除元素
 按照索引删除元素，所以需要用户知道要删除的元素的索引
 ```rust
 list.remove(1);
 ```
+>Note: 对ListStore中的数据进行增加或者删除的时候，并不会立即落账，需要调用flush方法使最新的变化落账，在合约方法执行结束的时候ListStore会自动调用flush方法。
 * 查询元素
 根据索引查询元素
 ```rust
 let x = list.get(1);
 ```
-* 打开已经存在List
-```rust
-let list: ListStore<String> = ListStore::open("key".to_string());
-```
+
 * 遍历list
 ```rust
 while let Some(data) = iter.next() {
@@ -166,7 +165,7 @@ let mut m:HashMapStore<String, String> = HashMapStore::open("test".to_string());
 
 * 添加元素
 ```rust
-m.put(format!("hello{}", i), format!("world{}", i));
+m.put("hello1", "world1");
 ```
 * 查询元素
 根据key获得value
@@ -181,7 +180,7 @@ let mut m2: HashMap<String, String> = HashMap::open("test".to_string());
 * 删除元素
 根据key删除元素
 ```rust
-m.remove("hello0");
+m.remove("hello1");
 ```
 
 * 遍历HashMapStore
