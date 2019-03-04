@@ -7,7 +7,7 @@ use crate::cmp::PartialEq;
 //slice default size
 const INDEX_SIZE: u32 = 64;
 
-pub struct List<T>
+pub struct ListStore<T>
 where
     T: Encoder + Decoder,
 {
@@ -19,7 +19,7 @@ where
     cache: BTreeMap<u32, Vec<T>>, //index, vec
 }
 
-impl<T> Drop for List<T>
+impl<T> Drop for ListStore<T>
 where
     T: Encoder + Decoder,
 {
@@ -28,7 +28,7 @@ where
     }
 }
 
-impl<T> List<T>
+impl<T> ListStore<T>
     where
         T: Encoder + Decoder + PartialEq,
 {
@@ -48,7 +48,7 @@ impl<T> List<T>
     }
 }
 
-impl<T> List<T>
+impl<T> ListStore<T>
 where
     T: Encoder + Decoder,
 {
@@ -61,7 +61,7 @@ where
         let next_key_id = source.read().unwrap();
         let index_size: Vec<(u32, u32)> = source.read().unwrap();
         let total = index_size.iter().map(|(_key, size)| size).sum();
-        Ok(List {
+        Ok(ListStore {
             key: key,
             need_flush: Vec::new(), //index,store all index which slice need update
             size: total,
@@ -71,11 +71,11 @@ where
         })
     }
 
-    pub(crate) fn new(key: String) -> List<T> {
+    pub(crate) fn new(key: String) -> ListStore<T> {
         let need_flush: Vec<u32> = Vec::default();
         let index_count: Vec<(u32, u32)> = Vec::new();
         let cache: BTreeMap<u32, Vec<T>> = BTreeMap::new();
-        List {
+        ListStore {
             key: key,
             need_flush: need_flush,
             size: 0,
@@ -84,12 +84,12 @@ where
             cache: cache,
         }
     }
-    pub fn open(key: String) -> List<T> {
+    pub fn open(key: String) -> ListStore<T> {
         match database::get(&key) {
-            None => List::new(key),
+            None => ListStore::new(key),
             Some(data) => {
                 let mut source = Source::new(data);
-                List::init(key, &mut source).unwrap()
+                ListStore::init(key, &mut source).unwrap()
             }
         }
     }
@@ -316,14 +316,14 @@ where
     T: Encoder + Decoder,
 {
     cursor: u32,
-    list: &'a mut List<T>,
+    list: &'a mut ListStore<T>,
 }
 
 impl<'a, T> Iterator<'a, T>
 where
     T: Encoder + Decoder,
 {
-    fn new(cursor: u32, list: &mut List<T>) -> Iterator<T> {
+    fn new(cursor: u32, list: &mut ListStore<T>) -> Iterator<T> {
         Iterator { cursor: cursor, list: list }
     }
 
@@ -346,7 +346,7 @@ where
 
 #[test]
 fn test_insert() {
-    let mut list: List<String> = List::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new("key".to_string());
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -364,7 +364,7 @@ fn test_insert() {
 
 #[test]
 fn list_node() {
-    let mut list: List<String> = List::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new("key".to_string());
     list.push("value".to_string());
     list.push("sss".to_string());
     //    list.append(123);
@@ -373,7 +373,7 @@ fn list_node() {
         assert_eq!(x, "sss")
     }
     list.flush();
-    let mut list2: List<String> = List::open("key".to_string());
+    let mut list2: ListStore<String> = ListStore::open("key".to_string());
     assert_eq!(list2.size, 2);
 
     list2.remove(1);
@@ -381,13 +381,13 @@ fn list_node() {
     assert_eq!(list2.need_flush.len(), 1);
     list2.flush();
 
-    let list3: List<String> = List::open("key".to_string());
+    let list3: ListStore<String> = ListStore::open("key".to_string());
     assert_eq!(list3.size, 1);
 }
 
 #[test]
 fn test_iter() {
-    let mut list: List<String> = List::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new("key".to_string());
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -409,7 +409,7 @@ fn test_iter() {
 
 #[test]
 fn clear() {
-    let mut list: List<String> = List::open("key".to_string());
+    let mut list: ListStore<String> = ListStore::open("key".to_string());
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -421,7 +421,7 @@ fn clear() {
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
-        let mut list: List<u64> = List::new("key".to_string());
+        let mut list: ListStore<u64> = ListStore::new("key".to_string());
         let mut array = Vec::new();
         for _i in 0..100 {
             match rand::random::<u8>() {

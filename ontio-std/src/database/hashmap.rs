@@ -1,4 +1,4 @@
-use super::list::List;
+use super::list::ListStore;
 use crate::abi::{Decoder, Encoder};
 use crate::database;
 use crate::prelude::*;
@@ -6,19 +6,19 @@ use crate::Vec;
 use alloc::collections::BTreeMap;
 use alloc::prelude::String;
 
-pub struct HashMap<K, V>
+pub struct HashMapStore<K, V>
 where
     K: AsRef<[u8]> + Encoder + Decoder + Ord + Clone,
     V: Encoder + Decoder + Clone,
 {
     size: u32, //hashmap size
     cache: BTreeMap<K, V>,
-    key_list: List<K>,   //store all the key
+    key_list: ListStore<K>,   //store all the key
     remove_list: Vec<K>, //store all removed key
     need_flush: Vec<K>,  //store all need flush key
 }
 
-impl<K, V> Drop for HashMap<K, V>
+impl<K, V> Drop for HashMapStore<K, V>
 where
     K: AsRef<[u8]> + Encoder + Decoder + Ord + Clone,
     V: Encoder + Decoder + Clone,
@@ -28,24 +28,24 @@ where
     }
 }
 
-impl<K, V> HashMap<K, V>
+impl<K, V> HashMapStore<K, V>
 where
     K: AsRef<[u8]> + Encoder + Decoder + Ord + Clone,
     V: Encoder + Decoder + Clone,
 {
-    pub(crate) fn new(key: String) -> HashMap<K, V> {
+    pub(crate) fn new(key: String) -> HashMapStore<K, V> {
         let cache: BTreeMap<K, V> = BTreeMap::new();
-        HashMap {
+        HashMapStore {
             size: 0,
             cache: cache,
-            key_list: List::new(key),
+            key_list: ListStore::new(key),
             remove_list: Vec::new(),
             need_flush: Vec::new(),
         }
     }
-    pub fn open(key: String) -> HashMap<K, V> {
-        let mut hashmap = HashMap::new(key.clone());
-        let list: List<K> = List::open(key);
+    pub fn open(key: String) -> HashMapStore<K, V> {
+        let mut hashmap = HashMapStore::new(key.clone());
+        let list: ListStore<K> = ListStore::open(key);
         hashmap.size = list.len();
         hashmap.key_list = list;
         hashmap
@@ -162,7 +162,7 @@ where
     V: Encoder + Decoder + Clone,
 {
     cursor: u32,
-    map: &'a mut HashMap<K, V>,
+    map: &'a mut HashMapStore<K, V>,
 }
 
 impl<'a, K, V> Iterator<'a, K, V>
@@ -170,7 +170,7 @@ where
     K: AsRef<[u8]> + Encoder + Decoder + Ord + Clone,
     V: Encoder + Decoder + Clone,
 {
-    fn new(cursor: u32, map: &mut HashMap<K, V>) -> Iterator<K, V> {
+    fn new(cursor: u32, map: &mut HashMapStore<K, V>) -> Iterator<K, V> {
         Iterator { cursor: cursor, map: map }
     }
     pub fn has_next(&self) -> bool {
@@ -206,7 +206,7 @@ where
 
 #[test]
 fn get() {
-    let mut m:HashMap<String, String> = HashMap::new("test".to_string());
+    let mut m: HashMapStore<String, String> = HashMapStore::new("test".to_string());
     for i in 0..90 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
@@ -220,7 +220,7 @@ fn get() {
 
 #[test]
 fn iter() {
-    let mut m = HashMap::new("test".to_string());
+    let mut m = HashMapStore::new("test".to_string());
     for i in 0..90 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
@@ -235,7 +235,7 @@ fn iter() {
 
     m.flush();
 
-    let mut m2: HashMap<String, String> = HashMap::open("test".to_string());
+    let mut m2: HashMapStore<String, String> = HashMapStore::open("test".to_string());
     assert_eq!(m2.size, 90);
     assert_eq!(m2.get(&"hello0".to_string()).unwrap(), "world0");
 
@@ -246,7 +246,7 @@ fn iter() {
 
 #[test]
 fn remove() {
-    let mut m = HashMap::new("test".to_string());
+    let mut m = HashMapStore::new("test".to_string());
     for i in 0..90 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
@@ -263,7 +263,7 @@ fn remove() {
 }
 #[test]
 fn iter_remove() {
-    let mut m = HashMap::new("test".to_string());
+    let mut m = HashMapStore::new("test".to_string());
     for i in 0..10 {
         m.put(format!("hello{}", i), format!("world{}", i));
     }
@@ -277,7 +277,7 @@ fn iter_remove() {
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
-        let mut map:HashMap<String, u32> = HashMap::open("key".to_string());
+        let mut map: HashMapStore<String, u32> = HashMapStore::open("key".to_string());
         map.clear();
         let mut bmap:BTreeMap<String, u32> = BTreeMap::new();
         for _i in 0..1000 {
