@@ -8,7 +8,7 @@ rust版本合约可以使用cargo命令新建合约。
 //创建rust合约示例
 cargo new --lib helloworld
 ```
-## 合约中函数跳转
+## 合约入口函数
 python 合约中main函数实现函数跳转
 
 rust 合约中invoke函数根据参数不同调用指定的函数
@@ -27,6 +27,7 @@ rust版本合约示例
 ```rust
 #[no_mangle]
 pub fn invoke() {
+    //Oep8TokenDispatcher是使用abi_codegen::contract自动生成的类，实现了对合约请求的自动派发和结果的序列化操作
     let mut dispatcher = Oep8TokenDispatcher::new(Oep8TokenInstance);//通过代码生成器，生成Oep8TokenDispatcher对象实例
     runtime::ret(&dispatcher.dispatch(&runtime::input()));//
 }
@@ -67,7 +68,7 @@ rust合约需要引入`database`模块中的`put`和`get`方法，此外，rust�
 rust合约中`put`和`get`方法示例
 ```rust
 database::put(INITED, true);
-database::get::<_, bool>(INITED).unwrap_or_default();
+let val :bool = database::get(INITED).unwrap_or_default();
 ```
 ListStore使用示例
 ```rust
@@ -83,7 +84,7 @@ HashMapStore使用示例
 ```rust
 use database::HashMapStore;
 let mut m = HashMapStore::open("test".to_string());
-m.put(format!("hello{}", i), format!("world{}", i));
+m.put("hello", "world");
 ```
 
 ## 合约编译成字节码
