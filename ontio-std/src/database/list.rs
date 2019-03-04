@@ -1,8 +1,8 @@
 use crate::abi::{Decoder, Encoder, Error, Sink, Source};
+use crate::cmp::PartialEq;
 use crate::database;
 use crate::{format, String, Vec};
 use alloc::collections::BTreeMap;
-use crate::cmp::PartialEq;
 
 //slice default size
 const INDEX_SIZE: u32 = 64;
@@ -29,11 +29,11 @@ where
 }
 
 impl<T> ListStore<T>
-    where
-        T: Encoder + Decoder + PartialEq,
+where
+    T: Encoder + Decoder + PartialEq,
 {
     pub(crate) fn contains(&mut self, value: &T) -> bool {
-        if self.size <=0 {
+        if self.size <= 0 {
             return false;
         } else {
             for i in 0..self.size {
@@ -250,7 +250,7 @@ where
             database::delete(&key);
         }
         self.need_flush.clear();
-        self.next_key_id =0;
+        self.next_key_id = 0;
         self.index_size.clear();
         self.size = 0;
         self.cache.clear();
