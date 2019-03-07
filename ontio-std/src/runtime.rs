@@ -52,6 +52,7 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
 
     Some(output)
 }
+///contract migrate
 pub fn contract_migrate(code: &[u8], vm_type: u32, name:&str, version:&str,author: &str, email:&str,
           desc:&str) -> Option<Address> {
     let mut addr: Address = Address::zero();
