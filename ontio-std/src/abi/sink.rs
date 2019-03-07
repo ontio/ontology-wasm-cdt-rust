@@ -1,6 +1,7 @@
 use super::Encoder;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
+use crate::types::Address;
 
 pub struct Sink {
     buf: Vec<u8>,
@@ -62,7 +63,32 @@ impl Sink {
             self.write_u64(val);
         }
     }
-
+    pub fn write_native_address(&mut self, address: &Address) {
+        self.write_byte(20);
+        self.write(address);
+    }
+    pub fn write_neovm_address(&mut self, address: &Address) {
+        self.write_varuint(20);
+        self.write(address);
+    }
+    pub fn write_native_varuint(&mut self, val:u64) {
+        if val < 0xFD {
+            self.write_byte(1);
+            self.write_byte(val as u8);
+        } else if val < 0xFFFF {
+            self.write_byte(2);
+            self.write_byte(0xFD);
+            self.write_u16(val as u16);
+        } else if val <= 0xFFFFFFFF {
+            self.write_byte(4);
+            self.write_byte(0xFE);
+            self.write_u32(val as u32);
+        } else {
+            self.write_byte(8);
+            self.write_byte(0xFF);
+            self.write_u64(val);
+        }
+    }
     pub fn into(self) -> Vec<u8> {
         self.buf
     }
