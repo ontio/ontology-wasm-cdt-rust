@@ -65,8 +65,7 @@ pub(crate) mod util {
         sink_param.write(function_name);
         sink_param.write(da);
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
-        if res.is_some() {
-            let data = res.unwrap();
+        if let Some(data) = res {
             if data.len() !=0 {
                 return true;
             }
@@ -85,8 +84,7 @@ pub(crate) mod util {
         sink_param.write(function_name);
         sink_param.write(param);
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
-        if res.is_some() {
-            let data = res.unwrap();
+        if let Some(data) = res {
             if data.len() !=0 {
                 return true;
             }
@@ -105,8 +103,7 @@ pub(crate) mod util {
         sink_param.write("transferFrom");
         sink_param.write(sink.into());
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
-        if res.is_some() {
-            let data = res.unwrap();
+        if let Some(data) = res {
             if data.len() !=0 {
                 return true;
             }
@@ -123,9 +120,10 @@ pub(crate) mod util {
         sink_param.write("allowance");
         sink_param.write(sink.into());
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
-        if res.is_some() {
-            let data = res.unwrap();
-            return U256::from(data.as_slice());
+        if let Some(data) = res {
+            if data.len() !=0 {
+                return U256::from(data.as_slice());
+            }
         }
         U256::zero()
     }
@@ -137,9 +135,10 @@ pub(crate) mod util {
         sink_param.write("balanceOf");
         sink_param.write(sink.into());
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
-        if res.is_some() {
-            let data = res.unwrap();
-            return U256::from(data.as_slice());
+        if let Some(data) = res {
+            if data.len() !=0 {
+                return U256::from(data.as_slice());
+            }
         }
         U256::zero()
     }
