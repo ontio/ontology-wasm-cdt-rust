@@ -4,6 +4,7 @@
 #![feature(alloc)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(exclusive_range_pattern)]
+#![feature(proc_macro_hygiene)]
 
 //#![feature(trace_macros)]
 
@@ -55,6 +56,7 @@ pub mod console;
 pub mod database;
 pub mod runtime;
 pub mod types;
+pub mod contract;
 pub mod abi_codegen {
     pub use ontio_codegen::contract;
 }
