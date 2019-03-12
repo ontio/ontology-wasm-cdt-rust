@@ -6,7 +6,7 @@ use ostd::prelude::*;
 use ostd::abi::Dispatcher;
 use ostd::{runtime, console};
 use ostd::abi::{Sink, Source, Decoder};
-use ostd::types::{H160,to_neo_bytes};
+use ostd::types::{to_neo_bytes};
 use ostd::contract::ont;
 use ostd::str;
 
@@ -26,11 +26,11 @@ pub trait ApiTest {
     fn call_wasm_balance_of(&self, contract_address:&Address, addr:&Address) -> U256;
     fn call_wasm_transfer(&self, contract_address:&Address, from: &Address, to:&Address, amount:U256) -> bool;
     fn call_neovm_transfer(&self, contract_address:&Address, from:&Address, to:&Address, amount:U256) -> bool;
-    fn call_ont_transfer(&self, version:u8, from: &Address, to:&Address, amount:U256) -> bool;
-    fn call_ont_balance_of(&self,version:u8, address:&Address) -> U256;
-    fn call_ont_approve(&self, version:u8, from: &Address, to:&Address, amount:U256) -> bool;
-    fn call_ont_allowance(&self, version:u8, from: &Address, to:&Address) -> U256;
-    fn call_ont_transfer_from(&self, version:u8,sender: &Address, from: &Address, to:&Address, amount:U256) -> bool;
+    fn call_ont_transfer(&self, from: &Address, to:&Address, amount:U256) -> bool;
+    fn call_ont_balance_of(&self,address:&Address) -> U256;
+    fn call_ont_approve(&self,from: &Address, to:&Address, amount:U256) -> bool;
+    fn call_ont_allowance(&self, from: &Address, to:&Address) -> U256;
+    fn call_ont_transfer_from(&self,sender: &Address, from: &Address, to:&Address, amount:U256) -> bool;
     fn contract_migrate(&self, code: Vec<u8>, vm_type: u32, name:&str, version:&str,author: &str, email:&str, desc:&str) -> bool;
 }
 
@@ -127,25 +127,25 @@ impl ApiTest for ApiTestInstance {
             false
         }
     }
-    fn call_ont_transfer(&self,version:u8, from: &Address, to:&Address, amount:U256) -> bool {
+    fn call_ont_transfer(&self,from: &Address, to:&Address, amount:U256) -> bool {
         let state = ont::State{
             from:from.clone(),
             to:to.clone(),
             amount:amount,
         };
-        ont::transfer(version,&[state])
+        ont::transfer(&[state])
     }
-    fn call_ont_approve(&self, version:u8, from: &Address, to:&Address, amount:U256) -> bool {
-        ont::approve(version, from, to, amount)
+    fn call_ont_approve(&self,from: &Address, to:&Address, amount:U256) -> bool {
+        ont::approve(from, to, amount)
     }
-    fn call_ont_allowance(&self, version:u8, from: &Address, to:&Address) -> U256 {
-        ont::allowance(version, from, to)
+    fn call_ont_allowance(&self, from: &Address, to:&Address) -> U256 {
+        ont::allowance(from, to)
     }
-    fn call_ont_balance_of(&self,version:u8, address:&Address) -> U256 {
-        ont::balance_of(version, address)
+    fn call_ont_balance_of(&self,address:&Address) -> U256 {
+        ont::balance_of(address)
     }
-    fn call_ont_transfer_from(&self, version:u8,sender: &Address, from: &Address, to:&Address, amount:U256) -> bool {
-        ont::transfer_from(version, sender,from,to,amount)
+    fn call_ont_transfer_from(&self,sender: &Address, from: &Address, to:&Address, amount:U256) -> bool {
+        ont::transfer_from(sender,from,to,amount)
     }
     fn contract_migrate(&self, code: Vec<u8>, vm_type: u32, name:&str, version:&str,author: &str, email:&str, desc:&str) -> bool {
         runtime::contract_migrate(code.as_slice(), vm_type, name,version,author, email, desc);
