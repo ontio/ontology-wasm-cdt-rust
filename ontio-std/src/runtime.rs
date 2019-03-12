@@ -18,12 +18,15 @@ mod env {
         pub fn get_output(dst: *mut u8);
         pub fn current_blockhash(blockhash: *const u8) -> u32;
         pub fn current_txhash(txhash: *const u8) -> u32;
-        pub fn contract_migrate(code:*const u8, code_len: u32, vm_type:u32, name_ptr:*const u8,
-                                name_len: u32, ver_ptr:*const u8, ver_len:u32, author_ptr:*const u8,
-                                author_len:u32, email_ptr:*const u8, email_len:u32, desc_ptr:*const u8,
-                                desc_len:u32, new_address_ptr:*mut u8) -> i32;
-//        pub fn contract_delete();
-        pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32;
+        pub fn contract_migrate(
+            code: *const u8, code_len: u32, vm_type: u32, name_ptr: *const u8, name_len: u32,
+            ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+            email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+            new_address_ptr: *mut u8,
+        ) -> i32;
+        //        pub fn contract_delete();
+        pub fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32)
+            -> u32;
         pub fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
         pub fn storage_delete(key: *const u8, klen: u32);
     }
@@ -31,16 +34,12 @@ mod env {
 
 //todo : return result
 pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
-    let addr: &[u8] =addr.as_ref();
-    let res = unsafe {
-        env::call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32)
-    };
+    let addr: &[u8] = addr.as_ref();
+    let res = unsafe { env::call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
     if res < 0 {
         return None;
     }
-    let size =  unsafe {
-        env::call_output_length()
-    };
+    let size = unsafe { env::call_output_length() };
 
     let mut output = vec![0u8; size as usize];
     if size != 0 {
@@ -53,15 +52,27 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
     Some(output)
 }
 ///contract migrate
-pub fn contract_migrate(code: &[u8], vm_type: u32, name:&str, version:&str,author: &str, email:&str,
-          desc:&str) -> Option<Address> {
+pub fn contract_migrate(
+    code: &[u8], vm_type: u32, name: &str, version: &str, author: &str, email: &str, desc: &str,
+) -> Option<Address> {
     let mut addr: Address = Address::zero();
     let res = unsafe {
-        env::contract_migrate(code.as_ptr(),code.len() as u32,vm_type,name.as_ptr(),
-                              name.len() as u32,version.as_ptr(), version.len() as u32,
-                              author.as_ptr(),author.len() as u32,email.as_ptr(),
-                              email.len() as u32, desc.as_ptr(),desc.len() as u32,
-                              addr.as_mut().as_mut_ptr())
+        env::contract_migrate(
+            code.as_ptr(),
+            code.len() as u32,
+            vm_type,
+            name.as_ptr(),
+            name.len() as u32,
+            version.as_ptr(),
+            version.len() as u32,
+            author.as_ptr(),
+            author.len() as u32,
+            email.as_ptr(),
+            email.len() as u32,
+            desc.as_ptr(),
+            desc.len() as u32,
+            addr.as_mut().as_mut_ptr(),
+        )
     };
     if res < 0 {
         return None;
@@ -102,7 +113,13 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
         let value = &mut val[INITIAL..];
         debug_assert!(value.len() == size - INITIAL);
         unsafe {
-            env::storage_read(key.as_ptr(), key.len() as u32, value.as_mut_ptr(), value.len() as u32, INITIAL as u32)
+            env::storage_read(
+                key.as_ptr(),
+                key.len() as u32,
+                value.as_mut_ptr(),
+                value.len() as u32,
+                INITIAL as u32,
+            )
         };
     }
 
@@ -146,7 +163,7 @@ pub fn entry_address() -> Address {
 }
 ///return current block hash
 pub fn current_blockhash() -> H256 {
-    let temp:[u8;32] = [0;32];
+    let temp: [u8; 32] = [0; 32];
     let block_hash = H256::new(temp);
     unsafe {
         env::current_blockhash(block_hash.as_ptr());
@@ -155,7 +172,7 @@ pub fn current_blockhash() -> H256 {
 }
 ///return current tx hash
 pub fn current_txhash() -> H256 {
-    let temp:[u8;32] = [0;32];
+    let temp: [u8; 32] = [0; 32];
     let tx_hash = H256::new(temp);
     unsafe {
         env::current_txhash(tx_hash.as_ptr());

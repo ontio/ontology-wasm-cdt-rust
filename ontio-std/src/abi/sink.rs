@@ -1,7 +1,7 @@
 use super::Encoder;
+use crate::types::Address;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
-use crate::types::Address;
 
 pub struct Sink {
     buf: Vec<u8>,
@@ -71,7 +71,7 @@ impl Sink {
         self.write_varuint(20);
         self.write(address);
     }
-    pub fn write_native_varuint(&mut self, val:u64) {
+    pub fn write_native_varuint(&mut self, val: u64) {
         if val < 0xFD {
             self.write_byte(1);
             self.write_byte(val as u8);

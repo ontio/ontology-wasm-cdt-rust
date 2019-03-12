@@ -53,10 +53,10 @@ pub use core::cmp;
 
 pub mod abi;
 pub mod console;
+pub mod contract;
 pub mod database;
 pub mod runtime;
 pub mod types;
-pub mod contract;
 pub mod abi_codegen {
     pub use ontio_codegen::contract;
 }
