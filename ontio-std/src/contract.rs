@@ -9,10 +9,10 @@ pub mod ont {
     use super::super::base58;
     const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
     pub fn transfer(version:u8, transfer: &[State]) -> bool {
-        super::util::transfer_inner(&ONT_CONTRACT_ADDRESS,"transfer", version, transfer)
+        super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, version, transfer)
     }
     pub fn approve(version:u8, from:&Address, to:&Address, amount:U256) -> bool {
-        super::util::approve_inner(&ONT_CONTRACT_ADDRESS,"approve", version, from, to, amount)
+        super::util::approve_inner(&ONT_CONTRACT_ADDRESS, version, from, to, amount)
     }
     pub fn balance_of(version:u8, address: &Address) -> U256 {
         super::util::balance_of(&ONT_CONTRACT_ADDRESS,version, &address)
@@ -30,13 +30,13 @@ pub mod ong {
     use super::super::base58;
     const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
     pub fn transfer(version:u8, transfer: &[super::ont::State]) -> bool {
-        super::util::transfer_inner(&ONG_CONTRACT_ADDRESS,"transfer", version, transfer)
+        super::util::transfer_inner(&ONG_CONTRACT_ADDRESS,version, transfer)
     }
     pub fn balance_of(version:u8, address: &Address) -> U256 {
         super::util::balance_of(&ONG_CONTRACT_ADDRESS,version, &address)
     }
     pub fn approve(version:u8, from: &Address, to: &Address, amount: U256) -> bool {
-        super::util::approve_inner(&ONG_CONTRACT_ADDRESS,"approve", version, from, to, amount)
+        super::util::approve_inner(&ONG_CONTRACT_ADDRESS, version, from, to, amount)
     }
     pub fn allowance(version:u8, from:&Address, to: &Address) -> U256 {
         super::util::allowance(&ONG_CONTRACT_ADDRESS, version, from, to)
@@ -50,7 +50,7 @@ pub(crate) mod util {
     use super::super::types::{Address,U256,to_neo_bytes};
     use super::super::abi::Sink;
     use super::super::runtime;
-    pub(crate) fn transfer_inner(contract_address: &Address, function_name:&str, version:u8, trasnfer: &[super::ont::State]) -> bool {
+    pub(crate) fn transfer_inner(contract_address: &Address, version:u8, trasnfer: &[super::ont::State]) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_varuint(trasnfer.len() as u64);
 
@@ -62,7 +62,7 @@ pub(crate) mod util {
         let da = sink.into();
         let mut sink_param = Sink::new(16);
         sink_param.write(version);
-        sink_param.write(function_name);
+        sink_param.write("transfer");
         sink_param.write(da);
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
         if let Some(data) = res {
@@ -73,7 +73,7 @@ pub(crate) mod util {
         false
     }
 
-    pub(crate) fn approve_inner(contract_address: &Address, function_name:&str, version:u8, from:&Address, to:&Address, amount:U256) -> bool {
+    pub(crate) fn approve_inner(contract_address: &Address, version:u8, from:&Address, to:&Address, amount:U256) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_address(from);
         sink.write_native_address(to);
@@ -81,7 +81,7 @@ pub(crate) mod util {
         let param = sink.into();
         let mut sink_param = Sink::new(16);
         sink_param.write(version);
-        sink_param.write(function_name);
+        sink_param.write("approve");
         sink_param.write(param);
         let res = runtime::call_contract(contract_address,sink_param.into().as_slice());
         if let Some(data) = res {
