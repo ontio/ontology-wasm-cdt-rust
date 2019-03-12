@@ -1,4 +1,4 @@
-use crate::types::Address;
+use crate::types::{Address, H256};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::collections::HashMap;
@@ -15,7 +15,10 @@ pub(crate) struct RuntimeInner{
     pub(crate) timestamp: u64,
     pub(crate) block_height: u64,
     pub(crate) caller: Address,
+    pub(crate) entry_address: Address,
     pub(crate) self_addr:Address,
+    pub(crate) block_hash: H256,
+    pub(crate) tx_hash: H256,
     pub(crate) witness: Vec<Address>,
     pub(crate) notify: Vec<Vec<u8>>,
 }
@@ -53,6 +56,18 @@ impl Runtime {
         self.inner.borrow().witness.iter().position(|wit| wit == addr).is_some()
     }
 
+    fn entry_address(&self) -> Address {
+        self.inner.borrow().entry_address.clone()
+    }
+
+    fn current_blockhash(&self) -> H256 {
+        self.inner.borrow().block_hash.clone()
+    }
+
+    fn current_txhash(&self) -> H256 {
+        self.inner.borrow().tx_hash.clone()
+    }
+
     fn notify(&self, msg: &[u8]) {
         self.inner.borrow_mut().notify.push(msg.to_vec());
     }
@@ -77,12 +92,12 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn blockheight() -> u64 {
+    pub unsafe extern "C" fn block_height() -> u64 {
         RUNTIME.with(|r| r.borrow().block_height())
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn selfaddress(dest: *mut u8) {
+    pub unsafe extern "C" fn self_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let addr = r.borrow().address();
              ptr::copy(addr.as_ptr(), dest, Address::len_bytes());
@@ -90,7 +105,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn calleraddress(dest: *mut u8) {
+    pub unsafe extern "C" fn caller_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let caller = r.borrow().caller();
             ptr::copy(caller.as_ptr(), dest, Address::len_bytes());
@@ -98,7 +113,31 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn checkwitness(addr: *const u8) -> bool {
+    pub unsafe extern "C" fn entry_address(dest: *mut u8) {
+        RUNTIME.with(|r| {
+            let entry = r.borrow().entry_address();
+            ptr::copy(entry.as_ptr(), dest, Address::len_bytes());
+        })
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn current_blockhash(dest: *mut u8) {
+        RUNTIME.with(|r| {
+            let block_hash = r.borrow().current_blockhash();
+            ptr::copy(block_hash.as_ptr(), dest, H256::len_bytes());
+        })
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn current_txhash(dest: *mut u8) {
+        RUNTIME.with(|r| {
+            let tx_hash = r.borrow().current_txhash();
+            ptr::copy(tx_hash.as_ptr(), dest, H256::len_bytes());
+        })
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn check_witness(addr: *const u8) -> bool {
         let address = Address::from_slice(slice::from_raw_parts(addr, 20));
         RUNTIME.with(|r| r.borrow().check_witness(&address))
     }

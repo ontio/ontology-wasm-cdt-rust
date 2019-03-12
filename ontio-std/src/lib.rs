@@ -4,6 +4,7 @@
 #![feature(alloc)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(exclusive_range_pattern)]
+#![feature(proc_macro_hygiene)]
 
 //#![feature(trace_macros)]
 
@@ -52,6 +53,7 @@ pub use core::cmp;
 
 pub mod abi;
 pub mod console;
+pub mod contract;
 pub mod database;
 pub mod runtime;
 pub mod types;

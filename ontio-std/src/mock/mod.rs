@@ -3,7 +3,7 @@ mod runtime;
 use self::runtime::setup_runtime;
 pub use self::runtime::Runtime;
 use self::runtime::RuntimeInner;
-use crate::types::Address;
+use crate::types::{Address, H256};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::iter::Iterator;
@@ -55,6 +55,19 @@ impl RuntimeHandle {
 
     pub fn caller(&self, caller: &Address) ->&Self {
         self.inner.borrow_mut().caller = caller.clone();
+        self
+    }
+    pub fn entry_address(&self, entry:&Address) -> &Self {
+        self.inner.borrow_mut().entry_address = entry.clone();
+        self
+    }
+
+    pub fn current_blockhash(&self, block_hash:&H256) -> &Self {
+        self.inner.borrow_mut().block_hash = block_hash.clone();
+        self
+    }
+    pub fn current_txhash(&self, tx_hash:&H256) -> &Self {
+        self.inner.borrow_mut().tx_hash = tx_hash.clone();
         self
     }
 

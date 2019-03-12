@@ -47,7 +47,7 @@ fn transfer() {
     assert_eq!(token.balance_of(&alice, token_id_1.clone()), U256::from(10));
     let bob = Address::random();
     let states = [
-        (owner, alice, U256::from(1000), token_id_1.clone()),
+        (owner.clone(), alice, U256::from(1000), token_id_1.clone()),
         (owner, bob, U256::from(1000), token_id_1.clone()),
     ];
     assert!(token.transfer_multi(&states));
