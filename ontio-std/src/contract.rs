@@ -15,13 +15,13 @@ pub mod ont {
         super::util::approve_inner(&ONT_CONTRACT_ADDRESS, version, from, to, amount)
     }
     pub fn balance_of(version:u8, address: &Address) -> U256 {
-        super::util::balance_of(&ONT_CONTRACT_ADDRESS,version, &address)
+        super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS,version, &address)
     }
     pub fn allowance(version:u8, from:&Address, to: &Address) -> U256 {
-        super::util::allowance(&ONT_CONTRACT_ADDRESS, version, from, to)
+        super::util::allowance_inner(&ONT_CONTRACT_ADDRESS, version, from, to)
     }
     pub fn transfer_from(version:u8, sender:&Address, from: &Address, to: &Address, amount: U256) -> bool {
-        super::util::transfer_from(&ONT_CONTRACT_ADDRESS,version, sender, from, to, amount)
+        super::util::transfer_from_inner(&ONT_CONTRACT_ADDRESS,version, sender, from, to, amount)
     }
 }
 
@@ -33,16 +33,16 @@ pub mod ong {
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS,version, transfer)
     }
     pub fn balance_of(version:u8, address: &Address) -> U256 {
-        super::util::balance_of(&ONG_CONTRACT_ADDRESS,version, &address)
+        super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS,version, &address)
     }
     pub fn approve(version:u8, from: &Address, to: &Address, amount: U256) -> bool {
         super::util::approve_inner(&ONG_CONTRACT_ADDRESS, version, from, to, amount)
     }
     pub fn allowance(version:u8, from:&Address, to: &Address) -> U256 {
-        super::util::allowance(&ONG_CONTRACT_ADDRESS, version, from, to)
+        super::util::allowance_inner(&ONG_CONTRACT_ADDRESS, version, from, to)
     }
     pub fn transfer_from(version:u8, sender:&Address, from: &Address, to: &Address, amount: U256) -> bool {
-        super::util::transfer_from(&ONG_CONTRACT_ADDRESS,version, sender, from, to, amount)
+        super::util::transfer_from_inner(&ONG_CONTRACT_ADDRESS,version, sender, from, to, amount)
     }
 }
 
@@ -92,7 +92,7 @@ pub(crate) mod util {
         false
     }
 
-    pub(crate) fn transfer_from(contract_address: &Address, version:u8, sender:&Address, from: &Address, to: &Address, amount: U256) -> bool {
+    pub(crate) fn transfer_from_inner(contract_address: &Address, version:u8, sender:&Address, from: &Address, to: &Address, amount: U256) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_address(sender);
         sink.write_native_address(from);
@@ -111,7 +111,7 @@ pub(crate) mod util {
         false
     }
 
-    pub(crate) fn allowance(contract_address: &Address, version:u8, from:&Address,to:&Address) -> U256 {
+    pub(crate) fn allowance_inner(contract_address: &Address, version:u8, from:&Address,to:&Address) -> U256 {
         let mut sink = Sink::new(0);
         sink.write_native_address(from);
         sink.write_native_address(to);
@@ -127,7 +127,7 @@ pub(crate) mod util {
         }
         U256::zero()
     }
-    pub(crate) fn balance_of(contract_address: &Address, version:u8, address: &Address) -> U256 {
+    pub(crate) fn balance_of_inner(contract_address: &Address, version:u8, address: &Address) -> U256 {
         let mut sink = Sink::new(0);
         sink.write_native_address(address);
         let mut sink_param = Sink::new(0);
