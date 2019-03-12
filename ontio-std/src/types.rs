@@ -61,3 +61,23 @@ impl H256 {
         H256(val)
     }
 }
+
+
+#[test]
+fn test_to_neo_bytes() {
+    use hexutil;
+    let data = U256::from(8380656);
+    let res = to_neo_bytes(data);
+    let r = hexutil::to_hex(res.as_slice());
+    assert_eq!(r, "0xf0e07f");
+
+    let data = U256::from(8446192);
+    let res = to_neo_bytes(data);
+    let r = hexutil::to_hex(res.as_slice());
+    assert_eq!(r, "0xf0e08000");
+
+    let data = U256::from(128);
+    let res = to_neo_bytes(data);
+    let r = hexutil::to_hex(res.as_slice());
+    assert_eq!(r, "0x8000");
+}
