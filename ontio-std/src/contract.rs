@@ -50,11 +50,11 @@ pub(crate) mod util {
     use super::super::types::{Address,U256,to_neo_bytes};
     use super::super::abi::Sink;
     use super::super::runtime;
-    pub(crate) fn transfer_inner(contract_address: &Address, version:u8, trasnfer: &[super::ont::State]) -> bool {
+    pub(crate) fn transfer_inner(contract_address: &Address, version:u8, transfer: &[super::ont::State]) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_varuint(trasnfer.len() as u64);
 
-        for state in trasnfer.iter() {
+        for state in transfer.iter() {
             sink.write_native_address(&state.from);
             sink.write_native_address(&state.to);
             sink.write(to_neo_bytes(state.amount));
