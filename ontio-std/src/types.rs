@@ -32,22 +32,18 @@ pub fn to_neo_bytes(data: U256) -> Vec<u8> {
         res.push(0);
         return res;
     }
-    let mut temp = [0u8;32];
-    data.to_big_endian(&mut temp);
+    let mut temp:[u8; 32] = [0; 32];
+    data.to_little_endian(&mut temp);
     let mut f = false;
-    for i in temp.iter() {
-        if res.len() ==0 && *i>240u8 {
-            f = true;
+    if let Some(pos) = temp.iter().rev().position(|v| *v != 0) {
+        let mut end =32 - pos;
+        res.extend_from_slice(&temp[0..end]);
+        if temp[end-1] >= 0x80 {
+            res.push(0);
         }
-        if res.len()!=0 || *i != 0u8 {
-            res.push(*i);
-        }
+        return res;
     }
-    res.reverse();
-    if f {
-        res.push(0);
-    }
-    res
+    unreachable!()
 }
 
 impl H160 {
