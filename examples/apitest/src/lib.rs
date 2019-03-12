@@ -20,8 +20,8 @@ pub trait ApiTest {
     fn contract_debug(&self, content:&str) ->();
     //    fn contract_delete(&self) -> ();
     fn check_witness(&self, addr: &Address) -> bool;
-    fn get_current_blockhash(&self) -> H160;
-    fn get_current_txhash(&self) -> H160;
+    fn get_current_blockhash(&self) -> H256;
+    fn get_current_txhash(&self) -> H256;
     fn call_wasm_name(&self, contract_address:&Address) -> String;
     fn call_wasm_balance_of(&self, contract_address:&Address, addr:&Address) -> U256;
     fn call_wasm_transfer(&self, contract_address:&Address, from: &Address, to:&Address, amount:U256) -> bool;
@@ -68,17 +68,11 @@ impl ApiTest for ApiTestInstance {
             false
         }
     }
-    fn get_current_blockhash(&self) -> H160 {
-        let temp:[u8;20] = [0;20];
-        let blockhash = H160::new(temp);
-        runtime::current_blockhash(&blockhash);
-        blockhash
+    fn get_current_blockhash(&self) -> H256 {
+        runtime::current_blockhash()
     }
-    fn get_current_txhash(&self) -> H160 {
-        let temp:[u8;20] = [0;20];
-        let txhash = H160::new(temp);
-        runtime::current_txhash(&txhash);
-        txhash
+    fn get_current_txhash(&self) -> H256 {
+        runtime::current_txhash()
     }
     fn call_wasm_name(&self, contract_address:&Address) -> String {
         let mut sink = Sink::new(16);

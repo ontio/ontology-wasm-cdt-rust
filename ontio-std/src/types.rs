@@ -27,23 +27,21 @@ pub type Address = H160;
 pub use bigint::U256;
 
 pub fn to_neo_bytes(data: U256) -> Vec<u8> {
-    let mut res:Vec<u8> = Vec::new();
-    if data.is_zero() {
-        res.push(0);
-        return res;
-    }
     let mut temp:[u8; 32] = [0; 32];
     data.to_little_endian(&mut temp);
-    let mut f = false;
     if let Some(pos) = temp.iter().rev().position(|v| *v != 0) {
-        let mut end =32 - pos;
+        let mut res:Vec<u8> = Vec::new();
+        let end =32 - pos;
         res.extend_from_slice(&temp[0..end]);
         if temp[end-1] >= 0x80 {
             res.push(0);
         }
         return res;
+    } else {
+        let mut res:Vec<u8> = Vec::new();
+        res.push(0);
+        return res;
     }
-    unreachable!()
 }
 
 impl H160 {
