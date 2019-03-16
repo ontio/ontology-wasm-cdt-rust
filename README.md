@@ -75,8 +75,9 @@ pub fn invoke() {
 ```
 
 4. compile contract：
+since the default stack size is 1M, which is too large for contract, we need reduce it, 32kb is enough for most usecase.
 ```
-cargo build --release --target wasm32-unknown-unknown
+RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
 ```
 
 ## Procedural Macros
