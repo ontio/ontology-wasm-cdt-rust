@@ -1,5 +1,6 @@
 use crate::vec::Vec;
-/// implement common types
+use core::mem;
+use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
 
 construct_fixed_hash! {
@@ -55,6 +56,56 @@ impl H256 {
         H256(val)
     }
 }
+
+pub struct Addr {
+    pub inner: [u8]
+}
+
+impl Addr {
+    pub(crate) fn from_u8_slice(s: &[u8]) -> &Addr {
+        assert_eq!(s.len(), 20);
+        unsafe { mem::transmute(s) }
+    }
+}
+
+impl Address {
+    pub fn addr(&self) -> &Addr {
+        &Addr::from_u8_slice(&self.0)
+    }
+}
+
+impl AsRef<Addr> for Address {
+    fn as_ref(&self) -> &Addr {
+        self.addr()
+    }
+}
+
+impl AsRef<[u8]> for Addr {
+    fn as_ref(&self) -> &[u8] {
+        &self.inner
+    }
+}
+
+impl AsRef<Addr> for Addr {
+    fn as_ref(&self) -> &Addr {
+        self
+    }
+}
+
+impl Deref for Addr {
+    type Target = [u8];
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for Addr {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
+
 
 #[test]
 fn test_to_neo_bytes() {

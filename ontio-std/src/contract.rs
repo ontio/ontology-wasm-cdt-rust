@@ -1,24 +1,30 @@
 pub mod ont {
+    use super::super::base58;
+    use super::super::types::{Address, U256};
+    const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
+
     pub struct State {
         pub from: Address,
         pub to: Address,
         pub amount: U256,
     }
-    use super::super::base58;
-    use super::super::types::{Address, U256};
-    const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
+
     pub fn transfer(transfer: &[State]) -> bool {
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, transfer)
     }
+
     pub fn approve(from: &Address, to: &Address, amount: U256) -> bool {
         super::util::approve_inner(&ONT_CONTRACT_ADDRESS, from, to, amount)
     }
+
     pub fn balance_of(address: &Address) -> U256 {
         super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, &address)
     }
+
     pub fn allowance(from: &Address, to: &Address) -> U256 {
         super::util::allowance_inner(&ONT_CONTRACT_ADDRESS, from, to)
     }
+
     pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U256) -> bool {
         super::util::transfer_from_inner(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
     }

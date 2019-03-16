@@ -1,9 +1,11 @@
 mod codec;
 mod sink;
 mod source;
+mod zero_copy_source;
 
 pub use self::sink::Sink;
 pub use self::source::Source;
+pub use self::zero_copy_source::ZeroCopySource;
 
 #[derive(Debug)]
 pub enum Error {

@@ -3,7 +3,7 @@ use super::{Decoder, Encoder};
 use super::{Sink, Source};
 
 use crate::cmp;
-use crate::types::{Address, H256, U256};
+use crate::types::{Address, Addr, H256, U256};
 use crate::{String, Vec};
 
 impl Decoder for u8 {
@@ -159,6 +159,12 @@ impl Encoder for &str {
 impl Encoder for String {
     fn encode(&self, sink: &mut Sink) {
         self.as_str().encode(sink)
+    }
+}
+
+impl Encoder for &Addr {
+    fn encode(&self, sink: &mut Sink) {
+        sink.write_bytes(&self)
     }
 }
 
