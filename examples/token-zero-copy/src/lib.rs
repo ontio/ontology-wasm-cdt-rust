@@ -24,15 +24,15 @@ fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
     if runtime::check_witness(&from) == false {
         return false;
     }
-    let mut frmbal = balance_of(&from);
-    let mut tobal = balance_of(&to);
+    let mut frmbal = balance_of(from);
+    let mut tobal = balance_of(to);
     if amount == 0.into() || frmbal < amount {
         false
     } else {
         frmbal = frmbal - amount;
         tobal = tobal + amount;
-        database::put(&from, frmbal);
-        database::put(&to, tobal);
+        database::put(from, frmbal);
+        database::put(to, tobal);
         notify(("Transfer".to_string(), from, to, amount));
         true
     }

@@ -2,6 +2,7 @@
 #![feature(core_intrinsics)]
 #![feature(allocator_api)]
 #![feature(alloc)]
+#![feature(alloc_prelude)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(exclusive_range_pattern)]
 #![feature(proc_macro_hygiene)]
