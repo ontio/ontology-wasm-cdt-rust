@@ -4,6 +4,7 @@ members = [
     "ontio-codegen",
     "examples",
     "examples/token",
+    "examples/token-zero-copy",
     "examples/token-codegen",
     "examples/oep5token",
     "examples/oep8token",

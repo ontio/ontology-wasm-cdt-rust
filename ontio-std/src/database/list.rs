@@ -268,11 +268,11 @@ where
                     i.encode(&mut sink);
                 }
                 let key = format!("{}{}", self.key, k);
-                database::put(&key, sink.into().as_slice());
+                database::put(&key, sink.bytes());
             }
             let mut sink = Sink::new(16);
             self.encode(&mut sink);
-            database::put(&self.key, sink.into())
+            database::put(&self.key, sink.bytes())
         }
     }
 

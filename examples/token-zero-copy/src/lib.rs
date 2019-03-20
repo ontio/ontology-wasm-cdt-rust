@@ -2,12 +2,13 @@
 extern crate ontio_std as ostd;
 
 use ostd::abi::{Encoder, Sink, ZeroCopySource};
-use ostd::prelude::*;
+use ostd::string::ToString;
+use ostd::types::{Addr, U256};
 use ostd::{database, runtime};
 
-const KEY_TOTAL_SUPPLY: &str = "total_supply";
-const NAME: &str = "wasm_token";
-const SYMBOL: &str = "WTK";
+const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
+const NAME: &'static str = "wasm_token";
+const SYMBOL: &'static str = "WTK";
 const TOTAL_SUPPLY: u64 = 100000000000;
 
 fn initialize() -> bool {
@@ -20,20 +21,21 @@ fn balance_of(owner: &Addr) -> U256 {
 }
 
 fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
-    assert!(runtime::check_witness(from));
-
+    if runtime::check_witness(&from) == false {
+        return false;
+    }
     let mut frmbal = balance_of(from);
     let mut tobal = balance_of(to);
     if amount == 0.into() || frmbal < amount {
-        return false;
+        false
+    } else {
+        frmbal = frmbal - amount;
+        tobal = tobal + amount;
+        database::put(from, frmbal);
+        database::put(to, tobal);
+        notify(("Transfer".to_string(), from, to, amount));
+        true
     }
-
-    frmbal = frmbal - amount;
-    tobal = tobal + amount;
-    database::put(from, frmbal);
-    database::put(to, tobal);
-    notify(("Transfer", from, to, amount));
-    true
 }
 
 fn total_supply() -> U256 {
@@ -44,18 +46,18 @@ fn total_supply() -> U256 {
 pub fn invoke() {
     let input = runtime::input();
     let mut source = ZeroCopySource::new(&input);
-    let action = source.read().unwrap();
+    let action: &[u8] = source.read().unwrap();
     let mut sink = Sink::new(12);
     match action {
-        "init" => sink.write(initialize()),
-        "name" => sink.write(NAME.to_string()),
-        "symbol" => sink.write(SYMBOL.to_string()),
-        "totalSupply" => sink.write(total_supply()),
-        "balanceOf" => {
-            let addr = source.read().unwrap();
+        b"init" => sink.write(initialize()),
+        b"name" => sink.write(NAME.to_string()),
+        b"symbol" => sink.write(SYMBOL.to_string()),
+        b"totalSupply" => sink.write(total_supply()),
+        b"balanceOf" => {
+            let addr = source.read_addr().unwrap();
             sink.write(balance_of(addr));
         }
-        "transfer" => {
+        b"transfer" => {
             let (from, to, amount) = source.read().unwrap();
             sink.write(transfer(from, to, amount));
         }

@@ -212,7 +212,7 @@ mod utils {
     pub fn concat<K: AsRef<[u8]>, T: Encoder>(prefix: K, key: T) -> Vec<u8> {
         let mut sink = ostd::abi::Sink::new(1);
         sink.write(key);
-        [prefix.as_ref(), sink.into().as_slice()].concat()
+        [prefix.as_ref(), sink.bytes()].concat()
     }
 }
 
