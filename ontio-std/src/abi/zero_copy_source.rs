@@ -1,4 +1,4 @@
-use super::Decoder;
+use super::Decoder2;
 use super::Error;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
@@ -37,12 +37,16 @@ impl<'a> ZeroCopySource<'a> {
         }
     }
 
-    pub fn next_var_bytes(&mut self)->  Result<&'a [u8], Error> {
+    pub fn read_bytes(&mut self) -> Result<&'a [u8], Error> {
         let n = self.read_varuint()?;
         self.next_bytes(n as usize)
     }
 
-    pub fn next_addr(&mut self) -> Result<&'a Addr, Error> {
+    pub fn read<T: Decoder2<'a>>(&mut self) -> Result<T, Error> {
+        T::decode2(self)
+    }
+
+    pub fn read_addr(&mut self) -> Result<&'a Addr, Error> {
         let buf = self.next_bytes(20)?;
         Ok(Addr::from_u8_slice(buf))
     }
@@ -53,7 +57,7 @@ impl<'a> ZeroCopySource<'a> {
         Ok(())
     }
 
-    pub(crate) fn read_byte(&mut self) -> Result<u8, Error> {
+    pub fn read_byte(&mut self) -> Result<u8, Error> {
         if self.pos >= self.buf.len() {
             Err(Error::UnexpectedEOF)
         } else {
@@ -63,7 +67,7 @@ impl<'a> ZeroCopySource<'a> {
         }
     }
 
-    pub(crate) fn read_bool(&mut self) -> Result<bool, Error> {
+    pub fn read_bool(&mut self) -> Result<bool, Error> {
         match self.read_byte()? {
             0 => Ok(false),
             1 => Ok(true),
@@ -72,7 +76,7 @@ impl<'a> ZeroCopySource<'a> {
     }
 
     #[allow(unused)]
-    pub(crate) fn skip(&mut self, n: usize) -> Result<(), Error> {
+    pub fn skip(&mut self, n: usize) -> Result<(), Error> {
         if self.buf.len() - self.pos < n {
             Err(Error::UnexpectedEOF)
         } else {
@@ -82,24 +86,24 @@ impl<'a> ZeroCopySource<'a> {
     }
 
     #[allow(unused)]
-    pub(crate) fn backup(&mut self, n: usize) {
+    pub fn backup(&mut self, n: usize) {
         assert!(self.pos >= n);
         self.pos -= n;
     }
 
-    pub(crate) fn read_u16(&mut self) -> Result<u16, Error> {
+    pub fn read_u16(&mut self) -> Result<u16, Error> {
         Ok(LittleEndian::read_u16(self.next_bytes(2)?))
     }
 
-    pub(crate) fn read_u32(&mut self) -> Result<u32, Error> {
+    pub fn read_u32(&mut self) -> Result<u32, Error> {
         Ok(LittleEndian::read_u32(self.next_bytes(4)?))
     }
 
-    pub(crate) fn read_u64(&mut self) -> Result<u64, Error> {
+    pub fn read_u64(&mut self) -> Result<u64, Error> {
         Ok(LittleEndian::read_u64(self.next_bytes(8)?))
     }
 
-    pub(crate) fn read_varuint(&mut self) -> Result<u64, Error> {
+    pub fn read_varuint(&mut self) -> Result<u64, Error> {
         match self.read_byte()? {
             0xFD => self.read_u16().map(|v| (3, v as u64)),
             0xFE => self.read_u32().map(|v| (5, v as u64)),

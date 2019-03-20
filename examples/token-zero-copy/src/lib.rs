@@ -2,7 +2,7 @@
 extern crate ontio_std as ostd;
 
 use ostd::abi::{Encoder, Sink, Source, ZeroCopySource};
-use ostd::types::{Address, Addr, U256};
+use ostd::types::{Addr, Address, U256};
 use ostd::{database, runtime};
 use ostd::{string::ToString, String};
 
@@ -46,7 +46,7 @@ fn total_supply() -> U256 {
 pub fn invoke() {
     let input = runtime::input();
     let mut source = ZeroCopySource::new(&input);
-    let action = source.next_var_bytes().unwrap();
+    let action: &[u8] = source.read().unwrap();
     let mut sink = Sink::new(12);
     match action {
         b"init" => sink.write(initialize()),
@@ -54,12 +54,12 @@ pub fn invoke() {
         b"symbol" => sink.write(SYMBOL.to_string()),
         b"totalSupply" => sink.write(total_supply()),
         b"balanceOf" => {
-            let addr = source.next_addr().unwrap();
-            sink.write(balance_of(&addr));
+            let addr = source.read_addr().unwrap();
+            sink.write(balance_of(addr));
         }
         b"transfer" => {
-            let from = source.next_addr().unwrap();
-            let to = source.next_addr().unwrap();
+            let from = source.read().unwrap();
+            let to = source.read().unwrap();
             let amount = U256::zero();
             sink.write(transfer(from, to, amount));
         }

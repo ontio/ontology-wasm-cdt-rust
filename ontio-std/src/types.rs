@@ -58,7 +58,7 @@ impl H256 {
 }
 
 pub struct Addr {
-    pub inner: [u8]
+    pub inner: [u8],
 }
 
 impl Addr {
@@ -105,7 +105,6 @@ impl DerefMut for Addr {
         &mut self.inner
     }
 }
-
 
 #[test]
 fn test_to_neo_bytes() {

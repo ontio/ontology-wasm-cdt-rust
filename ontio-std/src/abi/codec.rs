@@ -1,14 +1,33 @@
 use super::Error;
-use super::{Decoder, Encoder};
+use super::{Decoder2, Encoder};
 use super::{Sink, Source};
 
+use crate::abi::{Decoder, ZeroCopySource};
 use crate::cmp;
-use crate::types::{Address, Addr, H256, U256};
+use crate::types::{Addr, Address, H256, U256};
 use crate::{String, Vec};
 
 impl Decoder for u8 {
     fn decode(source: &mut Source) -> Result<Self, Error> {
         source.read_byte()
+    }
+}
+
+impl<'a> Decoder2<'a> for u8 {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_byte()
+    }
+}
+
+impl<'a> Decoder2<'a> for &'a Addr {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_addr()
+    }
+}
+
+impl<'a> Decoder2<'a> for &'a [u8] {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_bytes()
     }
 }
 
