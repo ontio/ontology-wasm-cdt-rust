@@ -26,6 +26,7 @@ pub trait Dispatcher {
     fn dispatch(&mut self, payload: &[u8]) -> crate::Vec<u8>;
 }
 
+#[doc(hidden)]
 pub trait Decoder2<'a>: Sized {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error>;
 }
