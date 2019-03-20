@@ -58,9 +58,7 @@ pub fn invoke() {
             sink.write(balance_of(addr));
         }
         b"transfer" => {
-            let from = source.read().unwrap();
-            let to = source.read().unwrap();
-            let amount = U256::zero();
+            let (from, to, amount) = source.read().unwrap();
             sink.write(transfer(from, to, amount));
         }
         _ => panic!("unsupported action!"),

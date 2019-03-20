@@ -1,6 +1,5 @@
 use super::Decoder2;
 use super::Error;
-use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
 
 use crate::types::{Addr, Hash, U256};

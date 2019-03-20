@@ -293,3 +293,13 @@ for_each_tuple! {
         }
     }
 }
+
+for_each_tuple! {
+    ($($item:ident)*) => {
+        impl<'a, $($item: Decoder2<'a>),*> Decoder2<'a> for ($($item,)*) {
+            fn decode2(_source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+                Ok(($(_source.read::<$item>()?,)*))
+            }
+        }
+    }
+}
