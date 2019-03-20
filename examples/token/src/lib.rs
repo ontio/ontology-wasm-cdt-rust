@@ -1,14 +1,13 @@
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Encoder, Sink, Source};
-use ostd::types::{Address, U256};
+use ostd::abi::{Encoder, Sink, ZeroCopySource};
+use ostd::prelude::*;
 use ostd::{database, runtime};
-use ostd::{string::ToString, String};
 
-const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
-const NAME: &'static str = "wasm_token";
-const SYMBOL: &'static str = "WTK";
+const KEY_TOTAL_SUPPLY: &str = "total_supply";
+const NAME: &str = "wasm_token";
+const SYMBOL: &str = "WTK";
 const TOTAL_SUPPLY: u64 = 100000000000;
 
 fn initialize() -> bool {
@@ -16,26 +15,25 @@ fn initialize() -> bool {
     true
 }
 
-fn balance_of(owner: &Address) -> U256 {
+fn balance_of(owner: &Addr) -> U256 {
     database::get(owner).unwrap_or(U256::zero())
 }
 
-fn transfer(from: Address, to: Address, amount: U256) -> bool {
-    if runtime::check_witness(&from) == false {
+fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
+    assert!(runtime::check_witness(from));
+
+    let mut frmbal = balance_of(from);
+    let mut tobal = balance_of(to);
+    if amount == 0.into() || frmbal < amount {
         return false;
     }
-    let mut frmbal = balance_of(&from);
-    let mut tobal = balance_of(&to);
-    if amount == 0.into() || frmbal < amount {
-        false
-    } else {
-        frmbal = frmbal - amount;
-        tobal = tobal + amount;
-        database::put(&from, frmbal);
-        database::put(&to, tobal);
-        notify(("Transfer".to_string(), from, to, amount));
-        true
-    }
+
+    frmbal = frmbal - amount;
+    tobal = tobal + amount;
+    database::put(from, frmbal);
+    database::put(to, tobal);
+    notify(("Transfer", from, to, amount));
+    true
 }
 
 fn total_supply() -> U256 {
@@ -44,17 +42,18 @@ fn total_supply() -> U256 {
 
 #[no_mangle]
 pub fn invoke() {
-    let mut source = Source::new(runtime::input());
-    let action = source.read::<String>().unwrap();
+    let input = runtime::input();
+    let mut source = ZeroCopySource::new(&input);
+    let action = source.read().unwrap();
     let mut sink = Sink::new(12);
-    match action.as_str() {
+    match action {
         "init" => sink.write(initialize()),
         "name" => sink.write(NAME.to_string()),
         "symbol" => sink.write(SYMBOL.to_string()),
         "totalSupply" => sink.write(total_supply()),
         "balanceOf" => {
             let addr = source.read().unwrap();
-            sink.write(balance_of(&addr));
+            sink.write(balance_of(addr));
         }
         "transfer" => {
             let (from, to, amount) = source.read().unwrap();
@@ -63,11 +62,11 @@ pub fn invoke() {
         _ => panic!("unsupported action!"),
     }
 
-    runtime::ret(&sink.into())
+    runtime::ret(sink.bytes())
 }
 
 fn notify<T: Encoder>(msg: T) {
     let mut sink = Sink::new(16);
     sink.write(msg);
-    runtime::notify(&sink.into());
+    runtime::notify(sink.bytes());
 }

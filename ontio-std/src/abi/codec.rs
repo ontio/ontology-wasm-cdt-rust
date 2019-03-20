@@ -5,7 +5,7 @@ use super::{Sink, Source};
 use crate::abi::{Decoder, ZeroCopySource};
 use crate::cmp;
 use crate::types::{Addr, Address, Hash, H256, U256};
-use crate::{String, Vec};
+use crate::{str, String, Vec};
 
 impl Decoder for u8 {
     fn decode(source: &mut Source) -> Result<Self, Error> {
@@ -30,6 +30,14 @@ impl<'a> Decoder2<'a> for &'a [u8] {
         source.read_bytes()
     }
 }
+
+impl<'a> Decoder2<'a> for &'a str {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        let buf = source.read_bytes()?;
+        str::from_utf8(buf).map_err(|_| Error::InvalidUtf8)
+    }
+}
+
 impl<'a> Decoder2<'a> for u16 {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
         source.read_u16()
@@ -47,6 +55,7 @@ impl<'a> Decoder2<'a> for u64 {
         source.read_u64()
     }
 }
+
 impl<'a> Decoder2<'a> for bool {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
         source.read_bool()

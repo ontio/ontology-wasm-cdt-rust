@@ -64,11 +64,11 @@ pub fn invoke() {
         _ => panic!("unsupported action!"),
     }
 
-    runtime::ret(&sink.into())
+    runtime::ret(sink.bytes())
 }
 
 fn notify<T: Encoder>(msg: T) {
     let mut sink = Sink::new(16);
     sink.write(msg);
-    runtime::notify(&sink.into());
+    runtime::notify(sink.bytes());
 }

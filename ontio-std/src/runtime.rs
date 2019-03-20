@@ -180,7 +180,7 @@ pub fn current_txhash() -> H256 {
     tx_hash
 }
 ///Check signature
-pub fn check_witness<T: AsRef<Addr>>(addr: &T) -> bool {
+pub fn check_witness<T: AsRef<Addr>>(addr: T) -> bool {
     unsafe { env::check_witness(addr.as_ref().as_ptr()) != 0 }
 }
 

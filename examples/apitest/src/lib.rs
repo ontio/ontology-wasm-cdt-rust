@@ -87,7 +87,7 @@ impl ApiTest for ApiTestInstance {
         let mut sink = Sink::new(16);
         sink.write("name".to_string());
         console::debug(&format!("{:?}", contract_address));
-        let res = runtime::call_contract(contract_address, sink.into().as_slice()).unwrap();
+        let res = runtime::call_contract(contract_address, sink.bytes().as_slice()).unwrap();
         let s = str::from_utf8(res.as_slice()).unwrap();
         console::debug(s);
         let mut source = Source::new(res);
@@ -96,7 +96,7 @@ impl ApiTest for ApiTestInstance {
     fn call_wasm_balance_of(&self, contract_address: &Address, addr: &Address) -> U256 {
         let mut sink = Sink::new(16);
         sink.write(("balance_of".to_string(), addr));
-        let res = runtime::call_contract(contract_address, sink.into().as_slice());
+        let res = runtime::call_contract(contract_address, sink.bytes().as_slice());
         if res.is_some() {
             let temp = res.unwrap();
             let mut source = Source::new(temp);
@@ -110,7 +110,7 @@ impl ApiTest for ApiTestInstance {
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write(("transfer".to_string(), from, to, amount));
-        let res = runtime::call_contract(contract_address, sink.into().as_slice());
+        let res = runtime::call_contract(contract_address, sink.bytes().as_slice());
         if res.is_some() {
             true
         } else {
@@ -129,7 +129,7 @@ impl ApiTest for ApiTestInstance {
         sink.write("transfer".to_string());
         sink.write(103u8);
         sink.write(contract_address);
-        let res = runtime::call_contract(contract_address, sink.into().as_slice());
+        let res = runtime::call_contract(contract_address, sink.bytes().as_slice());
         if res.is_some() {
             let data = res.unwrap();
             runtime::notify("true".as_bytes());

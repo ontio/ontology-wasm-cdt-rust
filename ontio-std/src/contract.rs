@@ -70,8 +70,8 @@ pub(crate) mod util {
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
         sink_param.write("transfer");
-        sink_param.write(sink.into());
-        let res = runtime::call_contract(contract_address, sink_param.into().as_slice());
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
                 return true;
@@ -90,8 +90,8 @@ pub(crate) mod util {
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
         sink_param.write("approve");
-        sink_param.write(sink.into());
-        let res = runtime::call_contract(contract_address, sink_param.into().as_slice());
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
                 return true;
@@ -111,8 +111,8 @@ pub(crate) mod util {
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
         sink_param.write("transferFrom");
-        sink_param.write(sink.into());
-        let res = runtime::call_contract(contract_address, sink_param.into().as_slice());
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
                 return true;
@@ -130,8 +130,8 @@ pub(crate) mod util {
         let mut sink_param = Sink::new(0);
         sink_param.write(VERSION);
         sink_param.write("allowance");
-        sink_param.write(sink.into());
-        let res = runtime::call_contract(contract_address, sink_param.into().as_slice());
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
                 return U256::from(data.as_slice());
@@ -145,8 +145,8 @@ pub(crate) mod util {
         let mut sink_param = Sink::new(0);
         sink_param.write(VERSION);
         sink_param.write("balanceOf");
-        sink_param.write(sink.into());
-        let res = runtime::call_contract(contract_address, sink_param.into().as_slice());
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
                 return U256::from(data.as_slice());

@@ -16,7 +16,7 @@ pub fn get<K: AsRef<[u8]>, T: Decoder>(key: K) -> Option<T> {
 pub fn put<K: AsRef<[u8]>, T: Encoder>(key: K, val: T) {
     let mut sink = Sink::new(12);
     sink.write(val);
-    runtime::storage_write(key.as_ref(), &sink.into());
+    runtime::storage_write(key.as_ref(), sink.bytes());
 }
 
 pub fn delete<K: AsRef<[u8]>>(key: K) {
