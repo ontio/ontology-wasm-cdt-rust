@@ -1,10 +1,10 @@
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Encoder, Sink, Source, ZeroCopySource};
-use ostd::types::{Addr, Address, U256};
+use ostd::abi::{Encoder, Sink, ZeroCopySource};
+use ostd::string::ToString;
+use ostd::types::{Addr, U256};
 use ostd::{database, runtime};
-use ostd::{string::ToString, String};
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const NAME: &'static str = "wasm_token";

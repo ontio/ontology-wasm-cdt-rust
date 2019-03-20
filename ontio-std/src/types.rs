@@ -56,6 +56,36 @@ impl H256 {
         H256(val)
     }
 }
+pub struct Hash {
+    pub inner: [u8],
+}
+
+impl Hash {
+    pub(crate) fn from_u8_slice(s: &[u8]) -> &Hash {
+        assert_eq!(s.len(), 32);
+        unsafe { mem::transmute(s) }
+    }
+}
+
+impl AsRef<[u8]> for Hash {
+    fn as_ref(&self) -> &[u8] {
+        &self.inner
+    }
+}
+
+impl Deref for Hash {
+    type Target = [u8];
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for Hash {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
 
 pub struct Addr {
     pub inner: [u8],

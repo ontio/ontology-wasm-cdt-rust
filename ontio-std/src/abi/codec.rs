@@ -4,7 +4,7 @@ use super::{Sink, Source};
 
 use crate::abi::{Decoder, ZeroCopySource};
 use crate::cmp;
-use crate::types::{Addr, Address, H256, U256};
+use crate::types::{Addr, Address, Hash, H256, U256};
 use crate::{String, Vec};
 
 impl Decoder for u8 {
@@ -28,6 +28,40 @@ impl<'a> Decoder2<'a> for &'a Addr {
 impl<'a> Decoder2<'a> for &'a [u8] {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
         source.read_bytes()
+    }
+}
+impl<'a> Decoder2<'a> for u16 {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_u16()
+    }
+}
+
+impl<'a> Decoder2<'a> for u32 {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_u32()
+    }
+}
+
+impl<'a> Decoder2<'a> for u64 {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_u64()
+    }
+}
+impl<'a> Decoder2<'a> for bool {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_bool()
+    }
+}
+
+impl<'a> Decoder2<'a> for &'a Hash {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_hash()
+    }
+}
+
+impl<'a> Decoder2<'a> for U256 {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        source.read_u256()
     }
 }
 

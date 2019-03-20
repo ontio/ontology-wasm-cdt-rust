@@ -3,7 +3,7 @@ use super::Error;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
 
-use crate::types::Addr;
+use crate::types::{Addr, Hash, U256};
 
 fn varuint_encode_size(val: u64) -> usize {
     if val < 0xfd {
@@ -49,6 +49,16 @@ impl<'a> ZeroCopySource<'a> {
     pub fn read_addr(&mut self) -> Result<&'a Addr, Error> {
         let buf = self.next_bytes(20)?;
         Ok(Addr::from_u8_slice(buf))
+    }
+
+    pub fn read_hash(&mut self) -> Result<&'a Hash, Error> {
+        let buf = self.next_bytes(32)?;
+        Ok(Hash::from_u8_slice(buf))
+    }
+
+    pub fn read_u256(&mut self) -> Result<U256, Error> {
+        let buf = self.next_bytes(32)?;
+        Ok(U256::from_little_endian(buf))
     }
 
     pub(crate) fn read_into(&mut self, buf: &mut [u8]) -> Result<(), Error> {
