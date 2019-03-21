@@ -28,10 +28,8 @@ fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
         return false;
     }
 
-    frmbal = frmbal - amount;
-    tobal = tobal + amount;
-    database::put(from, frmbal);
-    database::put(to, tobal);
+    database::put(from, frmbal - amount);
+    database::put(to, tobal + amount);
     notify(("Transfer", from, to, amount));
     true
 }
@@ -48,8 +46,8 @@ pub fn invoke() {
     let mut sink = Sink::new(12);
     match action {
         "init" => sink.write(initialize()),
-        "name" => sink.write(NAME.to_string()),
-        "symbol" => sink.write(SYMBOL.to_string()),
+        "name" => sink.write(NAME),
+        "symbol" => sink.write(SYMBOL),
         "totalSupply" => sink.write(total_supply()),
         "balanceOf" => {
             let addr = source.read().unwrap();
