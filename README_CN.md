@@ -25,7 +25,7 @@ edition = "2018"
 crate-type = ["cdylib"] #编译为动态链接库
 
 [dependencies]
-ontio-std = {git = "https://github.com/laizy/ontio-cdk"}
+ontio-std = {git = "https://github.com/ontio/ontology-wasm-cdt-rust"}
 
 [features]
 mock = ["ontio-std/mock"]
@@ -41,6 +41,80 @@ pub fn invoke() {
     runtime::ret(b"hello, world");
 }
 ```
+一个简单的token合约如下：
+```rust
+#![no_std]
+extern crate ontio_std as ostd;
+
+use ostd::abi::{Encoder, Sink, ZeroCopySource};
+use ostd::prelude::*;
+use ostd::{database, runtime};
+
+const KEY_TOTAL_SUPPLY: &str = "total_supply";
+const NAME: &str = "wasm_token";
+const SYMBOL: &str = "WTK";
+const TOTAL_SUPPLY: u64 = 100000000000;
+
+fn initialize() -> bool {
+    database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
+    true
+}
+
+fn balance_of(owner: &Addr) -> U256 {
+    database::get(owner).unwrap_or(U256::zero())
+}
+
+fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
+    assert!(runtime::check_witness(from));
+
+    let mut frmbal = balance_of(from);
+    let mut tobal = balance_of(to);
+    if amount == U256::zero() || frmbal < amount {
+        return false;
+    }
+
+    database::put(from, frmbal - amount);
+    database::put(to, tobal + amount);
+    notify(("Transfer", from, to, amount));
+    true
+}
+
+fn total_supply() -> U256 {
+    database::get(KEY_TOTAL_SUPPLY).unwrap()
+}
+
+#[no_mangle]
+pub fn invoke() {
+    let input = runtime::input();
+    let mut source = ZeroCopySource::new(&input);
+    let action = source.read().unwrap();
+    let mut sink = Sink::new(12);
+    match action {
+        "init" => sink.write(initialize()),
+        "name" => sink.write(NAME),
+        "symbol" => sink.write(SYMBOL),
+        "totalSupply" => sink.write(total_supply()),
+        "balanceOf" => {
+            let addr = source.read().unwrap();
+            sink.write(balance_of(addr));
+        }
+        "transfer" => {
+            let (from, to, amount) = source.read().unwrap();
+            sink.write(transfer(from, to, amount));
+        }
+        _ => panic!("unsupported action!"),
+    }
+
+    runtime::ret(sink.bytes())
+}
+
+fn notify<T: Encoder>(msg: T) {
+    let mut sink = Sink::new(16);
+    sink.write(msg);
+    runtime::notify(sink.bytes());
+}
+```
+
 4. 合约编译：
 由于rustc编译默认设置的栈内存大小是1M，这对于大型软件程序来说比较合理，但对合约来说是巨大的浪费，因此在编译时设置下栈的大小，32kb对于绝大多数合约来说是够用的。
 `RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown`
