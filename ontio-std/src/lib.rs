@@ -11,11 +11,20 @@
 //#![feature(trace_macros)]
 
 cfg_if::cfg_if! {
-    if #[cfg(not(feature = "std"))] {
+    if #[cfg(all(not(feature = "std"), feature = "bump-alloc"))] {
+        use ontio_bump_alloc::BumpAlloc;
+        #[global_allocator]
+        static ALLOC: BumpAlloc = BumpAlloc::new();
+    } else if #[cfg(not(feature = "std"))] {
         extern crate wee_alloc;
         // Use `wee_alloc` as the global allocator.
         #[global_allocator]
         static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+    }
+}
+
+cfg_if::cfg_if! {
+    if #[cfg(not(feature = "std"))] {
         /// Overrides the default panic_fmt
         #[no_mangle]
         #[panic_handler]
