@@ -42,28 +42,28 @@ let flag = runtime::check_witness(&from);
 
 在合约中调用其他合约时，需要按照目标合约的参数序列化标准序列化参数。
 - `wasm`合约调用`neovm`合约
- - `U256`数据类型的序列化，需要先调用`types::to_neo_bytes()`方法转换成字节数组，然后在调用``。
- - `Address`数据类型要用`sink.write_neovm_address()`方法序列化。
- - 参数序列化步骤
-   1. 先序列化要调用合约中方法的参数，目标合约的方法参数要按照倒序的方式序列化
-   2. 方法参数序列化完成后，再序列化`83u8`和`193u8`字节码
-   3. 序列化方法名
-   4. 序列化字节码`103u8`
-   5. 序列化合约地址
-```
-let mut sink = Sink::new(16);
-sink.write(to_neo_bytes(amount));
-sink.write_neovm_address(to);
-sink.write_neovm_address(from);
-sink.write(83u8);
-sink.write(193u8);
-sink.write("transfer".to_string());
-sink.write(103u8);
-sink.write(contract_address);
-let res = runtime::call_contract(contract_address, sink.bytes());
-```
+  - `U256`数据类型的序列化，需要先调用`types::to_neo_bytes()`方法转换成字节数组，然后在调用``。
+  - `Address`数据类型要用`sink.write_neovm_address()`方法序列化。
+  - 参数序列化步骤
+    1. 先序列化要调用合约中方法的参数，目标合约的方法参数要按照倒序的方式序列化
+    2. 方法参数序列化完成后，再序列化`83u8`和`193u8`字节码
+    3. 序列化方法名
+    4. 序列化字节码`103u8`
+    5. 序列化合约地址
+    ```
+    let mut sink = Sink::new(16);
+    sink.write(to_neo_bytes(amount));
+    sink.write_neovm_address(to);
+    sink.write_neovm_address(from);
+    sink.write(83u8);
+    sink.write(193u8);
+    sink.write("transfer".to_string());
+    sink.write(103u8);
+    sink.write(contract_address);
+    let res = runtime::call_contract(contract_address, sink.bytes());
+    ```
 - `wasm`调用`native`
-  - `wasm`调用`ont`和`ong`中的方法请参考contract模块
+   - `wasm`调用`ont`和`ong`中的方法请参考contract模块
 
 ## ontio-std介绍
 
@@ -101,39 +101,39 @@ let (from, to, amount) = source.read().unwrap();
 
 4. contract模块
 - `ong`：封装了在合约中调用ong的相关操作，例如转账、查询余额等。
-  - `allowance(from: &Address, to: &Address)` 查询allowance余额
- 示例
-```
-use ostd::contract::ont;
-ont::allowance(from, to)
-```
-  - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
+   - `allowance(from: &Address, to: &Address)` 查询allowance余额
+     示例
+    ```
+    use ostd::contract::ont;
+    ont::allowance(from, to)
+    ```
+   - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
 
- 示例
-```
-use ostd::contract::ont;
-ont::approve(from, to, amount)
-```
-  - `balance_of` 查询余额
+     示例
+    ```
+    use ostd::contract::ont;
+    ont::approve(from, to, amount)
+    ```
+   - `balance_of` 查询余额
 
- 示例：
- ```
- use ostd::contract::ont;
- ong::balance_of(address)
- ```
-  - `transfer` 转账
+     示例：
+     ```
+     use ostd::contract::ont;
+     ong::balance_of(address)
+     ```
+   - `transfer` 转账
 
- 示例
-```
-let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
-ont::transfer(&[state])
-```
-  - `transfer_from`
+     示例
+    ```
+    let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
+    ont::transfer(&[state])
+    ```
+   - `transfer_from`
 
- 示例
-```
-ont::transfer_from(sender, from, to, amount)
-```
+     示例
+    ```
+    ont::transfer_from(sender, from, to, amount)
+    ```
 - `ont`:封装了在合约中调用ont的相关操作,调用方法和ong类似。
 
 

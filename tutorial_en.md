@@ -48,30 +48,30 @@ let flag = runtime::check_witness(&from);
 
 When calling other contracts in a contract, you need to serialize the parameters according to the parameters serialize standard of the target contract.
 - `wasm`contract invoke `neovm` contract
- - `U256` should convert to byte array by `types::to_neo_bytes()` firstly, then invoke `sink.write()` to serialize;
- - `Address` should be serialized by `sink.write_neovm_address()`。
- - parameter serialize step
-   1. The method parameters of the target contract are serialized in reverse order.
-   2. After the method parameters are serialized, serialize the `83u8` and `193u8` bytecodes.
-   3. serialize function name
-   4. serialize `103u8`
-   5. serialize contract address
+   - `U256` should convert to byte array by `types::to_neo_bytes()` firstly, then invoke `sink.write()` to serialize;
+   - `Address` should be serialized by `sink.write_neovm_address()`。
+   - parameter serialize step
+    1. The method parameters of the target contract are serialized in reverse order.
+    2. After the method parameters are serialized, serialize the `83u8` and `193u8` bytecodes.
+    3. serialize function name
+    4. serialize `103u8`
+    5. serialize contract address
 
-example
-```
-let mut sink = Sink::new(16);
-sink.write(to_neo_bytes(amount));
-sink.write_neovm_address(to);
-sink.write_neovm_address(from);
-sink.write(83u8);
-sink.write(193u8);
-sink.write("transfer".to_string());
-sink.write(103u8);
-sink.write(contract_address);
-let res = runtime::call_contract(contract_address, sink.bytes());
-```
+    example
+    ```
+    let mut sink = Sink::new(16);
+    sink.write(to_neo_bytes(amount));
+    sink.write_neovm_address(to);
+    sink.write_neovm_address(from);
+    sink.write(83u8);
+    sink.write(193u8);
+    sink.write("transfer".to_string());
+    sink.write(103u8);
+    sink.write(contract_address);
+    let res = runtime::call_contract(contract_address, sink.bytes());
+    ```
 - `wasm` invoke `native`
-  - The contract module encapsulates the method of calling the native contract
+   - The contract module encapsulates the method of calling the native contract
 
 ## ontio-std instruction
 
