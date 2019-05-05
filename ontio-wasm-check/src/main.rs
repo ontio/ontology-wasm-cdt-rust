@@ -15,9 +15,17 @@ fn main() {
     let wasm_dir = matches.value_of("WASM_DIR").unwrap();
     if wasm_dir == "" {
         println!("file name is None");
+        return;
     }
     if !wasm_dir.ends_with(".wasm") {
         println!("file extension is wrong")
+        return;
     }
-    check(wasm_dir);
+    let res = check(wasm_dir);
+    match res {
+        Ok(()) => {}
+        Err(e) => {
+            print!("check wasm err: {}", e);
+        }
+    }
 }
