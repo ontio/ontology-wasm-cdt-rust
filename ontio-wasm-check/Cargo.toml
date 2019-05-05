@@ -1,0 +1,18 @@
+[package]
+name = "invalid-check"
+version = "0.1.0"
+authors = ["lucas7788 <sishsh@163.com>"]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "check"
+path ="src/main.rs"
+
+[dependencies]
+parity-wasm = "0.31"
+wasmi = "0.4.5"
+wabt = "0.6"
+clap = "2.26.0"
