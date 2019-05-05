@@ -108,7 +108,7 @@ use ostd::contract::ont;
 ont::allowance(from, to)
 ```
   - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
-  
+
  示例
 ```
 use ostd::contract::ont;

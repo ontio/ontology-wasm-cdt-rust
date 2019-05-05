@@ -44,7 +44,7 @@ example
 let flag = runtime::check_witness(&from);
 ```
 
-4. Contract and contract interaction
+4. Interaction between contracts
 
 When calling other contracts in a contract, you need to serialize the parameters according to the parameters serialize standard of the target contract.
 - `wasm`contract invoke `neovm` contract
@@ -111,36 +111,36 @@ example
 4. contract
 - `ong`：Encapsulates related operations that call ong in the contract, such as transferring, checking balances, and so on.。
   - `allowance(from: &Address, to: &Address)` query allowance balance
-example
-```
-use ostd::contract::ont;
-ont::allowance(from, to)
-```
+    example
+    ```
+    use ostd::contract::ont;
+    ont::allowance(from, to)
+    ```
   - `approve(from: &Address, to: &Address, amount: U256)` one address approve another address transfer assets
-example
-```
-use ostd::contract::ont;
-ont::approve(from, to, amount)
-```
+    example
+    ```
+    use ostd::contract::ont;
+    ont::approve(from, to, amount)
+    ```
   - `balance_of` query balance
 
- example
- ```
- use ostd::contract::ont;
- ong::balance_of(address)
- ```
+     example
+     ```
+     use ostd::contract::ont;
+     ong::balance_of(address)
+     ```
   - `transfer`
 
-example
-```
-let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
-ont::transfer(&[state])
-```
+    example
+    ```
+    let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
+    ont::transfer(&[state])
+    ```
   - `transfer_from`
-example
-```
-ont::transfer_from(sender, from, to, amount)
-```
+    example
+    ```
+    ont::transfer_from(sender, from, to, amount)
+    ```
 - `ont`:Encapsulates related operations that call ont in the contract, Similar to ong。
 
 5. database
