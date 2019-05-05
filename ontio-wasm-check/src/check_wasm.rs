@@ -41,7 +41,7 @@ fn check_global_section(global_section: &GlobalSection) -> Result<(), String> {
         }
         let res = common::is_invalid_init_expr(entry.init_expr());
         if res.is_err() {
-            return Err(format!("global type content type is invalid: {}", &entry.init_expr()));
+            return Err(format!("global type content type is invalid: {:?}", &entry.init_expr()));
         }
     }
     return Ok(());
@@ -97,7 +97,6 @@ fn check_import_section(import_section: &ImportSection, module: &Module) -> Resu
                                 }
                                 index += 1;
                             }
-                            _ => {}
                         }
                     }
                 }
@@ -133,7 +132,7 @@ fn check_element_section(elements_section: &ElementSection) -> Result<(), String
     return Ok(());
 }
 pub fn check_module(module: &Module) -> Result<(), String> {
-    let wasmi_module = wasmi::Module::from_parity_wasm_module(module.into())
+    let wasmi_module = wasmi::Module::from_parity_wasm_module(module.clone())
         .expect("wasmi from_parity_wasm_module failed");
     let float_check = wasmi_module.deny_floating_point();
     if float_check.is_err() {
