@@ -1,5 +1,5 @@
 [package]
-name = "invalid-check"
+name = "ontio-wasm-check"
 version = "0.1.0"
 authors = ["lucas7788 <sishsh@163.com>"]
 edition = "2018"
