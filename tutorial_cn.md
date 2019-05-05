@@ -7,11 +7,13 @@
 
 ## 开始
 1. 生成ontio-cdk api文档
+
 克隆`https://github.com/ontio/ontology-wasm-cdt-rust.git`项目到本地，然后进入项目根目录，执行`cargo doc`命令生成api文档。
 
 2. 合约中数据类型转换
 - `u32`、`u64`等基本的数据类型转换成`U256`
 - `U256`转换成`u64`、`u32`等数据类型
+
 详情请参考api文档中`U256`类型的方法
 
 示例
@@ -30,12 +32,14 @@ let s = format!("{}", 123);
 let address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 ```
 3. 合约中验证签名
+
 示例
 ```
 let flag = runtime::check_witness(&from);
 ```
 
 4. 合约与合约交互
+
 在合约中调用其他合约时，需要按照目标合约的参数序列化标准序列化参数。
 - `wasm`合约调用`neovm`合约
  - `U256`数据类型的序列化，需要先调用`types::to_neo_bytes()`方法转换成字节数组，然后在调用``。
@@ -67,6 +71,7 @@ let res = runtime::call_contract(contract_address, sink.bytes());
 - `Sink`  : 用于合约中数据类型的序列化
 对于实现`Encoder`接口的数据类型都可以直接用`sink.write()`方法进行序列化,
 `sink`进行初始化的时候,会初始化一个Vec,需要指定其初始化大小。
+
 示例
 ```
 let mut sink = Sink::new(16);
@@ -75,7 +80,9 @@ sink.write("transfer".to_string());
 ```
 
 - `Source`: 用于合约中数据类型的反序列化
+
 对于实现`Decoder`接口类型的数据类型可以直接用`source.read().unwrap()`方法进行反序列化
+
 示例
 ```
 let input = runtime::input();
@@ -94,31 +101,35 @@ let (from, to, amount) = source.read().unwrap();
 
 4. contract模块
 - `ong`：封装了在合约中调用ong的相关操作，例如转账、查询余额等。
- - `allowance(from: &Address, to: &Address)` 查询allowance余额
+  - `allowance(from: &Address, to: &Address)` 查询allowance余额
  示例
 ```
 use ostd::contract::ont;
 ont::allowance(from, to)
 ```
- - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
+  - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
+  
  示例
 ```
 use ostd::contract::ont;
 ont::approve(from, to, amount)
 ```
- - `balance_of` 查询余额
+  - `balance_of` 查询余额
+
  示例：
  ```
  use ostd::contract::ont;
  ong::balance_of(address)
  ```
- - `transfer` 转账
+  - `transfer` 转账
+
  示例
 ```
 let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
 ont::transfer(&[state])
 ```
- - `transfer_from`
+  - `transfer_from`
+
  示例
 ```
 ont::transfer_from(sender, from, to, amount)
