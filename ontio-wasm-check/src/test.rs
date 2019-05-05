@@ -3,6 +3,7 @@ extern crate parity_wasm;
 use crate::check_wasm::{check, check_module};
 use std::io::BufRead;
 use parity_wasm::elements::Module;
+extern crate wasmi;
 
 #[test]
 fn check_f32_test() {
@@ -62,6 +63,8 @@ fn check_global_section() {
 
 fn check_test(wasm_binary: Vec<u8>) {
     let parity_module = parity_wasm::deserialize_buffer(wasm_binary.as_slice());
+    let wasmi_module = wasmi::Module::from_parity_wasm_module(parity_module).unwrap();
+    wasmi_module.deny_floating_point();
     match parity_module {
         Ok(parity_modu) => {
             let res = check_module(&parity_modu);

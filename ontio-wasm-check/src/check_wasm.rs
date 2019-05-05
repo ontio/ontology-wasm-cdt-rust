@@ -1,4 +1,5 @@
 extern crate parity_wasm;
+extern crate wasmi;
 use parity_wasm::elements::{FuncBody, Local, ValueType,GlobalEntry,Type, FunctionType,Instruction,ImportEntry,External,InitExpr,Module,
                             CodeSection,GlobalSection,ImportSection,DataSection,ElementSection};
 use std::vec::Vec;
@@ -17,12 +18,12 @@ fn check_code_section(code_section: &CodeSection) -> Result<(), String> {
                 return Err(format!("invalid value type: {}", local.value_type()));
             }
         }
-        let instructions = body.code();
-        for instruction in instructions.elements() {
-            if common::is_invalid_instruction(&instruction) {
-                return Err(format!("invalid instruction: {}", instruction));
-            }
-        }
+//        let instructions = body.code();
+//        for instruction in instructions.elements() {
+//            if common::is_invalid_instruction(&instruction) {
+//                return Err(format!("invalid instruction: {}", instruction));
+//            }
+//        }
     }
     return Ok(());
 }
@@ -34,7 +35,7 @@ fn check_global_section(global_section: &GlobalSection) -> Result<(), String> {
         }
         let res = common::is_invalid_init_expr(entry.init_expr());
         if  res.is_err() {
-            return Err(format!("global type content type is invalid: {}", &entry.global_type().content_type()));
+            return Err(format!("global type content type is invalid: {}", &entry.init_expr()));
         }
     }
     return Ok(());
@@ -119,6 +120,11 @@ fn check_element_section(elements_section: &ElementSection) -> Result<(), String
     return Ok(());
 }
 pub fn check_module(module: &Module) -> Result<(), String> {
+    let wasmi_module = wasmi::Module::from_parity_wasm_module(module.into()).expect("wasmi from_parity_wasm_module failed");
+    let float_check = wasmi_module.deny_floating_point();
+    if float_check.is_err() {
+        return Err(format!("float check failed"));
+    }
     if let Some(code_section) = module.code_section() {
         let res = check_code_section(code_section);
         if res.is_err() {
