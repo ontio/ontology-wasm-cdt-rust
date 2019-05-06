@@ -155,7 +155,9 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 - `U256`   : 小端序的大整数。
 
 7. runtime 模块
+
 该模块封装了合约和链交互的api
+
 |名称|参数|返回值|描述|
 |:--|:--|:--|:--|
 |timestamp||u64|获得当前时间戳|
