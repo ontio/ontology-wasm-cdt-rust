@@ -156,14 +156,16 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 
 7. runtime 模块
 该模块封装了合约和链交互的api
-- `address`:获得当前合约地址
-- `block_height`:获得当前区块高度
-- `call_height`:调用另外一个合约
-- `caller`: 获得调用者的合约地址
-- `check_witness`: 校验签名
-- `contract_migrate`：合约升级
-- `current_blockhash`:获得当前的区块hash
-- `current_txhash`: 获得当前的交易hash
-- `notify`:合约中推送的事件
-- `ret`：合约执行结束时调用，返回执行结果
-- `timestamp`: 获得当前区块的时间戳
+|名称|参数|返回值|描述|
+|:--|:--|:--|:--|
+|timestamp||u64|获得当前时间戳|
+|address||Address|获得当前合约地址|
+|block_height||u32|获得当前区块高度|
+|caller||Address|获得调用者的合约地址|
+|call_contract|addr: &T,<br /> input: &[u8]|Option<Vec<u8>>|调用另一个合约|
+|check_witness|<T: AsRef<Addr>>addr: T|bool|校验签名|
+|contract_migrate|code: &[u8], <br />vm_type: u32, <br />name: &str, <br />version: &str, <br />author: &str, <br />email: &str, <br />desc: &str,|Option<Address>|合约升级|
+|current_blockhash||H256|获得当前区块hash|
+|current_txhash||H256|获得当前交易的hash|
+|notify|data: &[u8]||合约中推送事件|
+|ret|data: &[u8]||合约执行结束时调用，返回执行结果|

@@ -163,14 +163,16 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 
 This module encapsulates the API for contract and chain interaction.
 
-- `address`: get the current contract address
-- `block_height`:get the current block height
-- `call_contract`:invoke another contract
-- `caller`: get caller's contract address
-- `check_witness`: verify signature
-- `contract_migrate`：contract upgrade
-- `current_blockhash`:get contract hash
-- `current_txhash`: get transaction hash
-- `notify`:Events pushed in the contract
-- `ret`: Called at the end of the contract execution, returning the execution result
-- `timestamp`: Get the timestamp of the current block
+|name|parameter|return|description|
+|:--|:--|:--|:--|
+|timestamp||u64|Get the timestamp of the current block|
+|address||Address|get the current contract address|
+|block_height||u32|get the current block height|
+|caller||Address|get caller's contract address|
+|call_contract|addr: &T,<br /> input: &[u8]|Option<Vec<u8>>|invoke another contract|
+|check_witness|<T: AsRef<Addr>>addr: T|bool|verify signature|
+|contract_migrate|code: &[u8], <br />vm_type: u32, <br />name: &str, <br />version: &str, <br />author: &str, <br />email: &str, <br />desc: &str,|Option<Address>|contract upgrade|
+|current_blockhash||H256|get current block hash|
+|current_txhash||H256|get current transaction hash|
+|notify|data: &[u8]||Events pushed in the contract|
+|ret|data: &[u8]||Called at the end of the contract execution, returning the execution result|
