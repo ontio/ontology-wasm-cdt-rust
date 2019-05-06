@@ -158,22 +158,67 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 
 该模块封装了合约和链交互的api
 
-|名称|参数|返回值|描述|
-|:--|:--|:--|:--|
-|timestamp||u64|获得当前时间戳|
-|address||Address|获得当前合约地址|
-|block_height||u32|获得当前区块高度|
-|caller||Address|获得调用者的合约地址|
-|call_contract|addr: &T,<br /> input: &[u8]|Option<Vec<u8>>|调用另一个合约|
-|check_witness|<T: AsRef<Addr>>addr: T|bool|校验签名|
-|contract_migrate|code: &[u8], <br />vm_type: u32, <br />name: &str, <br />version: &str, <br />author: &str, <br />email: &str, <br />desc: &str,|Option<Address>|合约升级|
-|current_blockhash||H256|获得当前区块hash|
-|current_txhash||H256|获得当前交易的hash|
-|notify|data: &[u8]||合约中推送事件|
-|ret|data: &[u8]||合约执行结束时调用，返回执行结果|
+- `timestamp() -> u64` 获得当前时间戳
+
+示例
+```
+runtime::timestamp()
+```
+- `block_height() -> u32` 获得当前区块高度
+
+示例
+```
+runtime::block_height()
+```
+- `address() -> Address` 获得当前合约地址
+
+示例
+```
+runtime::address()
+```
+
+- `caller() -> Address` 获得调用者的合约地址
+
+示例
+```
+runtime::caller()
+```
+- `current_blockhash() -> H256` 获得当前区块hash
+
+示例
+```
+runtime::current_blockhash()
+```
+- `current_txhash() -> H256` 获得当前交易hash
+
+示例
+```
+runtime::current_txhash()
+```
+- `check_witness<T: AsRef<Addr>>(addr: T) -> bool` 校验签名
+
+示例
+```
+runtime::check_witness(addr)
+```
+- `ret(data: &[u8]) -> !` 合约执行结束时调用，返回执行结果
+
+示例
+```
+let mut dispatcher = ApiTestDispatcher::new(ApiTestInstance);
+runtime::ret(&dispatcher.dispatch(&runtime::input()));
+```
+- `notify(data: &[u8])` 合约中推送事件
+
+示例
+```
+runtime::notify("success".as_bytes());
+```
 
 ## 合约例子
 
 [oep4](examples/token-zero-copy)
+
 [oep5](examples/oep5token)
+
 [oep8](examples/oep8token)

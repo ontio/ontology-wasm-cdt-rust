@@ -163,24 +163,68 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 
 This module encapsulates the API for contract and chain interaction.
 
-|name|parameter|return|description|
-|:--|:--|:--|:--|
-|timestamp||u64|Get the timestamp of the current block|
-|address||Address|get the current contract address|
-|block_height||u32|get the current block height|
-|caller||Address|get caller's contract address|
-|call_contract|addr: &T,<br /> input: &[u8]|Option<Vec<u8>>|invoke another contract|
-|check_witness|<T: AsRef<Addr>>addr: T|bool|verify signature|
-|contract_migrate|code: &[u8], <br />vm_type: u32, <br />name: &str, <br />version: &str, <br />author: &str, <br />email: &str, <br />desc: &str,|Option<Address>|contract upgrade|
-|current_blockhash||H256|get current block hash|
-|current_txhash||H256|get current transaction hash|
-|notify|data: &[u8]||Events pushed in the contract|
-|ret|data: &[u8]||Called at the end of the contract execution, returning the execution result|
+- `timestamp() -> u64` get current timestamp
 
+example
+```
+runtime::timestamp()
+```
+- `block_height() -> u32` get current block height
+
+example
+```
+runtime::block_height()
+```
+- `address() -> Address` get current contract address
+
+example
+```
+runtime::address()
+```
+
+- `caller() -> Address` get caller contract address
+
+example
+```
+runtime::caller()
+```
+- `current_blockhash() -> H256` get current block hash
+
+example
+```
+runtime::current_blockhash()
+```
+- `current_txhash() -> H256` get current transaction hash
+
+example
+```
+runtime::current_txhash()
+```
+- `check_witness<T: AsRef<Addr>>(addr: T) -> bool` verify signature
+
+example
+```
+runtime::check_witness(addr)
+```
+- `ret(data: &[u8]) -> !` Called at the end of the contract execution, returning the execution result
+
+example
+```
+let mut dispatcher = ApiTestDispatcher::new(ApiTestInstance);
+runtime::ret(&dispatcher.dispatch(&runtime::input()));
+```
+- `notify(data: &[u8])` Events pushed in the contract
+
+example
+```
+runtime::notify("success".as_bytes());
+```
 
 
 ## contract examples
 
 [oep4](examples/token-zero-copy)
+
 [oep5](examples/oep5token)
+
 [oep8](examples/oep8token)
