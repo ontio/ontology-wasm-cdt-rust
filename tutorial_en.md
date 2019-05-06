@@ -28,7 +28,7 @@ let n = u.as_u64();
 
 example
 ```
-let s = format!("{}", 123);
+let s = 123.to_string();
 ```
 - `base58` convert to `Address`
 

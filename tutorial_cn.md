@@ -24,7 +24,7 @@ let n = u.as_u64();
 - `u64`转换成`string`
 示例
 ```
-let s = format!("{}", 123);
+let s = 123.to_string();
 ```
 - `base58`编码的地址转换成`Address`
 示例
