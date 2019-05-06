@@ -6,7 +6,7 @@ pub fn quote(item: syn::Item) -> proc_macro2::TokenStream {
     match item {
         syn::Item::Trait(item_trait) => {
             let contract = Contract::from_item_trait(item_trait);
-            let disp = generate_dispacher(&contract);
+            let disp = generate_dispatcher(&contract);
             let trait_and_event = generate_event(&contract);
             quote! {
                 #trait_and_event
@@ -129,7 +129,7 @@ impl ContractEvent {
     }
 }
 
-fn generate_dispacher(contract: &Contract) -> proc_macro2::TokenStream {
+fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
     let actions: Vec<proc_macro2::TokenStream> = contract.fields.iter().filter_map(|field| {
         match field {
             &ContractField::Action(ref action) => {
