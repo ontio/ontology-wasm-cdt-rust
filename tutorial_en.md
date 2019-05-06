@@ -176,3 +176,11 @@ This module encapsulates the API for contract and chain interaction.
 |current_txhash||H256|get current transaction hash|
 |notify|data: &[u8]||Events pushed in the contract|
 |ret|data: &[u8]||Called at the end of the contract execution, returning the execution result|
+
+
+
+## contract examples
+
+[oep4](examples/token-zero-copy)
+[oep5](examples/oep5token)
+[oep8](examples/oep8token)

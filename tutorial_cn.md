@@ -171,3 +171,9 @@ let balance = database::get(owner).unwrap_or(U256::zero());
 |current_txhash||H256|获得当前交易的hash|
 |notify|data: &[u8]||合约中推送事件|
 |ret|data: &[u8]||合约执行结束时调用，返回执行结果|
+
+## 合约例子
+
+[oep4](examples/token-zero-copy)
+[oep5](examples/oep5token)
+[oep8](examples/oep8token)
