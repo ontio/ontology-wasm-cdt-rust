@@ -1,8 +1,8 @@
 use crate::vec::Vec;
+use crate::String;
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
-use crate::String;
 
 construct_fixed_hash! {
     pub struct H256(32);
