@@ -1,4 +1,5 @@
 use crate::vec::Vec;
+use crate::String;
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
@@ -26,6 +27,12 @@ impl AsRef<H256> for H256 {
 pub type Address = H160;
 
 pub use bigint::U256;
+
+impl Address {
+    pub fn to_hex_string(&self) -> String {
+        return hexutil::to_hex(&self.0);
+    }
+}
 
 pub fn to_neo_bytes(data: U256) -> Vec<u8> {
     let mut temp: [u8; 32] = [0; 32];

@@ -15,7 +15,7 @@ mod env {
         pub fn get_input(dst: *mut u8);
         pub fn call_contract(addr: *const u8, input_ptr: *const u8, input_len: u32) -> i32;
         pub fn call_output_length() -> u32;
-        pub fn get_output(dst: *mut u8);
+        pub fn get_call_output(dst: *mut u8);
         pub fn current_blockhash(blockhash: *const u8) -> u32;
         pub fn current_txhash(txhash: *const u8) -> u32;
         pub fn contract_migrate(
@@ -45,7 +45,7 @@ pub fn call_contract<T: AsRef<Addr>>(addr: &T, input: &[u8]) -> Option<Vec<u8>> 
     if size != 0 {
         let value = &mut output[..];
         unsafe {
-            env::get_output(value.as_mut_ptr());
+            env::get_call_output(value.as_mut_ptr());
         }
     }
 
