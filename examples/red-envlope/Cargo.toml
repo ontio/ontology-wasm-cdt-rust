@@ -1,0 +1,16 @@
+[package]
+name = "red-envlope"
+version = "0.1.0"
+authors = ["lucas7788 <sishsh@163.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+ontio-std = {path="../../ontio-std"}
+sha2 = { version = "0.8", default-features = false }
+
+[features]
+mock = ["ontio-std/mock"]
