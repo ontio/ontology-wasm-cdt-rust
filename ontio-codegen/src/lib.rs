@@ -34,7 +34,6 @@ pub fn base58(item: TokenStream) -> TokenStream {
     result.into()
 }
 
-
 #[cfg(test)]
 mod tests {
 

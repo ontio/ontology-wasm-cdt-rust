@@ -7,6 +7,8 @@ pub use self::sink::Sink;
 pub use self::source::Source;
 pub use self::zero_copy_source::ZeroCopySource;
 
+pub use ontio_serialize::*;
+
 #[derive(Debug)]
 pub enum Error {
     UnexpectedEOF,
