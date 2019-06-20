@@ -65,6 +65,9 @@ pub mod types;
 pub mod abi_codegen {
     pub use ontio_codegen::contract;
 }
+pub mod serialize_codegen {
+    pub use ontio_serialize::Encoder;
+}
 
 pub use ontio_codegen::base58;
 
