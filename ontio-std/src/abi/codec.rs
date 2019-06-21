@@ -136,8 +136,6 @@ impl Encoder for bool {
     }
 }
 
-
-
 impl Decoder for Address {
     fn decode(source: &mut Source) -> Result<Self, Error> {
         let mut addr = Address::zero();

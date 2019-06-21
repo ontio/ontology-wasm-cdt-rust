@@ -4,7 +4,6 @@ extern crate ontio_std as ostd;
 use ostd::abi::{Decoder, Encoder};
 use ostd::abi::{Error, Sink, Source, ZeroCopySource};
 use ostd::base58;
-use ostd::console;
 use ostd::contract::{ong, ont};
 use ostd::database;
 use ostd::prelude::*;
@@ -18,25 +17,12 @@ const re_prefix: &str = "RE_PREFIX_";
 const sent_prefix: &str = "SENT_COUNT_";
 const claim_prefix: &str = "CLAIM_PREFIX_";
 
+#[derive(Encoder, Decoder)]
 struct ReceiveRecord {
     account: Address,
     amount: u64,
 }
-impl Encoder for ReceiveRecord {
-    fn encode(&self, sink: &mut Sink) {
-        sink.write(&self.account);
-        sink.write(self.amount);
-    }
-}
-
-impl Decoder for ReceiveRecord {
-    fn decode(source: &mut Source) -> Result<Self, Error> {
-        let account: Address = source.read()?;
-        let amount: u64 = source.read()?;
-        return Ok(ReceiveRecord { account, amount });
-    }
-}
-
+#[derive(Encoder, Decoder)]
 struct EnvlopeStruct {
     token_addr: Address,
     total_amount: u64,
@@ -46,41 +32,11 @@ struct EnvlopeStruct {
     records: Vec<ReceiveRecord>,
 }
 
-impl Encoder for EnvlopeStruct {
-    fn encode(&self, sink: &mut Sink) {
-        sink.write(&self.token_addr);
-        sink.write(self.total_amount);
-        sink.write(self.total_package_count);
-        sink.write(self.remain_amount);
-        sink.write(self.remain_package_count);
-        sink.write(&self.records);
-    }
-}
-
-impl Decoder for EnvlopeStruct {
-    fn decode(source: &mut Source) -> Result<Self, Error> {
-        let token_addr = source.read()?;
-        let total_amount = source.read()?;
-        let total_package_count = source.read()?;
-        let remain_amount = source.read()?;
-        let remain_package_count = source.read()?;
-        let records: Vec<ReceiveRecord> = source.read()?;
-        return Ok(EnvlopeStruct {
-            token_addr,
-            total_amount,
-            total_package_count,
-            remain_amount,
-            remain_package_count,
-            records,
-        });
-    }
-}
-
 fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: Address) -> bool {
     if runtime::check_witness(&owner) == false {
         return false;
     }
-    if is_ont_address(token_addr.clone()) {
+    if is_ont_address(&token_addr) {
         assert!(amount >= pack_count);
     }
     let key = [sent_prefix.as_bytes(), owner.as_ref()].concat();
@@ -92,13 +48,13 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
     let hash_bytes = hash.as_bytes();
     let re_key = [re_prefix.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
-    if is_ont_address(token_addr.clone()) {
+    if is_ont_address(&token_addr) {
         let state = ont::State { from: owner.clone(), to: self_addr, amount: U256::from(amount) };
         let res = ont::transfer(&[state]);
         if !res {
             return false;
         }
-    } else if is_ong_address(token_addr.clone()) {
+    } else if is_ong_address(&token_addr) {
         let state = ont::State { from: owner.clone(), to: self_addr, amount: U256::from(amount) };
         let res = ong::transfer(&[state]);
         if !res {
@@ -175,7 +131,7 @@ fn claim_envlope(account: Address, hash: &str) -> bool {
 
         if claim_amount == 0 {
             claim_amount = 1;
-        } else if is_ont_address(est.token_addr.clone()) {
+        } else if is_ont_address(&est.token_addr) {
             if est.remain_amount - claim_amount < est.remain_package_count - 1 {
                 claim_amount = est.remain_amount - est.remain_package_count;
             }
@@ -186,11 +142,11 @@ fn claim_envlope(account: Address, hash: &str) -> bool {
     est.remain_package_count -= 1;
     est.records.push(record);
     let self_addr = runtime::address();
-    if is_ont_address(est.token_addr.clone()) {
+    if is_ont_address(&est.token_addr) {
         let state =
             ont::State { from: self_addr, to: account.clone(), amount: U256::from(claim_amount) };
         return ont::transfer(&[state]);
-    } else if is_ong_address(est.token_addr.clone()) {
+    } else if is_ong_address(&est.token_addr) {
         let state =
             ont::State { from: self_addr, to: account.clone(), amount: U256::from(claim_amount) };
         return ong::transfer(&[state]);
@@ -207,12 +163,12 @@ fn claim_envlope(account: Address, hash: &str) -> bool {
     return true;
 }
 
-fn is_ong_address(contract_addr: Address) -> bool {
-    contract_addr == ONG_CONTRACT_ADDRESS
+fn is_ong_address(contract_addr: &Address) -> bool {
+    contract_addr == &ONG_CONTRACT_ADDRESS
 }
 
-fn is_ont_address(contract_addr: Address) -> bool {
-    contract_addr == ONT_CONTRACT_ADDRESS
+fn is_ont_address(contract_addr: &Address) -> bool {
+    contract_addr == &ONT_CONTRACT_ADDRESS
 }
 
 #[no_mangle]
@@ -223,7 +179,6 @@ pub fn invoke() {
     let mut sink = Sink::new(12);
     match action {
         b"create_red_envlope" => {
-            console::debug("11111");
             let (owner, pack_count, amount, token_addr) = source.read().unwrap();
             sink.write(create_red_envlope(owner, pack_count, amount, token_addr));
         }

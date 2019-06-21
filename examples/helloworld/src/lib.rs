@@ -17,11 +17,9 @@ fn say_hello() -> String {
     let mut p = &Person { name: "test".to_string(), age: 10 };
     let mut sink = Sink::new(0);
     p.encode(&mut sink);
-    println!("{:?}", sink.bytes());
 
     let mut source = Source::new(sink.bytes().to_vec());
     let p2: Person = source.read().unwrap();
-    println!("{:?}", p2);
     return "hello world".to_string();
 }
 
