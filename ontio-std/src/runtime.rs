@@ -19,19 +19,9 @@ mod env {
         pub fn current_blockhash(blockhash: *const u8) -> u32;
         pub fn current_txhash(txhash: *const u8) -> u32;
         pub fn contract_migrate(
-            code: *const u8,
-            code_len: u32,
-            vm_type: u32,
-            name_ptr: *const u8,
-            name_len: u32,
-            ver_ptr: *const u8,
-            ver_len: u32,
-            author_ptr: *const u8,
-            author_len: u32,
-            email_ptr: *const u8,
-            email_len: u32,
-            desc_ptr: *const u8,
-            desc_len: u32,
+            code: *const u8, code_len: u32, vm_type: u32, name_ptr: *const u8, name_len: u32,
+            ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+            email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
             new_address_ptr: *mut u8,
         ) -> i32;
         //        pub fn contract_delete();
@@ -63,13 +53,7 @@ pub fn call_contract<T: AsRef<Addr>>(addr: &T, input: &[u8]) -> Option<Vec<u8>> 
 }
 ///contract migrate
 pub fn contract_migrate(
-    code: &[u8],
-    vm_type: u32,
-    name: &str,
-    version: &str,
-    author: &str,
-    email: &str,
-    desc: &str,
+    code: &[u8], vm_type: u32, name: &str, version: &str, author: &str, email: &str, desc: &str,
 ) -> Option<Address> {
     let mut addr: Address = Address::zero();
     let res = unsafe {

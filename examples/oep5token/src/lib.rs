@@ -31,11 +31,7 @@ pub trait Oep5Token {
     fn take_ownership(&mut self, token_id: String) -> bool;
     fn create_multi_tokens(&mut self, owner: &Address) -> bool;
     fn create_one_token(
-        &mut self,
-        name: &str,
-        url: &str,
-        token_type: &str,
-        owner: &Address,
+        &mut self, name: &str, url: &str, token_type: &str, owner: &Address,
     ) -> bool;
 }
 
@@ -122,11 +118,7 @@ impl Oep5Token for Oep5TokenInstance {
         true
     }
     fn create_one_token(
-        &mut self,
-        name: &str,
-        url: &str,
-        token_type: &str,
-        owner: &Address,
+        &mut self, name: &str, url: &str, token_type: &str, owner: &Address,
     ) -> bool {
         let mut total_supply: U256 = database::get(KEY_TOTAL_SUPPLY).unwrap_or_default();
         total_supply = total_supply + U256::from(1);

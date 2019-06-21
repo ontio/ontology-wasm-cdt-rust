@@ -25,20 +25,11 @@ pub trait Oep8Token {
     fn transfer(&mut self, from: &Address, to: &Address, amount: U256, token_id: String) -> bool;
     fn transfer_multi(&mut self, states: &[(Address, Address, U256, String)]) -> bool;
     fn approve(
-        &mut self,
-        owner: &Address,
-        spender: &Address,
-        amount: U256,
-        token_id: String,
+        &mut self, owner: &Address, spender: &Address, amount: U256, token_id: String,
     ) -> bool;
     fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U256;
     fn transfer_from(
-        &mut self,
-        spender: &Address,
-        from: &Address,
-        to: &Address,
-        amount: U256,
-        token_id: String,
+        &mut self, spender: &Address, from: &Address, to: &Address, amount: U256, token_id: String,
     ) -> bool;
     fn approve_multi(&mut self, obj: &[(Address, Address, U256, String)]) -> bool;
     fn transfer_from_multi(&mut self, obj: &[(Address, Address, Address, U256, String)]) -> bool;
@@ -112,11 +103,7 @@ impl Oep8Token for Oep8TokenInstance {
         true
     }
     fn approve(
-        &mut self,
-        owner: &Address,
-        spender: &Address,
-        amount: U256,
-        token_id: String,
+        &mut self, owner: &Address, spender: &Address, amount: U256, token_id: String,
     ) -> bool {
         assert_eq!(runtime::check_witness(owner), true);
         assert_eq!(self.check_token_id(token_id.clone()), true);
@@ -133,12 +120,7 @@ impl Oep8Token for Oep8TokenInstance {
         database::get(&approve_key).unwrap_or(U256::zero())
     }
     fn transfer_from(
-        &mut self,
-        spender: &Address,
-        from: &Address,
-        to: &Address,
-        amount: U256,
-        token_id: String,
+        &mut self, spender: &Address, from: &Address, to: &Address, amount: U256, token_id: String,
     ) -> bool {
         assert!(amount > U256::zero());
         assert_eq!(runtime::check_witness(spender), true);
