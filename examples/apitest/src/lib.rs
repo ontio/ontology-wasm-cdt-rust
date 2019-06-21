@@ -25,20 +25,38 @@ pub trait ApiTest {
     fn call_wasm_name(&self, contract_address: &Address) -> String;
     fn call_wasm_balance_of(&self, contract_address: &Address, addr: &Address) -> U256;
     fn call_wasm_transfer(
-        &self, contract_address: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool;
     fn call_neovm_transfer(
-        &self, contract_address: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool;
     fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U256) -> bool;
     fn call_ont_balance_of(&self, address: &Address) -> U256;
     fn call_ont_approve(&self, from: &Address, to: &Address, amount: U256) -> bool;
     fn call_ont_allowance(&self, from: &Address, to: &Address) -> U256;
     fn call_ont_transfer_from(
-        &self, sender: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        sender: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool;
     fn contract_migrate(
-        &self, code: Vec<u8>, vm_type: u32, name: &str, version: &str, author: &str, email: &str,
+        &self,
+        code: Vec<u8>,
+        vm_type: u32,
+        name: &str,
+        version: &str,
+        author: &str,
+        email: &str,
         desc: &str,
     ) -> bool;
 }
@@ -106,7 +124,11 @@ impl ApiTest for ApiTestInstance {
         }
     }
     fn call_wasm_transfer(
-        &self, contract_address: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write(("transfer".to_string(), from, to, amount));
@@ -118,7 +140,11 @@ impl ApiTest for ApiTestInstance {
         }
     }
     fn call_neovm_transfer(
-        &self, contract_address: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write(to_neo_bytes(amount));
@@ -154,12 +180,22 @@ impl ApiTest for ApiTestInstance {
         ont::balance_of(address)
     }
     fn call_ont_transfer_from(
-        &self, sender: &Address, from: &Address, to: &Address, amount: U256,
+        &self,
+        sender: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool {
         ont::transfer_from(sender, from, to, amount)
     }
     fn contract_migrate(
-        &self, code: Vec<u8>, vm_type: u32, name: &str, version: &str, author: &str, email: &str,
+        &self,
+        code: Vec<u8>,
+        vm_type: u32,
+        name: &str,
+        version: &str,
+        author: &str,
+        email: &str,
         desc: &str,
     ) -> bool {
         runtime::contract_migrate(code.as_slice(), vm_type, name, version, author, email, desc);

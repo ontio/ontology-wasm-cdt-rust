@@ -57,7 +57,8 @@ pub(crate) mod util {
     use super::super::types::{to_neo_bytes, Address, U256};
     const VERSION: u8 = 0;
     pub(crate) fn transfer_inner(
-        contract_address: &Address, transfer: &[super::ont::State],
+        contract_address: &Address,
+        transfer: &[super::ont::State],
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_varuint(transfer.len() as u64);
@@ -81,7 +82,10 @@ pub(crate) mod util {
     }
 
     pub(crate) fn approve_inner(
-        contract_address: &Address, from: &Address, to: &Address, amount: U256,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_address(from);
@@ -101,7 +105,11 @@ pub(crate) mod util {
     }
 
     pub(crate) fn transfer_from_inner(
-        contract_address: &Address, sender: &Address, from: &Address, to: &Address, amount: U256,
+        contract_address: &Address,
+        sender: &Address,
+        from: &Address,
+        to: &Address,
+        amount: U256,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_address(sender);
@@ -122,7 +130,9 @@ pub(crate) mod util {
     }
 
     pub(crate) fn allowance_inner(
-        contract_address: &Address, from: &Address, to: &Address,
+        contract_address: &Address,
+        from: &Address,
+        to: &Address,
     ) -> U256 {
         let mut sink = Sink::new(0);
         sink.write_native_address(from);
