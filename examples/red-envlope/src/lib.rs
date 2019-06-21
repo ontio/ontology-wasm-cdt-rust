@@ -2,7 +2,7 @@
 #![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
 use ostd::abi::{Decoder, Encoder};
-use ostd::abi::{Error, Sink, Source, ZeroCopySource};
+use ostd::abi::{Sink, ZeroCopySource};
 use ostd::base58;
 use ostd::contract::{ong, ont};
 use ostd::database;
@@ -13,9 +13,9 @@ use sha2::Digest;
 const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
 
-const re_prefix: &str = "RE_PREFIX_";
-const sent_prefix: &str = "SENT_COUNT_";
-const claim_prefix: &str = "CLAIM_PREFIX_";
+const RE_PREFIX: &str = "RE_PREFIX_";
+const SENT_PREFIX: &str = "SENT_COUNT_";
+const CLAIM_PREFIX: &str = "CLAIM_PREFIX_";
 
 #[derive(Encoder, Decoder)]
 struct ReceiveRecord {
@@ -39,14 +39,14 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
     if is_ont_address(&token_addr) {
         assert!(amount >= pack_count);
     }
-    let key = [sent_prefix.as_bytes(), owner.as_ref()].concat();
+    let key = [SENT_PREFIX.as_bytes(), owner.as_ref()].concat();
     let mut sent_count = database::get(&key).unwrap_or(0u64);
     sent_count += 1;
     database::put(&key, sent_count);
     let hash_key = [owner.as_ref(), format!("{}", sent_count).as_bytes()].concat();
     let hash = utils::sha256(hash_key);
     let hash_bytes = hash.as_bytes();
-    let re_key = [re_prefix.as_bytes(), hash_bytes].concat();
+    let re_key = [RE_PREFIX.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
     if is_ont_address(&token_addr) {
         let state = ont::State { from: owner.clone(), to: self_addr, amount: U256::from(amount) };
@@ -82,7 +82,7 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
 }
 
 fn query_envlope(hash: &str) -> String {
-    let re_key = [re_prefix, hash].concat();
+    let re_key = [RE_PREFIX, hash].concat();
     let res: Option<EnvlopeStruct> = database::get::<_, EnvlopeStruct>(re_key);
     if let Some(r) = res {
         let mut records: Vec<String> = Vec::new();
@@ -99,12 +99,12 @@ fn claim_envlope(account: Address, hash: &str) -> bool {
     if runtime::check_witness(account) == false {
         return false;
     }
-    let claim_key = [claim_prefix.as_bytes(), hash.as_bytes(), account.as_ref()].concat();
+    let claim_key = [CLAIM_PREFIX.as_bytes(), hash.as_bytes(), account.as_ref()].concat();
     let claimed = database::get(claim_key.clone()).unwrap_or(0u64);
     if claimed != 0 {
         return false;
     }
-    let re_key = [re_prefix, hash].concat();
+    let re_key = [RE_PREFIX, hash].concat();
     let es = database::get::<_, EnvlopeStruct>(re_key.clone());
     if es.is_none() {
         return false;
@@ -203,3 +203,6 @@ mod utils {
         format!("{:?}", H256::from_slice(hasher.result().as_slice()))
     }
 }
+
+#[cfg(test)]
+mod test;

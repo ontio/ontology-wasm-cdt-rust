@@ -5,7 +5,7 @@ use crate::ostd::abi::{Decoder, Encoder};
 use ostd::abi::{Sink, Source, ZeroCopySource};
 use ostd::prelude::*;
 use ostd::runtime;
-use ostd::{str, String};
+use ostd::String;
 
 #[derive(Encoder, Decoder, Debug)]
 struct Person {
@@ -14,12 +14,12 @@ struct Person {
 }
 
 fn say_hello() -> String {
-    let mut p = &Person { name: "test".to_string(), age: 10 };
+    let p = &Person { name: "test".to_string(), age: 10 };
     let mut sink = Sink::new(0);
     p.encode(&mut sink);
 
     let mut source = Source::new(sink.bytes().to_vec());
-    let p2: Person = source.read().unwrap();
+    let _p2: Person = source.read().unwrap();
     return "hello world".to_string();
 }
 

@@ -4,7 +4,7 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DataStruct, Fields, Lit};
+use syn::{parse_macro_input, Lit};
 
 mod base58;
 mod contract;

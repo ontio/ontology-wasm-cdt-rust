@@ -4,7 +4,7 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DataStruct, Fields, Lit};
+use syn::{Data, DataStruct, Fields};
 
 #[proc_macro_derive(Encoder)]
 pub fn derive_encoder(item: TokenStream) -> TokenStream {

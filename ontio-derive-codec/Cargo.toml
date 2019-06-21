@@ -1,5 +1,5 @@
 [package]
-name = "ontio-serialize"
+name = "ontio-derive-codec"
 version = "0.1.0"
 authors = ["Lucas <sishsh@163.com>"]
 edition = "2018"
@@ -13,7 +13,6 @@ proc-macro = true
 syn = { version = "0.15.24", features = ["full", "extra-traits"] }
 quote = "0.6"
 proc-macro2 = "0.4.24"
-sha2 = { version = "0.8", default-features = false }
 
 [dev-dependencies]
 ontio-std  = {path="../ontio-std"}
