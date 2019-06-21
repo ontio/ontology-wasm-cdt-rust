@@ -12,6 +12,7 @@ cfg-if = { version = "0.1", default-features = false }
 byteorder = { version = "1", default-features = false }
 ontio-codegen = { path = "../ontio-codegen"}
 etcommon-hexutil = { version = "0.2.4", default-features = false }
+ontio-derive-codec = { path = "../ontio-derive-codec"}
 
 [dev-dependencies]
 rand = "0.6"

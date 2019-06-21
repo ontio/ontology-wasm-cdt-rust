@@ -22,8 +22,8 @@ fn balance_of(owner: &Addr) -> U256 {
 fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
     assert!(runtime::check_witness(from));
 
-    let mut frmbal = balance_of(from);
-    let mut tobal = balance_of(to);
+    let frmbal = balance_of(from);
+    let tobal = balance_of(to);
     if amount == 0.into() || frmbal < amount {
         return false;
     }

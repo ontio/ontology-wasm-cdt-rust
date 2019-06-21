@@ -25,6 +25,14 @@ impl<'a> Decoder2<'a> for &'a Addr {
     }
 }
 
+impl<'a> Decoder2<'a> for Address {
+    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+        let mut addr = Address::zero();
+        source.read_into(addr.as_mut())?;
+        Ok(addr)
+    }
+}
+
 impl<'a> Decoder2<'a> for &'a [u8] {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
         source.read_bytes()
