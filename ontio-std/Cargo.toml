@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 wee_alloc = "0.4"
+ontio-bump-alloc = {path = "../ontio-bump-alloc", optional = true}
 bigint = { version = "4.4", default-features = false }
 fixed-hash = { version = "0.3", default-features = false }
 cfg-if = { version = "0.1", default-features = false }
@@ -19,4 +20,5 @@ rand = "0.6"
 
 [features]
 std = []
+bump-alloc = ["ontio-bump-alloc"]
 mock = ["std", "fixed-hash/default"]

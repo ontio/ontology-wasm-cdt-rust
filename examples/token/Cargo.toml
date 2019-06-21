@@ -9,5 +9,5 @@ crate-type = ["cdylib"]
 path = "src/lib.rs"
 
 [dependencies]
-ontio-std = {path="../../ontio-std"}
+ontio-std = {path="../../ontio-std", features=["bump-alloc"]}
 
