@@ -203,6 +203,3 @@ mod utils {
         format!("{:?}", H256::from_slice(hasher.result().as_slice()))
     }
 }
-
-#[cfg(test)]
-mod test;
