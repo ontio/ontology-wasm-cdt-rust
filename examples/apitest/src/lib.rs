@@ -41,6 +41,7 @@ pub trait ApiTest {
         &self, code: Vec<u8>, vm_type: u32, name: &str, version: &str, author: &str, email: &str,
         desc: &str,
     ) -> bool;
+    fn sha256(&self, data: &[u8]) -> H256;
 }
 
 pub(crate) struct ApiTestInstance;
@@ -164,6 +165,10 @@ impl ApiTest for ApiTestInstance {
     ) -> bool {
         runtime::contract_migrate(code.as_slice(), vm_type, name, version, author, email, desc);
         true
+    }
+
+    fn sha256(&self, data: &[u8]) -> H256 {
+        runtime::sha256(data)
     }
 }
 

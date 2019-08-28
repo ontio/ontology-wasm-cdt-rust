@@ -8,7 +8,6 @@ use ostd::contract::{ong, ont};
 use ostd::database;
 use ostd::prelude::*;
 use ostd::runtime;
-use sha2::Digest;
 
 const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
@@ -44,7 +43,7 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
     sent_count += 1;
     database::put(&key, sent_count);
     let hash_key = [owner.as_ref(), format!("{}", sent_count).as_bytes()].concat();
-    let hash = utils::sha256(hash_key);
+    let hash = format!("{:?}", runtime::sha256(hash_key));
     let hash_bytes = hash.as_bytes();
     let re_key = [RE_PREFIX.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
@@ -193,13 +192,4 @@ pub fn invoke() {
         _ => panic!("unsupported action!"),
     }
     runtime::ret(sink.bytes())
-}
-
-mod utils {
-    use super::*;
-    pub fn sha256<D: AsRef<[u8]>>(data: D) -> String {
-        let mut hasher = sha2::Sha256::new();
-        hasher.input(data.as_ref());
-        format!("{:?}", H256::from_slice(hasher.result().as_slice()))
-    }
 }
