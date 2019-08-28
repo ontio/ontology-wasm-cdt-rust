@@ -1,7 +1,6 @@
 #![feature(lang_items)]
 #![feature(core_intrinsics)]
 #![feature(allocator_api)]
-#![feature(alloc)]
 #![feature(alloc_prelude)]
 #![feature(slice_concat_ext)]
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -56,7 +55,6 @@ pub use alloc::{format, vec};
 pub mod prelude {
     pub use crate::types::{Addr, Address, H256, U256};
     pub use alloc::prelude::*;
-    pub use alloc::slice::SliceConcatExt;
     pub use alloc::string::{String, ToString};
     pub use alloc::vec::Vec;
     pub use alloc::{format, vec};
