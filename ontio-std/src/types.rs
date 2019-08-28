@@ -23,6 +23,30 @@ impl AsRef<H256> for H256 {
         return self;
     }
 }
+impl H256 {
+    pub fn to_hex_string(&self) -> String {
+        to_hex_string_reverse(&self.0)
+    }
+}
+
+fn to_hex_string_reverse(data: &[u8]) -> String {
+    use core::fmt::Write;
+    let mut s = String::with_capacity(data.len() * 2);
+    for v in data.iter().rev() {
+        write!(s, "{:02x}", *v).unwrap();
+    }
+    s
+}
+
+#[allow(unused)]
+fn to_hex_string(data: &[u8]) -> String {
+    use core::fmt::Write;
+    let mut s = String::with_capacity(data.len() * 2);
+    for v in data {
+        write!(s, "{:02x}", *v).unwrap();
+    }
+    s
+}
 
 pub type Address = H160;
 
@@ -30,7 +54,7 @@ pub use bigint::U256;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {
-        return hexutil::to_hex(&self.0);
+        to_hex_string_reverse(&self.0)
     }
 }
 
@@ -145,13 +169,12 @@ impl DerefMut for Addr {
 
 #[test]
 fn test_to_neo_bytes() {
-    use hexutil;
     let raw_data = [0, 128, 1024, 10000, 8380656, 8446192];
-    let expected_data = ["0x00", "0x8000", "0x0004", "0x1027", "0xf0e07f", "0xf0e08000"];
+    let expected_data = ["00", "8000", "0004", "1027", "f0e07f", "f0e08000"];
     for i in 0..raw_data.len() {
         let data = U256::from(raw_data[i]);
         let res = to_neo_bytes(data);
-        let r = hexutil::to_hex(res.as_slice());
+        let r = to_hex_string(res.as_slice());
         assert_eq!(r, expected_data[i]);
     }
 }

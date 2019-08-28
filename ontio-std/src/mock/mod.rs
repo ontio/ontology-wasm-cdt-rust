@@ -3,26 +3,18 @@ mod runtime;
 use self::runtime::setup_runtime;
 pub use self::runtime::Runtime;
 use self::runtime::RuntimeInner;
+use crate::abi::{Encoder, Sink};
 use crate::types::{Address, H256};
 use std::cell::RefCell;
-use std::rc::Rc;
 use std::iter::Iterator;
-use crate::abi::{Encoder, Sink};
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+use std::rc::Rc;
 
 pub struct RuntimeHandle {
-   inner: Rc<RefCell<RuntimeInner>>,
+    inner: Rc<RefCell<RuntimeInner>>,
 }
 
 impl RuntimeHandle {
-    pub fn storage_put<K: AsRef<[u8]>, T:Encoder>(&self, key: K, val: T) -> &Self {
+    pub fn storage_put<K: AsRef<[u8]>, T: Encoder>(&self, key: K, val: T) -> &Self {
         let mut sink = Sink::new(12);
         sink.write(val);
         self.inner.borrow_mut().storage.insert(key.as_ref().to_vec(), sink.into());
@@ -38,40 +30,40 @@ impl RuntimeHandle {
         self
     }
 
-    pub fn timestamp(&self, time: u64) ->&Self {
+    pub fn timestamp(&self, time: u64) -> &Self {
         self.inner.borrow_mut().timestamp = time;
         self
     }
 
-    pub fn block_height(&self, height: u64) ->&Self {
+    pub fn block_height(&self, height: u64) -> &Self {
         self.inner.borrow_mut().block_height = height;
         self
     }
 
-    pub fn address(&self, addr: &Address) ->&Self {
+    pub fn address(&self, addr: &Address) -> &Self {
         self.inner.borrow_mut().self_addr = addr.clone();
         self
     }
 
-    pub fn caller(&self, caller: &Address) ->&Self {
+    pub fn caller(&self, caller: &Address) -> &Self {
         self.inner.borrow_mut().caller = caller.clone();
         self
     }
-    pub fn entry_address(&self, entry:&Address) -> &Self {
+    pub fn entry_address(&self, entry: &Address) -> &Self {
         self.inner.borrow_mut().entry_address = entry.clone();
         self
     }
 
-    pub fn current_blockhash(&self, block_hash:&H256) -> &Self {
+    pub fn current_blockhash(&self, block_hash: &H256) -> &Self {
         self.inner.borrow_mut().block_hash = block_hash.clone();
         self
     }
-    pub fn current_txhash(&self, tx_hash:&H256) -> &Self {
+    pub fn current_txhash(&self, tx_hash: &H256) -> &Self {
         self.inner.borrow_mut().tx_hash = tx_hash.clone();
         self
     }
 
-    pub fn witness<T : AsRef<Address>, I:IntoIterator<Item = T>>(&self, addr: I) -> &Self {
+    pub fn witness<T: AsRef<Address>, I: IntoIterator<Item = T>>(&self, addr: I) -> &Self {
         self.inner.borrow_mut().witness = addr.into_iter().map(|a| a.as_ref().clone()).collect();
         self
     }

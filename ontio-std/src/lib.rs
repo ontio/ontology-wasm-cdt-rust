@@ -75,18 +75,5 @@ pub mod abi_codegen {
 
 pub use ontio_codegen::base58;
 
-cfg_if::cfg_if! {
-    if #[cfg(feature = "mock")] {
-        pub mod mock;
-//        pub use self::mock::setup_runtime;
-//        pub use self::mock::RuntimeBuilder;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+#[cfg(feature = "mock")]
+pub mod mock;

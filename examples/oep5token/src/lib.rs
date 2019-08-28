@@ -5,7 +5,6 @@ use ostd::abi::Encoder;
 use ostd::format;
 use ostd::prelude::*;
 use ostd::{database, runtime};
-use sha2::Digest;
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const INITED: &'static str = "Initialized";
@@ -124,7 +123,7 @@ impl Oep5Token for Oep5TokenInstance {
         total_supply = total_supply + U256::from(1);
         database::put(KEY_TOTAL_SUPPLY, &total_supply);
         let tmp = utils::concat(owner, &total_supply);
-        let token_id = utils::sha256(&tmp);
+        let token_id = runtime::sha256(&tmp).to_hex_string();
         let token = (token_id.clone(), name, url, token_type);
         database::put(&utils::concat(PREFIX_INDEX, &total_supply), &token_id);
         database::put(&utils::concat(PREFIX_OWNER, &token_id), owner);
@@ -147,11 +146,6 @@ mod utils {
         let mut sink = ostd::abi::Sink::new(1);
         sink.write(key);
         [prefix.as_ref(), sink.bytes()].concat()
-    }
-    pub fn sha256<D: AsRef<[u8]>>(data: D) -> String {
-        let mut hasher = sha2::Sha256::new();
-        hasher.input(data.as_ref());
-        format!("{:?}", H256::from_slice(hasher.result().as_slice()))
     }
 }
 

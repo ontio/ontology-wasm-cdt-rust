@@ -1,22 +1,24 @@
 use crate::types::{Address, H256};
 use std::cell::RefCell;
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::rc::Rc;
+
+use sha2::Digest;
 
 /// Mock of contract execution runtime
 #[derive(Default)]
-pub struct Runtime{
+pub struct Runtime {
     pub(crate) inner: Rc<RefCell<RuntimeInner>>,
 }
 
 #[derive(Default)]
-pub(crate) struct RuntimeInner{
+pub(crate) struct RuntimeInner {
     pub(crate) storage: HashMap<Vec<u8>, Vec<u8>>,
     pub(crate) timestamp: u64,
     pub(crate) block_height: u64,
     pub(crate) caller: Address,
     pub(crate) entry_address: Address,
-    pub(crate) self_addr:Address,
+    pub(crate) self_addr: Address,
     pub(crate) block_hash: H256,
     pub(crate) tx_hash: H256,
     pub(crate) witness: Vec<Address>,
@@ -71,6 +73,11 @@ impl Runtime {
     fn notify(&self, msg: &[u8]) {
         self.inner.borrow_mut().notify.push(msg.to_vec());
     }
+    fn sha256(&self, data: &[u8]) -> H256 {
+        let mut hasher = sha2::Sha256::new();
+        hasher.input(data);
+        H256::from_slice(hasher.result().as_slice())
+    }
 }
 
 thread_local!(static RUNTIME: RefCell<Runtime> = RefCell::new(Runtime::default()));
@@ -81,10 +88,10 @@ pub fn setup_runtime(runtime: Runtime) {
 
 mod env {
     use super::*;
-    use std::slice;
-    use std::ptr;
-    use std::u32;
     use std::cmp;
+    use std::ptr;
+    use std::slice;
+    use std::u32;
 
     #[no_mangle]
     pub unsafe extern "C" fn ontio_timestamp() -> u64 {
@@ -100,7 +107,7 @@ mod env {
     pub unsafe extern "C" fn ontio_self_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let addr = r.borrow().address();
-             ptr::copy(addr.as_ptr(), dest, Address::len_bytes());
+            ptr::copy(addr.as_ptr(), dest, Address::len_bytes());
         })
     }
 
@@ -143,21 +150,29 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ontio_storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32 {
+    pub unsafe extern "C" fn ontio_storage_read(
+        key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32,
+    ) -> u32 {
         let offset = offset as usize;
         let key = slice::from_raw_parts(key, klen as usize);
         let v = RUNTIME.with(|r| r.borrow().storage_read(key));
         match v {
             None => u32::MAX,
             Some(v) => {
-                ptr::copy(v.as_slice()[offset..].as_ptr(), val, cmp::min(vlen as usize, v.len() - offset));
+                ptr::copy(
+                    v.as_slice()[offset..].as_ptr(),
+                    val,
+                    cmp::min(vlen as usize, v.len() - offset),
+                );
                 v.len() as u32
             }
         }
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ontio_storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32) {
+    pub unsafe extern "C" fn ontio_storage_write(
+        key: *const u8, klen: u32, val: *const u8, vlen: u32,
+    ) {
         let key = slice::from_raw_parts(key, klen as usize);
         let val = slice::from_raw_parts(val, vlen as usize);
         RUNTIME.with(|r| r.borrow().storage_write(key, val));
@@ -173,5 +188,14 @@ mod env {
     pub unsafe extern "C" fn ontio_notify(ptr: *const u8, len: u32) {
         let msg = slice::from_raw_parts(ptr, len as usize);
         RUNTIME.with(|r| r.borrow().notify(msg));
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ontio_sha256(ptr: *const u8, len: u32, h256: *mut u8) {
+        let msg = slice::from_raw_parts(ptr, len as usize);
+        RUNTIME.with(|r| {
+            let hash = r.borrow().sha256(msg);
+            ptr::copy(hash.as_ptr(), h256, 32);
+        });
     }
 }
