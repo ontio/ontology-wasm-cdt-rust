@@ -24,8 +24,9 @@ mod env {
             email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
             new_address_ptr: *mut u8,
         ) -> i32;
-        pub fn ontio_storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32)
-            -> u32;
+        pub fn ontio_storage_read(
+            key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32,
+        ) -> u32;
         pub fn ontio_storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32);
         pub fn ontio_storage_delete(key: *const u8, klen: u32);
         pub fn ontio_sha256(data: *const u8, len: u32, val: *mut u8);
@@ -35,7 +36,8 @@ mod env {
 //todo : return result
 pub fn call_contract<T: AsRef<Addr>>(addr: &T, input: &[u8]) -> Option<Vec<u8>> {
     let addr: &[u8] = addr.as_ref().as_ref();
-    let res = unsafe { env::ontio_call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
+    let res =
+        unsafe { env::ontio_call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
     if res < 0 {
         return None;
     }
@@ -101,7 +103,13 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
     const INITIAL: usize = 32;
     let mut val = vec![0; INITIAL];
     let size = unsafe {
-        env::ontio_storage_read(key.as_ptr(), key.len() as u32, val.as_mut_ptr(), val.len() as u32, 0)
+        env::ontio_storage_read(
+            key.as_ptr(),
+            key.len() as u32,
+            val.as_mut_ptr(),
+            val.len() as u32,
+            0,
+        )
     };
 
     if size == core::u32::MAX {
