@@ -87,17 +87,17 @@ mod env {
     use std::cmp;
 
     #[no_mangle]
-    pub unsafe extern "C" fn timestamp() -> u64 {
+    pub unsafe extern "C" fn ontio_timestamp() -> u64 {
         RUNTIME.with(|r| r.borrow().timestamp())
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn block_height() -> u64 {
+    pub unsafe extern "C" fn ontio_block_height() -> u64 {
         RUNTIME.with(|r| r.borrow().block_height())
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn self_address(dest: *mut u8) {
+    pub unsafe extern "C" fn ontio_self_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let addr = r.borrow().address();
              ptr::copy(addr.as_ptr(), dest, Address::len_bytes());
@@ -105,7 +105,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn caller_address(dest: *mut u8) {
+    pub unsafe extern "C" fn ontio_caller_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let caller = r.borrow().caller();
             ptr::copy(caller.as_ptr(), dest, Address::len_bytes());
@@ -113,7 +113,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn entry_address(dest: *mut u8) {
+    pub unsafe extern "C" fn ontio_entry_address(dest: *mut u8) {
         RUNTIME.with(|r| {
             let entry = r.borrow().entry_address();
             ptr::copy(entry.as_ptr(), dest, Address::len_bytes());
@@ -121,7 +121,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn current_blockhash(dest: *mut u8) {
+    pub unsafe extern "C" fn ontio_current_blockhash(dest: *mut u8) {
         RUNTIME.with(|r| {
             let block_hash = r.borrow().current_blockhash();
             ptr::copy(block_hash.as_ptr(), dest, H256::len_bytes());
@@ -129,7 +129,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn current_txhash(dest: *mut u8) {
+    pub unsafe extern "C" fn ontio_current_txhash(dest: *mut u8) {
         RUNTIME.with(|r| {
             let tx_hash = r.borrow().current_txhash();
             ptr::copy(tx_hash.as_ptr(), dest, H256::len_bytes());
@@ -137,13 +137,13 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn check_witness(addr: *const u8) -> bool {
+    pub unsafe extern "C" fn ontio_check_witness(addr: *const u8) -> bool {
         let address = Address::from_slice(slice::from_raw_parts(addr, 20));
         RUNTIME.with(|r| r.borrow().check_witness(&address))
     }
 
     #[no_mangle]
-    pub unsafe fn storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32 {
+    pub unsafe extern "C" fn ontio_storage_read(key: *const u8, klen: u32, val: *mut u8, vlen: u32, offset: u32) -> u32 {
         let offset = offset as usize;
         let key = slice::from_raw_parts(key, klen as usize);
         let v = RUNTIME.with(|r| r.borrow().storage_read(key));
@@ -157,20 +157,20 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe fn storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32) {
+    pub unsafe extern "C" fn ontio_storage_write(key: *const u8, klen: u32, val: *const u8, vlen: u32) {
         let key = slice::from_raw_parts(key, klen as usize);
         let val = slice::from_raw_parts(val, vlen as usize);
         RUNTIME.with(|r| r.borrow().storage_write(key, val));
     }
 
     #[no_mangle]
-    pub unsafe fn storage_delete(key: *const u8, klen: u32) {
+    pub unsafe extern "C" fn ontio_storage_delete(key: *const u8, klen: u32) {
         let key = slice::from_raw_parts(key, klen as usize);
         RUNTIME.with(|r| r.borrow().storage_delete(key));
     }
 
     #[no_mangle]
-    pub unsafe fn notify(ptr: *const u8, len: u32) {
+    pub unsafe extern "C" fn ontio_notify(ptr: *const u8, len: u32) {
         let msg = slice::from_raw_parts(ptr, len as usize);
         RUNTIME.with(|r| r.borrow().notify(msg));
     }
