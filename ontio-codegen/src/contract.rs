@@ -44,7 +44,7 @@ enum ContractField {
 fn is_event(method: &syn::TraitItemMethod) -> bool {
     method.attrs.iter().any(|attr| {
         if attr.style == syn::AttrStyle::Outer {
-            attr.path.is_ident(syn::Ident::new("event", Span::call_site()))
+            attr.path.is_ident(&syn::Ident::new("event", Span::call_site()))
         } else {
             false
         }
@@ -69,7 +69,7 @@ impl ContractField {
 #[derive(Debug)]
 struct ContractAction {
     name: syn::Ident,
-    params: Vec<(syn::Pat, syn::Type)>,
+    params: Vec<(Box<syn::Pat>, Box<syn::Type>)>,
     ret: Option<syn::Type>,
     method: syn::TraitItemMethod,
 }
@@ -81,16 +81,14 @@ impl ContractAction {
 
         let params = method
             .sig
-            .decl
             .inputs
             .into_iter()
             .filter_map(|arg| match arg {
-                syn::FnArg::SelfRef(_) | syn::FnArg::SelfValue(_) => None,
-                syn::FnArg::Captured(capt) => Some((capt.pat, capt.ty)),
-                _ => panic!("unsupported FnArg type"),
+                syn::FnArg::Receiver(_) => None,
+                syn::FnArg::Typed(capt) => Some((capt.pat, capt.ty)),
             })
             .collect();
-        let ret = match method.sig.decl.output {
+        let ret = match method.sig.output {
             syn::ReturnType::Default => None,
             syn::ReturnType::Type(_, ty) => Some(*ty),
         };
@@ -102,8 +100,8 @@ impl ContractAction {
 #[derive(Debug)]
 struct ContractEvent {
     name: syn::Ident,
-    method_sig: syn::MethodSig,
-    params: Vec<(syn::Pat, syn::Type)>,
+    method_sig: syn::Signature,
+    params: Vec<(Box<syn::Pat>, Box<syn::Type>)>,
     default: Option<syn::Block>,
 }
 
@@ -111,13 +109,11 @@ impl ContractEvent {
     fn from_trait_method(method: syn::TraitItemMethod) -> Self {
         let params = method
             .sig
-            .decl
             .inputs
             .iter()
             .filter_map(|arg| match arg {
-                &syn::FnArg::SelfRef(_) | &syn::FnArg::SelfValue(_) => None,
-                &syn::FnArg::Captured(ref capt) => Some((capt.pat.clone(), capt.ty.clone())),
-                _ => panic!("unsupported FnArg type"),
+                &syn::FnArg::Receiver(_) => None,
+                &syn::FnArg::Typed(ref capt) => Some((capt.pat.clone(), capt.ty.clone())),
             })
             .collect();
         ContractEvent {
@@ -136,6 +132,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
                 let args = action.params.iter().map(|&(_, ref ty)| {
+                    let ty :&syn::Type = &ty;
                     match ty {
                         syn::Type::Reference(refer) => {
                             let mutability = refer.mutability.as_ref();
