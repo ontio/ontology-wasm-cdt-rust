@@ -1,4 +1,4 @@
-use crate::vec::Vec;
+use crate::prelude::*;
 use crate::String;
 use core::mem;
 use core::ops::{Deref, DerefMut};
@@ -50,6 +50,8 @@ fn to_hex_string(data: &[u8]) -> String {
 
 pub type Address = H160;
 
+pub type U128 = u128;
+
 pub use bigint::U256;
 
 impl Address {
@@ -58,21 +60,18 @@ impl Address {
     }
 }
 
-pub fn to_neo_bytes(data: U256) -> Vec<u8> {
-    let mut temp: [u8; 32] = [0; 32];
-    data.to_little_endian(&mut temp);
+pub fn to_neo_bytes(data: U128) -> Vec<u8> {
+    let temp = data.to_le_bytes();
     if let Some(pos) = temp.iter().rev().position(|v| *v != 0) {
         let mut res: Vec<u8> = Vec::new();
-        let end = 32 - pos;
+        let end = temp.len() - pos;
         res.extend_from_slice(&temp[0..end]);
         if temp[end - 1] >= 0x80 {
             res.push(0);
         }
         return res;
     } else {
-        let mut res: Vec<u8> = Vec::new();
-        res.push(0);
-        return res;
+        vec![0]
     }
 }
 
@@ -169,12 +168,11 @@ impl DerefMut for Addr {
 
 #[test]
 fn test_to_neo_bytes() {
-    let raw_data = [0, 128, 1024, 10000, 8380656, 8446192];
+    let raw_data = [0u128, 128, 1024, 10000, 8380656, 8446192];
     let expected_data = ["00", "8000", "0004", "1027", "f0e07f", "f0e08000"];
-    for i in 0..raw_data.len() {
-        let data = U256::from(raw_data[i]);
-        let res = to_neo_bytes(data);
+    for (data, exp) in raw_data.into_iter().zip(&expected_data) {
+        let res = to_neo_bytes(*data);
         let r = to_hex_string(res.as_slice());
-        assert_eq!(r, expected_data[i]);
+        assert_eq!(r, exp.to_string());
     }
 }

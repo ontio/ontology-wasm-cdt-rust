@@ -23,19 +23,19 @@ pub trait ApiTest {
     fn get_current_blockhash(&self) -> H256;
     fn get_current_txhash(&self) -> H256;
     fn call_wasm_name(&self, contract: &Address) -> String;
-    fn call_wasm_balance_of(&self, contract: &Address, addr: &Address) -> U256;
+    fn call_wasm_balance_of(&self, contract: &Address, addr: &Address) -> U128;
     fn call_wasm_transfer(
-        &self, contract: &Address, from: &Address, to: &Address, amount: U256,
+        &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool;
     fn call_neovm_transfer(
-        &self, contract: &Address, from: &Address, to: &Address, amount: U256,
+        &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool;
-    fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U256) -> bool;
-    fn call_ont_balance_of(&self, address: &Address) -> U256;
-    fn call_ont_approve(&self, from: &Address, to: &Address, amount: U256) -> bool;
-    fn call_ont_allowance(&self, from: &Address, to: &Address) -> U256;
+    fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U128) -> bool;
+    fn call_ont_balance_of(&self, address: &Address) -> U128;
+    fn call_ont_approve(&self, from: &Address, to: &Address, amount: U128) -> bool;
+    fn call_ont_allowance(&self, from: &Address, to: &Address) -> U128;
     fn call_ont_transfer_from(
-        &self, sender: &Address, from: &Address, to: &Address, amount: U256,
+        &self, sender: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool;
     fn contract_migrate(
         &self, code: Vec<u8>, vm_type: u32, name: &str, version: &str, author: &str, email: &str,
@@ -94,20 +94,21 @@ impl ApiTest for ApiTestInstance {
         let mut source = Source::new(res);
         source.read().unwrap()
     }
-    fn call_wasm_balance_of(&self, contract: &Address, addr: &Address) -> U256 {
+    fn call_wasm_balance_of(&self, contract: &Address, addr: &Address) -> U128 {
         let mut sink = Sink::new(16);
         sink.write(("balance_of".to_string(), addr));
         let res = runtime::call_contract(contract, sink.bytes());
         if res.is_some() {
             let temp = res.unwrap();
             let mut source = Source::new(temp);
-            U256::decode(&mut source).unwrap()
+            U128::decode(&mut source).unwrap()
         } else {
-            U256::zero()
+            0
         }
     }
+
     fn call_wasm_transfer(
-        &self, contract: &Address, from: &Address, to: &Address, amount: U256,
+        &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write(("transfer".to_string(), from, to, amount));
@@ -119,7 +120,7 @@ impl ApiTest for ApiTestInstance {
         }
     }
     fn call_neovm_transfer(
-        &self, contract: &Address, from: &Address, to: &Address, amount: U256,
+        &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write(to_neo_bytes(amount));
@@ -141,21 +142,21 @@ impl ApiTest for ApiTestInstance {
             false
         }
     }
-    fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U256) -> bool {
+    fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U128) -> bool {
         let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
         ont::transfer(&[state])
     }
-    fn call_ont_approve(&self, from: &Address, to: &Address, amount: U256) -> bool {
+    fn call_ont_approve(&self, from: &Address, to: &Address, amount: U128) -> bool {
         ont::approve(from, to, amount)
     }
-    fn call_ont_allowance(&self, from: &Address, to: &Address) -> U256 {
+    fn call_ont_allowance(&self, from: &Address, to: &Address) -> U128 {
         ont::allowance(from, to)
     }
-    fn call_ont_balance_of(&self, address: &Address) -> U256 {
+    fn call_ont_balance_of(&self, address: &Address) -> U128 {
         ont::balance_of(address)
     }
     fn call_ont_transfer_from(
-        &self, sender: &Address, from: &Address, to: &Address, amount: U256,
+        &self, sender: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
         ont::transfer_from(sender, from, to, amount)
     }

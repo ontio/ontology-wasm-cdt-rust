@@ -42,7 +42,7 @@ mod tests {
     trait TestContract {
         fn mut_self(&mut self, owner: Address) -> bool;
         fn ref_self(&self) -> String;
-        fn multi_param(&mut self, from: Address, to: Address, amount: U256) -> bool;
+        fn multi_param(&mut self, from: Address, to: Address, amount: U128) -> bool;
         fn ref_param(&mut self, owner: &Address) -> bool;
         fn slice_param(&mut self, addrs: &[Address]) -> bool;
         fn mut_param(&mut self, owner: &mut Address) -> bool;
@@ -50,9 +50,9 @@ mod tests {
         fn str_param(&mut self, owner: &str) -> bool;
 
         #[event]
-        fn Event(&self, from: Address, to: Address, amount: U256) {}
+        fn Event(&self, from: Address, to: Address, amount: U128) {}
         #[event]
-        fn RefParam(&self, from: &Address, to: Address, amount: U256) {}
+        fn RefParam(&self, from: &Address, to: Address, amount: U128) {}
         #[event]
         fn SliceParam(&self, from: &[Address]) {}
     }
