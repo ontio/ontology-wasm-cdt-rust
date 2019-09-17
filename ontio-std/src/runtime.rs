@@ -32,7 +32,7 @@ mod env {
         pub fn ontio_sha256(data: *const u8, len: u32, val: *mut u8);
         pub fn ontio_contract_create(code_ptr:*const u8, code_len:u32, need_storage: u32, name_ptr:*const u8,name_len:u32,
                                      ver_ptr: *const u8, ver_len:u32,author_ptr:*const u8, author_len:u32, email_ptr: *const u8,
-                                     email_len:u32,desc_ptr: *const u8,desc_len:u32,new_addr_ptr:*const u8) -> u32;
+                                     email_len:u32,desc_ptr: *const u8,desc_len:u32,new_addr_ptr:*mut u8) -> u32;
     }
 }
 

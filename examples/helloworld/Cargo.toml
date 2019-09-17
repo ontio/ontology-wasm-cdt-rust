@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 path = "src/lib.rs"
 
 [dependencies]
+hex = "0.3.2"
 ontio-std = {path="../../ontio-std"}
 
 [features]
