@@ -11,8 +11,7 @@ members = [
     "examples/oep8token",
     "examples/apitest",
     "examples/helloworld",
-    "examples/red-envlope",
-    "examples/wasm-call-wasm"
+    "examples/red-envlope"
 ]
 
 [profile.release]
