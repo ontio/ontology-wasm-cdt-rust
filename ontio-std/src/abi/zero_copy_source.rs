@@ -4,9 +4,19 @@ use byteorder::{ByteOrder, LittleEndian};
 
 use crate::types::{Address, H256, U256};
 
-use super::source::varuint_encode_size;
-
 use core::mem::transmute;
+
+fn varuint_encode_size(val: u64) -> usize {
+    if val < 0xfd {
+        1
+    } else if val <= 0xffff {
+        3
+    } else if val <= 0xFFFFFFFF {
+        5
+    } else {
+        9
+    }
+}
 
 pub struct ZeroCopySource<'a> {
     buf: &'a [u8],

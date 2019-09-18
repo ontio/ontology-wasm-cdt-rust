@@ -2,7 +2,7 @@ mod list;
 
 pub use self::list::ListStore;
 
-use super::abi::{Decoder2, Encoder, Sink, Source, ZeroCopySource};
+use super::abi::{Decoder2, Encoder, Sink, ZeroCopySource};
 use super::prelude::*;
 use super::runtime;
 

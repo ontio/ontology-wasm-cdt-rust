@@ -208,7 +208,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
             fn dispatch(&mut self, payload: &[u8]) -> ontio_std::Vec<u8> {
                 let contract_instance = &mut self.contract_instance;
                 // todo: avoid bytes copy
-                let mut source = ontio_std::abi::Source::new(payload.to_vec());
+                let mut source = ontio_std::abi::ZeroCopySource::new(payload);
                 let action = source.read::<String>().unwrap();
                 let arg_decode_err = "failed to decode argument";
                 match action.as_str() {

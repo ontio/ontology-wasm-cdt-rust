@@ -1,4 +1,4 @@
-use crate::abi::{Decoder, Encoder, Error, ZeroCopySource, Sink, Source};
+use crate::abi::{Decoder2, Encoder, Error, Sink, ZeroCopySource};
 use crate::cmp::PartialEq;
 use crate::database;
 use crate::{format, String, Vec};
@@ -7,9 +7,7 @@ use alloc::collections::BTreeMap;
 //slice default size
 const INDEX_SIZE: u32 = 64;
 
-pub struct ListStore<T>
-where
-    T: Encoder + Decoder,
+pub struct ListStore<T:Encoder>
 {
     key: String,
     need_flush: Vec<u32>, //index,store all index which slice need update
@@ -19,9 +17,7 @@ where
     cache: BTreeMap<u32, Vec<T>>, //index, vec
 }
 
-impl<T> Drop for ListStore<T>
-where
-    T: Encoder + Decoder,
+impl<T:Encoder> Drop for ListStore<T>
 {
     fn drop(&mut self) {
         self.flush();
@@ -30,7 +26,7 @@ where
 
 impl<T> ListStore<T>
 where
-    T: Encoder + Decoder + PartialEq,
+    for<'a> T: Decoder2<'a> + Encoder + PartialEq,
 {
     #[allow(unused)]
     pub(crate) fn contains(&mut self, value: &T) -> bool {
@@ -48,16 +44,18 @@ where
         false
     }
 }
-
-impl<T> ListStore<T>
-where
-    T: Encoder + Decoder,
+impl<T:Encoder> ListStore<T>
 {
     fn encode(&self, sink: &mut Sink) {
         sink.write(self.next_key_id);
         sink.write(&self.index_size);
     }
+}
 
+impl<T> ListStore<T>
+where
+    for<'a> T: Decoder2<'a> + Encoder,
+{
     fn init(key: String, source: &mut ZeroCopySource) -> Result<Self, Error> {
         let next_key_id = source.read().unwrap();
         let index_size: Vec<(u32, u32)> = source.read().unwrap();
@@ -67,23 +65,16 @@ where
             need_flush: Vec::new(), //index,store all index which slice need update
             size: total,
             next_key_id,
-            index_size, //index, count
+            index_size,             //index, count
             cache: BTreeMap::new(), //index, vec
         })
     }
 
     pub(crate) fn new(key: String) -> ListStore<T> {
         let need_flush: Vec<u32> = Vec::default();
-        let index_count: Vec<(u32, u32)> = Vec::new();
+        let index_size: Vec<(u32, u32)> = Vec::new();
         let cache: BTreeMap<u32, Vec<T>> = BTreeMap::new();
-        ListStore {
-            key: key,
-            need_flush: need_flush,
-            size: 0,
-            next_key_id: 0,
-            index_size: index_count,
-            cache: cache,
-        }
+        ListStore { key, need_flush, size: 0, next_key_id: 0, index_size, cache }
     }
     pub fn open(key: String) -> ListStore<T> {
         match database::get::<_, Vec<u8>>(&key) {
@@ -126,8 +117,8 @@ where
             } else {
                 //read data from database
                 let key = format!("{}{}", self.key, bulk.0);
-                let data = database::get(key).unwrap();
-                let mut source = Source::new(data);
+                let data: Vec<u8> = database::get(key).unwrap();
+                let mut source = ZeroCopySource::new(&data);
                 let l = source.read_u32().unwrap();
                 let mut temp: Vec<T> = Vec::new();
                 for _ in 0..l {
@@ -167,8 +158,8 @@ where
             if !self.cache.contains_key(&last_index_count.0) {
                 //read data from database
                 let keyn = format!("{}{}", self.key, last_index_count.0);
-                let last_node_vec_data = database::get(keyn).unwrap();
-                let mut source = Source::new(last_node_vec_data);
+                let last_node_vec_data: Vec<u8> = database::get(keyn).unwrap();
+                let mut source = ZeroCopySource::new(&last_node_vec_data);
                 let last_length = source.read_u32().unwrap();
                 let mut last_node_vec: Vec<T> = Vec::new();
                 for _ in 0..last_length {
@@ -225,9 +216,9 @@ where
             } else {
                 //read data from db
                 let key = format!("{}{}", self.key, bulk.0);
-                match database::get(&key) {
+                match database::get::<_, Vec<u8>>(&key) {
                     Some(data) => {
-                        let mut source = Source::new(data);
+                        let mut source = ZeroCopySource::new(&data);
                         let l = source.read_u32().unwrap();
                         let mut temp: Vec<T> = Vec::new();
                         for _ in 0..l {
@@ -257,26 +248,6 @@ where
         self.cache.clear();
     }
 
-    pub fn flush(&mut self) {
-        if !self.need_flush.is_empty() {
-            let need_flush = self.need_flush.to_vec();
-            for k in need_flush {
-                let v = self.cache.get(&k).unwrap();
-                let l = v.len() as u32;
-                let mut sink = Sink::new(16);
-                sink.write_u32(l);
-                for i in v {
-                    i.encode(&mut sink);
-                }
-                let key = format!("{}{}", self.key, k);
-                database::put(&key, sink.bytes());
-            }
-            let mut sink = Sink::new(16);
-            self.encode(&mut sink);
-            database::put(&self.key, sink.bytes())
-        }
-    }
-
     pub fn iter(&mut self) -> Iterator<T> {
         Iterator::new(0, self)
     }
@@ -299,8 +270,8 @@ where
         //if data not in cache, read data from database
         if self.cache.get(&bulk.0).is_none() {
             let key = format!("{}{}", self.key, bulk.0);
-            let data = database::get(key).unwrap();
-            let mut source = Source::new(data);
+            let data: Vec<u8> = database::get(key).unwrap();
+            let mut source = ZeroCopySource::new(&data);
             let l = source.read_u32().unwrap();
             let mut temp: Vec<T> = Vec::new();
             for _ in 0..l {
@@ -312,9 +283,32 @@ where
     }
 }
 
+impl<T: Encoder> ListStore<T>
+{
+    pub fn flush(&mut self) {
+        if !self.need_flush.is_empty() {
+            let need_flush = self.need_flush.to_vec();
+            for k in need_flush {
+                let v = self.cache.get(&k).unwrap();
+                let l = v.len() as u32;
+                let mut sink = Sink::new(16);
+                sink.write_u32(l);
+                for i in v {
+                    i.encode(&mut sink);
+                }
+                let key = format!("{}{}", self.key, k);
+                database::put(&key, sink.bytes());
+            }
+            let mut sink = Sink::new(16);
+            self.encode(&mut sink);
+            database::put(&self.key, sink.bytes())
+        }
+    }
+}
+
 pub struct Iterator<'a, T>
 where
-    T: Encoder + Decoder,
+    for<'b> T: Decoder2<'b> + Encoder + 'static,
 {
     cursor: u32,
     list: &'a mut ListStore<T>,
@@ -322,7 +316,7 @@ where
 
 impl<'a, T> Iterator<'a, T>
 where
-    T: Encoder + Decoder,
+    for<'b> T: Decoder2<'b> + Encoder,
 {
     fn new(cursor: u32, list: &mut ListStore<T>) -> Iterator<T> {
         Iterator { cursor: cursor, list: list }
