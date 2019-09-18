@@ -15,11 +15,11 @@ fn initialize() -> bool {
     true
 }
 
-fn balance_of(owner: &Addr) -> U128 {
+fn balance_of(owner: &Address) -> U128 {
     database::get(owner).unwrap_or(0)
 }
 
-fn transfer(from: &Addr, to: &Addr, amount: U128) -> bool {
+fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     assert!(runtime::check_witness(from));
 
     let frmbal = balance_of(from);

@@ -4,7 +4,7 @@ use super::{Sink, Source};
 
 use crate::abi::{Decoder, ZeroCopySource};
 use crate::cmp;
-use crate::types::{Addr, Address, Hash, H256, U256};
+use crate::types::{Address, H256, U256};
 use crate::{str, String, Vec};
 
 impl Decoder for u8 {
@@ -19,9 +19,9 @@ impl<'a> Decoder2<'a> for u8 {
     }
 }
 
-impl<'a> Decoder2<'a> for &'a Addr {
+impl<'a> Decoder2<'a> for &'a Address {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
-        source.read_addr()
+        source.read_address()
     }
 }
 
@@ -70,9 +70,9 @@ impl<'a> Decoder2<'a> for bool {
     }
 }
 
-impl<'a> Decoder2<'a> for &'a Hash {
+impl<'a> Decoder2<'a> for &'a H256 {
     fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
-        source.read_hash()
+        source.read_h256()
     }
 }
 
@@ -259,12 +259,6 @@ impl Encoder for &str {
 impl Encoder for String {
     fn encode(&self, sink: &mut Sink) {
         self.as_str().encode(sink)
-    }
-}
-
-impl Encoder for &Addr {
-    fn encode(&self, sink: &mut Sink) {
-        sink.write_bytes(&self)
     }
 }
 

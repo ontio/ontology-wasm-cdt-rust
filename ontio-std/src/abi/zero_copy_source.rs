@@ -2,19 +2,11 @@ use super::Decoder2;
 use super::Error;
 use byteorder::{ByteOrder, LittleEndian};
 
-use crate::types::{Addr, Hash, U256};
+use crate::types::{Address, H256, U256};
 
-fn varuint_encode_size(val: u64) -> usize {
-    if val < 0xfd {
-        1
-    } else if val <= 0xffff {
-        3
-    } else if val <= 0xFFFFFFFF {
-        5
-    } else {
-        9
-    }
-}
+use super::source::varuint_encode_size;
+
+use core::mem::transmute;
 
 pub struct ZeroCopySource<'a> {
     buf: &'a [u8],
@@ -45,14 +37,14 @@ impl<'a> ZeroCopySource<'a> {
         T::decode2(self)
     }
 
-    pub fn read_addr(&mut self) -> Result<&'a Addr, Error> {
+    pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {
         let buf = self.next_bytes(20)?;
-        Ok(Addr::from_u8_slice(buf))
+        Ok(unsafe {transmute(buf.as_ptr())})
     }
 
-    pub fn read_hash(&mut self) -> Result<&'a Hash, Error> {
+    pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;
-        Ok(Hash::from_u8_slice(buf))
+        Ok(unsafe {transmute(buf.as_ptr())})
     }
 
     pub fn read_u256(&mut self) -> Result<U256, Error> {

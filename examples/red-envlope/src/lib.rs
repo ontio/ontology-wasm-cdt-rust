@@ -94,7 +94,7 @@ fn query_envlope(hash: &str) -> String {
     return "".to_string();
 }
 
-fn claim_envlope(account: Address, hash: &str) -> bool {
+fn claim_envlope(account: &Address, hash: &str) -> bool {
     if runtime::check_witness(account) == false {
         return false;
     }

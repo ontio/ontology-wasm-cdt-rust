@@ -53,7 +53,7 @@ pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
 pub mod prelude {
-    pub use crate::types::{Addr, Address, H256, U128, U256};
+    pub use crate::types::{Address, H256, U128, U256};
     pub use alloc::prelude::*;
     pub use alloc::string::{String, ToString};
     pub use alloc::vec::Vec;

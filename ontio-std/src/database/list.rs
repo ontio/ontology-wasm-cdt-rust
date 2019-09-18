@@ -32,6 +32,7 @@ impl<T> ListStore<T>
 where
     T: Encoder + Decoder + PartialEq,
 {
+    #[allow(unused)]
     pub(crate) fn contains(&mut self, value: &T) -> bool {
         if self.size <= 0 {
             return false;

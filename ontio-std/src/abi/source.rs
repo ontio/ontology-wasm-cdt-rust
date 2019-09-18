@@ -3,7 +3,7 @@ use super::Error;
 use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
 
-fn varuint_encode_size(val: u64) -> usize {
+pub(crate) fn varuint_encode_size(val: u64) -> usize {
     if val < 0xfd {
         1
     } else if val <= 0xffff {
