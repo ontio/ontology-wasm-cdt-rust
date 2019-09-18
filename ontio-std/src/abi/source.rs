@@ -91,6 +91,14 @@ impl Source {
         Ok(LittleEndian::read_u64(self.next_bytes(8)?))
     }
 
+    pub(crate) fn read_u128(&mut self) -> Result<u128, Error> {
+        Ok(LittleEndian::read_u128(self.next_bytes(16)?))
+    }
+
+    pub(crate) fn read_i128(&mut self) -> Result<i128, Error> {
+        Ok(LittleEndian::read_i128(self.next_bytes(16)?))
+    }
+
     pub(crate) fn read_varuint(&mut self) -> Result<u64, Error> {
         match self.read_byte()? {
             0xFD => self.read_u16().map(|v| (3, v as u64)),

@@ -48,20 +48,20 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
     let re_key = [RE_PREFIX.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
     if is_ont_address(&token_addr) {
-        let state = ont::State { from: owner.clone(), to: self_addr, amount: U256::from(amount) };
+        let state = ont::State { from: owner.clone(), to: self_addr, amount: amount as u128 };
         let res = ont::transfer(&[state]);
         if !res {
             return false;
         }
     } else if is_ong_address(&token_addr) {
-        let state = ont::State { from: owner.clone(), to: self_addr, amount: U256::from(amount) };
+        let state = ont::State { from: owner.clone(), to: self_addr, amount: amount as u128 };
         let res = ong::transfer(&[state]);
         if !res {
             return false;
         }
     } else {
         let mut sink = Sink::new(16);
-        sink.write(("transfer", self_addr, owner, U256::from(amount)));
+        sink.write(("transfer", self_addr, owner, amount as u128));
         let res = runtime::call_contract(&token_addr, sink.bytes());
         if res.is_none() {
             return false;
@@ -143,15 +143,15 @@ fn claim_envlope(account: Address, hash: &str) -> bool {
     let self_addr = runtime::address();
     if is_ont_address(&est.token_addr) {
         let state =
-            ont::State { from: self_addr, to: account.clone(), amount: U256::from(claim_amount) };
+            ont::State { from: self_addr, to: account.clone(), amount: claim_amount as u128 };
         return ont::transfer(&[state]);
     } else if is_ong_address(&est.token_addr) {
         let state =
-            ont::State { from: self_addr, to: account.clone(), amount: U256::from(claim_amount) };
+            ont::State { from: self_addr, to: account.clone(), amount: claim_amount as U128 };
         return ong::transfer(&[state]);
     } else {
         let mut sink = Sink::new(16);
-        sink.write(("transfer", self_addr, account, U256::from(claim_amount)));
+        sink.write(("transfer", self_addr, account, claim_amount));
         let res = runtime::call_contract(&est.token_addr, sink.bytes());
         if res.is_none() {
             return false;

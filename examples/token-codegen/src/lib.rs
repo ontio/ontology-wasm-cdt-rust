@@ -10,7 +10,7 @@ use ostd::{database, runtime};
 const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
-const TOTAL_SUPPLY: u64 = 100000000000;
+const TOTAL_SUPPLY: U128 = 100000000000;
 const KEY_BALANCE: &'static str = "b";
 const KEY_APPROVE: &'static str = "a";
 
@@ -18,29 +18,29 @@ const KEY_APPROVE: &'static str = "a";
 pub trait MyToken {
     fn initialize(&mut self, owner: &Address) -> bool;
     fn name(&self) -> String;
-    fn balance_of(&self, owner: &Address) -> U256;
-    fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool;
-    fn transfer_multi(&mut self, states: &[(Address, Address, U256)]) -> bool;
-    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U256) -> bool;
-    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U256) -> bool;
-    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256;
-    fn total_supply(&self) -> U256;
+    fn balance_of(&self, owner: &Address) -> U128;
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool;
+    fn transfer_multi(&mut self, states: &[(Address, Address, U128)]) -> bool;
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U128) -> bool;
+    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U128) -> bool;
+    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U128;
+    fn total_supply(&self) -> U128;
 
     #[event]
-    fn Transfer(&self, from: &Address, to: &Address, amount: U256) {}
+    fn Transfer(&self, from: &Address, to: &Address, amount: U128) {}
     #[event]
-    fn Approve(&self, approves: &Address, receiver: &Address, amount: U256) {}
+    fn Approve(&self, approves: &Address, receiver: &Address, amount: U128) {}
 }
 
 pub(crate) struct MyTokenInstance;
 
 impl MyToken for MyTokenInstance {
     fn initialize(&mut self, owner: &Address) -> bool {
-        if database::get::<_, U256>(KEY_TOTAL_SUPPLY).is_some() {
+        if database::get::<_, U128>(KEY_TOTAL_SUPPLY).is_some() {
             return false;
         }
-        database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
-        database::put(&utils::gen_balance_key(owner), U256::from(TOTAL_SUPPLY));
+        database::put(KEY_TOTAL_SUPPLY, U128::from(TOTAL_SUPPLY));
+        database::put(&utils::gen_balance_key(owner), U128::from(TOTAL_SUPPLY));
         true
     }
 
@@ -48,17 +48,17 @@ impl MyToken for MyTokenInstance {
         "wasm_token".to_string()
     }
 
-    fn balance_of(&self, owner: &Address) -> U256 {
-        database::get(&utils::gen_balance_key(owner)).unwrap_or(U256::zero())
+    fn balance_of(&self, owner: &Address) -> U128 {
+        database::get(&utils::gen_balance_key(owner)).unwrap_or(0)
     }
 
-    fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool {
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool {
         if runtime::check_witness(from) == false {
             return false;
         }
         let mut frmbal = self.balance_of(from);
         let mut tobal = self.balance_of(to);
-        if amount == 0.into() || frmbal < amount {
+        if amount == 0 || frmbal < amount {
             false
         } else {
             frmbal = frmbal - amount;
@@ -69,7 +69,7 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
-    fn transfer_multi(&mut self, states: &[(Address, Address, U256)]) -> bool {
+    fn transfer_multi(&mut self, states: &[(Address, Address, U128)]) -> bool {
         if states.is_empty() {
             return false;
         }
@@ -81,7 +81,7 @@ impl MyToken for MyTokenInstance {
         true
     }
 
-    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U256) -> bool {
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount: U128) -> bool {
         if runtime::check_witness(approves) == false {
             return false;
         }
@@ -94,7 +94,7 @@ impl MyToken for MyTokenInstance {
             true
         }
     }
-    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U256) -> bool {
+    fn transfer_from(&mut self, receiver: &Address, approves: &Address, amount: U128) -> bool {
         if runtime::check_witness(receiver) == false {
             return false;
         }
@@ -115,10 +115,10 @@ impl MyToken for MyTokenInstance {
         database::put(utils::gen_balance_key(receiver), receivbal);
         true
     }
-    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256 {
-        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or(U256::zero())
+    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U128 {
+        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or(0)
     }
-    fn total_supply(&self) -> U256 {
+    fn total_supply(&self) -> U128 {
         database::get(KEY_TOTAL_SUPPLY).unwrap()
     }
 }
