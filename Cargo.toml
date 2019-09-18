@@ -3,7 +3,6 @@ members = [
     "ontio-std",
     "ontio-codegen",
     "ontio-bump-alloc",
-    "examples",
     "examples/token",
     "examples/token-zero-copy",
     "examples/token-codegen",
