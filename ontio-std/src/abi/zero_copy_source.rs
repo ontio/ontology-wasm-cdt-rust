@@ -39,12 +39,12 @@ impl<'a> ZeroCopySource<'a> {
 
     pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {
         let buf = self.next_bytes(20)?;
-        Ok(unsafe {transmute(buf.as_ptr())})
+        Ok(unsafe { transmute(buf.as_ptr()) })
     }
 
     pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;
-        Ok(unsafe {transmute(buf.as_ptr())})
+        Ok(unsafe { transmute(buf.as_ptr()) })
     }
 
     pub fn read_u256(&mut self) -> Result<U256, Error> {

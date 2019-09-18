@@ -1,4 +1,4 @@
-use crate::abi::{Decoder, Encoder, Error, Sink, Source};
+use crate::abi::{Decoder, Encoder, Error, ZeroCopySource, Sink, Source};
 use crate::cmp::PartialEq;
 use crate::database;
 use crate::{format, String, Vec};
@@ -58,16 +58,16 @@ where
         sink.write(&self.index_size);
     }
 
-    fn init(key: String, source: &mut Source) -> Result<Self, Error> {
+    fn init(key: String, source: &mut ZeroCopySource) -> Result<Self, Error> {
         let next_key_id = source.read().unwrap();
         let index_size: Vec<(u32, u32)> = source.read().unwrap();
         let total = index_size.iter().map(|(_key, size)| size).sum();
         Ok(ListStore {
-            key: key,
+            key,
             need_flush: Vec::new(), //index,store all index which slice need update
             size: total,
-            next_key_id: next_key_id,
-            index_size: index_size, //index, count
+            next_key_id,
+            index_size, //index, count
             cache: BTreeMap::new(), //index, vec
         })
     }
@@ -86,10 +86,10 @@ where
         }
     }
     pub fn open(key: String) -> ListStore<T> {
-        match database::get(&key) {
+        match database::get::<_, Vec<u8>>(&key) {
             None => ListStore::new(key),
             Some(data) => {
-                let mut source = Source::new(data);
+                let mut source = ZeroCopySource::new(&data);
                 ListStore::init(key, &mut source).unwrap()
             }
         }

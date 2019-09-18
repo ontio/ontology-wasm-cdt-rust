@@ -1,7 +1,5 @@
 use crate::prelude::*;
 use crate::String;
-use core::mem;
-use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
 
 construct_fixed_hash! {

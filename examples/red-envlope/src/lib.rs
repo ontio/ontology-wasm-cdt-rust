@@ -21,6 +21,7 @@ struct ReceiveRecord {
     account: Address,
     amount: u64,
 }
+
 #[derive(Encoder, Decoder)]
 struct EnvlopeStruct {
     token_addr: Address,
