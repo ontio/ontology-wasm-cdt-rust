@@ -54,7 +54,7 @@ pub mod ong {
 pub(crate) mod util {
     use super::super::abi::Sink;
     use super::super::runtime;
-    use super::super::types::{to_neo_bytes, Address, U128};
+    use super::super::types::{to_neo_bytes, u128_from_neo_bytes, Address, U128};
     use core::convert::TryInto;
 
     const VERSION: u8 = 0;
@@ -136,7 +136,7 @@ pub(crate) mod util {
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
-                return U128::from_le_bytes(data.as_slice().try_into().unwrap());
+                return u128_from_neo_bytes(data);
                 // todo: impl from neobytes
             }
         }
@@ -152,7 +152,8 @@ pub(crate) mod util {
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
-                return U128::from_le_bytes(data.as_slice().try_into().unwrap());
+                return u128_from_neo_bytes(data);
+                //                return U128::from_le_bytes(data.as_slice().try_into().unwrap());
                 // todo: impl from neobytes
             }
         }

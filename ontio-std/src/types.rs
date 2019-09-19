@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use crate::String;
+use core::convert::TryInto;
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
@@ -73,6 +74,21 @@ pub fn to_neo_bytes(data: U128) -> Vec<u8> {
     } else {
         vec![0]
     }
+}
+
+pub fn u128_from_neo_bytes(n: Vec<u8>) -> U128 {
+    let mut temp: Vec<u8> = Vec::new();
+    temp.extend_from_slice(n.as_slice());
+    if let Some(mut pos) = temp.iter().rev().position(|v| *v != 0) {
+        let mut res: Vec<u8> = Vec::new();
+        temp.reverse();
+        for i in temp.len()..16 {
+            res.push(0u8);
+        }
+        res.extend_from_slice(temp.as_slice());
+        return U128::from_be_bytes(res.as_slice().try_into().unwrap());
+    }
+    0
 }
 
 impl H160 {
@@ -174,5 +190,19 @@ fn test_to_neo_bytes() {
         let res = to_neo_bytes(*data);
         let r = to_hex_string(res.as_slice());
         assert_eq!(r, exp.to_string());
+
+        let u = u128_from_neo_bytes(res.clone());
+        assert_eq!(u, *data);
+    }
+}
+
+#[test]
+fn test_from_neo_bytes() {
+    for i in 0..100000 {
+        let v: u64 = rand::random();
+        let bs = to_neo_bytes(v as U128);
+
+        let u = u128_from_neo_bytes(bs.clone());
+        assert_eq!(v as U128, u);
     }
 }
