@@ -113,18 +113,14 @@ mod test;
 ```rust
 const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 ```
-2. u32转换成U256类型的数据
-```rust
-U256::from(1)
-```
-3. 校验签名
+2. 校验签名
 
 ```rust
 use ostd::{database, runtime};
 runtime::check_witness(&owner);
 ```
-4. 合约中可以直接用`assert_eq!`和`assert!`等判断条件是true还是false。
-5. rust合约中ListStore的使用介绍
+3. 合约中可以直接用`assert_eq!`和`assert!`等判断条件是true还是false。
+4. rust合约中ListStore的使用介绍
 * 新建或者打开已经存在的一个ListStore
 ```rust
 let mut list: ListStore<String> = ListStore::open("key".to_string());

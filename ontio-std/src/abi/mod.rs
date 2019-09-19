@@ -4,6 +4,7 @@ mod source;
 
 pub use self::sink::Sink;
 pub use self::source::Source;
+use crate::prelude::*;
 
 pub use ontio_derive_codec::*;
 
@@ -19,7 +20,7 @@ pub trait Encoder {
 }
 
 pub trait Dispatcher {
-    fn dispatch(&mut self, payload: &[u8]) -> crate::Vec<u8>;
+    fn dispatch(&mut self, payload: &[u8]) -> Vec<u8>;
 }
 
 #[doc(hidden)]

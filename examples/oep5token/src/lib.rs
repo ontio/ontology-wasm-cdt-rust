@@ -13,14 +13,14 @@ const PREFIX_OWNER: &'static str = "04";
 const PREFIX_TOKEN_ID: &'static str = "05";
 const PREFIX_BALANCE: &'static str = "06";
 
-#[ostd::abi_codegen::contract]
+#[ostd::macros::contract]
 pub trait Oep5Token {
     fn initialize(&mut self, owner: &Address) -> bool;
     fn name(&self) -> String;
-    fn total_supply(&self) -> U256;
-    fn query_token_id_by_index(&self, idx: U256) -> String;
+    fn total_supply(&self) -> U128;
+    fn query_token_id_by_index(&self, idx: U128) -> String;
     fn query_token_by_id(&self, token_id: String) -> String;
-    fn balance_of(&self, address: &Address) -> U256;
+    fn balance_of(&self, address: &Address) -> U128;
     fn owner_of(&self, token_id: String) -> Address;
     fn transfer(&mut self, to: &Address, token_id: String) -> bool;
     fn transfer_multi(&mut self, states: &[(Address, String)]) -> bool;
@@ -48,10 +48,10 @@ impl Oep5Token for Oep5TokenInstance {
     fn name(&self) -> String {
         "wasm_token".to_string()
     }
-    fn total_supply(&self) -> U256 {
+    fn total_supply(&self) -> U128 {
         database::get(KEY_TOTAL_SUPPLY).unwrap_or_default()
     }
-    fn query_token_id_by_index(&self, idx: U256) -> String {
+    fn query_token_id_by_index(&self, idx: U128) -> String {
         database::get(&utils::concat(PREFIX_INDEX, &idx)).unwrap_or_default()
     }
     fn query_token_by_id(&self, token_id: String) -> String {
@@ -59,7 +59,7 @@ impl Oep5Token for Oep5TokenInstance {
             database::get(&utils::concat(PREFIX_TOKEN_ID, &token_id)).unwrap_or_default();
         image
     }
-    fn balance_of(&self, address: &Address) -> U256 {
+    fn balance_of(&self, address: &Address) -> U128 {
         database::get(&utils::concat(PREFIX_BALANCE, address)).unwrap_or_default()
     }
     fn owner_of(&self, token_id: String) -> Address {
@@ -118,8 +118,8 @@ impl Oep5Token for Oep5TokenInstance {
     fn create_one_token(
         &mut self, name: &str, url: &str, token_type: &str, owner: &Address,
     ) -> bool {
-        let mut total_supply: U256 = database::get(KEY_TOTAL_SUPPLY).unwrap_or_default();
-        total_supply = total_supply + U256::from(1);
+        let mut total_supply: U128 = database::get(KEY_TOTAL_SUPPLY).unwrap_or_default();
+        total_supply += 1;
         database::put(KEY_TOTAL_SUPPLY, &total_supply);
         let tmp = utils::concat(owner, &total_supply);
         let token_id = runtime::sha256(&tmp).to_hex_string();
@@ -128,7 +128,7 @@ impl Oep5Token for Oep5TokenInstance {
         database::put(&utils::concat(PREFIX_OWNER, &token_id), owner);
         database::put(&utils::concat(PREFIX_TOKEN_ID, &token_id), token);
         let mut balance = self.balance_of(owner);
-        balance = balance + U256::from(1);
+        balance += 1;
         database::put(&utils::concat(PREFIX_BALANCE, owner), balance);
         true
     }

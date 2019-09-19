@@ -22,3 +22,5 @@ RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32
 for wasm in ./target/wasm32-unknown-unknown/release/*.wasm ; do
 	ontio-wasm-build $wasm $wasm
 done
+
+

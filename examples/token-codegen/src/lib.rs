@@ -7,14 +7,14 @@ use ostd::abi::Dispatcher;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
-const _ADDR_EMPTY: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
+const _ADDR_EMPTY: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 const KEY_TOTAL_SUPPLY: &'static str = "total_supply";
 const TOTAL_SUPPLY: U128 = 100000000000;
 const KEY_BALANCE: &'static str = "b";
 const KEY_APPROVE: &'static str = "a";
 
-#[ostd::abi_codegen::contract]
+#[ostd::macros::contract]
 pub trait MyToken {
     fn initialize(&mut self, owner: &Address) -> bool;
     fn name(&self) -> String;

@@ -11,16 +11,6 @@
 克隆`https://github.com/ontio/ontology-wasm-cdt-rust.git`项目到本地，然后进入项目根目录，执行`cargo doc`命令生成api文档。
 
 2. 合约中数据类型转换
-- `u32`、`u64`等基本的数据类型转换成`U256`
-- `U256`转换成`u64`、`u32`等数据类型
-
-详情请参考api文档中`U256`类型的方法
-
-示例
-```
-let u = U256::from(1);
-let n = u.as_u64();
-```
 - `u64`转换成`string`
 示例
 ```
@@ -42,7 +32,7 @@ let flag = runtime::check_witness(&from);
 
 在合约中调用其他合约时，需要按照目标合约的参数序列化标准序列化参数。
 - `wasm`合约调用`neovm`合约
-  - `U256`数据类型的序列化，需要先调用`types::to_neo_bytes()`方法转换成字节数组，然后在调用``。
+  - `U128`数据类型的序列化，需要先调用`types::to_neo_bytes()`方法转换成字节数组，然后在调用``。
   - `Address`数据类型要用`sink.write_neovm_address()`方法序列化。
   - 参数序列化步骤
     1. 先序列化要调用合约中方法的参数，目标合约的方法参数要按照倒序的方式序列化
@@ -107,7 +97,7 @@ let (from, to, amount) = source.read().unwrap();
     use ostd::contract::ont;
     ont::allowance(from, to)
     ```
-   - `approve(from: &Address, to: &Address, amount: U256)` 一个地址允许另一个地址转移多少资产
+   - `approve(from: &Address, to: &Address, amount: U128)` 一个地址允许另一个地址转移多少资产
 
      示例
     ```
@@ -147,12 +137,12 @@ let (from, to, amount) = source.read().unwrap();
 ```
 use ostd::database;
 database::put(from, frmbal);
-let balance = database::get(owner).unwrap_or(U256::zero());
+let balance = database::get(owner).unwrap_or(0);
 ```
 
 6. types 模块
 - `Address`: 地址，是长度为20的字节数组
-- `U256`   : 小端序的大整数。
+- `U128`   : 小端序的大整数。
 
 7. runtime 模块
 
@@ -195,7 +185,7 @@ runtime::current_blockhash()
 ```
 runtime::current_txhash()
 ```
-- `check_witness<T: AsRef<Addr>>(addr: T) -> bool` 校验签名
+- `check_witness(addr: &Address) -> bool` 校验签名
 
 示例
 ```

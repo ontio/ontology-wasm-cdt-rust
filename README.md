@@ -85,23 +85,23 @@ use ostd::{database, runtime};
 const KEY_TOTAL_SUPPLY: &str = "total_supply";
 const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
-const TOTAL_SUPPLY: u64 = 100000000000;
+const TOTAL_SUPPLY: U128 = 100000000000;
 
 fn initialize() -> bool {
-    database::put(KEY_TOTAL_SUPPLY, U256::from(TOTAL_SUPPLY));
+    database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);
     true
 }
 
-fn balance_of(owner: &Addr) -> U256 {
-    database::get(owner).unwrap_or(U256::zero())
+fn balance_of(owner: &Address) -> U128 {
+    database::get(owner).unwrap_or(0)
 }
 
-fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
+fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     assert!(runtime::check_witness(from));
 
     let mut frmbal = balance_of(from);
     let mut tobal = balance_of(to);
-    if amount == U256::zero() || frmbal < amount {
+    if amount == 0 || frmbal < amount {
         return false;
     }
     
@@ -111,7 +111,7 @@ fn transfer(from: &Addr, to: &Addr, amount: U256) -> bool {
     true
 }
 
-fn total_supply() -> U256 {
+fn total_supply() -> U128 {
     database::get(KEY_TOTAL_SUPPLY).unwrap()
 }
 
@@ -170,18 +170,18 @@ pub trait MyToken {
     //Define the external interface of the contract
     fn initialize(&mut self, owner: &Address) -> bool;
     fn name(&self) -> String;
-    fn balance_of(&self, owner: &Address) -> U256;
-    fn transfer(&mut self, from: &Address, to: &Address, amount: U256) -> bool;
-    fn approve(&mut self, approves: &Address, receiver: &Address, amount:U256) -> bool;
-    fn transfer_from(&mut self, receiver: &Address,approves: &Address, amount:U256) -> bool;
-    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U256;
-    fn total_supply(&self) -> U256;
+    fn balance_of(&self, owner: &Address) -> U128;
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool;
+    fn approve(&mut self, approves: &Address, receiver: &Address, amount:U128) -> bool;
+    fn transfer_from(&mut self, receiver: &Address,approves: &Address, amount:U128) -> bool;
+    fn allowance(&mut self, approves: &Address, receiver: &Address) -> U128;
+    fn total_supply(&self) -> U128;
 
     //defining Event of the contract
     #[event]
-    fn Transfer(&self, from: &Address, to: &Address, amount: U256) {}
+    fn Transfer(&self, from: &Address, to: &Address, amount: U128) {}
     #[event]
-    fn Approve(&self, approves:&Address, receiver: &Address, amount: U256) {}
+    fn Approve(&self, approves:&Address, receiver: &Address, amount: U128) {}
 }
 
 pub(crate) struct MyTokenInstance;
@@ -199,7 +199,7 @@ impl MyToken for MyTokenInstance {
         ///....
     }
 
-    fn balance_of(&self, owner: &Address) -> U256 {
+    fn balance_of(&self, owner: &Address) -> U128 {
         //...
     }
     //... Implementation of other functions

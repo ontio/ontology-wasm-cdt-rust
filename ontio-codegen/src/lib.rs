@@ -38,7 +38,7 @@ pub fn base58(item: TokenStream) -> TokenStream {
 mod tests {
 
     use ontio_std::prelude::*;
-    #[ontio_std::abi_codegen::contract]
+    #[ontio_std::macros::contract]
     trait TestContract {
         fn mut_self(&mut self, owner: Address) -> bool;
         fn ref_self(&self) -> String;
@@ -59,6 +59,6 @@ mod tests {
 
     #[test]
     fn base58() {
-        const _ADDR: Address = ontio_std::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
+        const _ADDR: Address = ontio_std::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     }
 }

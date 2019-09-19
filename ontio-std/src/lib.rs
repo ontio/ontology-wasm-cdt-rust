@@ -25,6 +25,7 @@ cfg_if::cfg_if! {
 
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "std"))] {
+        use prelude::*;
         /// Overrides the default panic_fmt
         #[no_mangle]
         #[panic_handler]
@@ -56,23 +57,18 @@ cfg_if::cfg_if! {
 
 extern crate alloc;
 
-pub use alloc::boxed::Box;
-pub use alloc::str;
-pub use alloc::string::{self, String};
-pub use alloc::vec::Vec;
-pub use alloc::{format, vec};
-
 pub mod prelude {
-    pub use crate::types::{Address, H256, U128, U256};
+    pub use crate::contract::TransferParam;
+    pub use crate::types::{Address, H256, S128, U128};
+    pub use alloc::boxed::Box;
     pub use alloc::prelude::*;
     pub use alloc::str;
-    pub use alloc::string::{String, ToString};
+    pub use alloc::string::{self, String, ToString};
     pub use alloc::vec::Vec;
     pub use alloc::{format, vec};
+    pub use core::cmp;
     pub use core::prelude::v1::*;
 }
-
-pub use core::cmp;
 
 pub mod abi;
 pub mod console;
@@ -80,11 +76,10 @@ pub mod contract;
 pub mod database;
 pub mod runtime;
 pub mod types;
-pub mod abi_codegen {
+pub mod macros {
+    pub use ontio_codegen::base58;
     pub use ontio_codegen::contract;
 }
-
-pub use ontio_codegen::base58;
 
 #[cfg(feature = "mock")]
 pub mod mock;

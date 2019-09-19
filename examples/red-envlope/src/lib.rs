@@ -3,9 +3,9 @@
 extern crate ontio_std as ostd;
 use ostd::abi::{Decoder, Encoder};
 use ostd::abi::{Sink, Source};
-use ostd::base58;
 use ostd::contract::{ong, ont};
 use ostd::database;
+use ostd::macros::base58;
 use ostd::prelude::*;
 use ostd::runtime;
 
@@ -49,14 +49,12 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
     let re_key = [RE_PREFIX.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
     if is_ont_address(&token_addr) {
-        let state = ont::State { from: owner.clone(), to: self_addr, amount: amount as u128 };
-        let res = ont::transfer(&[state]);
+        let res = ont::transfer(&owner, &self_addr, amount as u128);
         if !res {
             return false;
         }
     } else if is_ong_address(&token_addr) {
-        let state = ont::State { from: owner.clone(), to: self_addr, amount: amount as u128 };
-        let res = ong::transfer(&[state]);
+        let res = ong::transfer(&owner, &self_addr, amount as u128);
         if !res {
             return false;
         }
@@ -123,9 +121,9 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
         record.amount = claim_amount;
     } else {
         let random = runtime::current_blockhash();
-        let mut part = [0u8; 8];
+        let mut part = [0u8; 16];
         part.copy_from_slice(&random.as_bytes()[..8]);
-        let random_num = U256::from_little_endian(&part).as_u64();
+        let random_num = U128::from_le_bytes(part) as u64;
         let percent = random_num % 100 + 1;
         let mut claim_amount = est.remain_amount * percent / 100;
 
@@ -143,13 +141,9 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     est.records.push(record);
     let self_addr = runtime::address();
     if is_ont_address(&est.token_addr) {
-        let state =
-            ont::State { from: self_addr, to: account.clone(), amount: claim_amount as u128 };
-        return ont::transfer(&[state]);
+        return ont::transfer(&self_addr, &account, claim_amount as u128);
     } else if is_ong_address(&est.token_addr) {
-        let state =
-            ont::State { from: self_addr, to: account.clone(), amount: claim_amount as U128 };
-        return ong::transfer(&[state]);
+        return ong::transfer(&self_addr, &account, claim_amount as u128);
     } else {
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, account, claim_amount));

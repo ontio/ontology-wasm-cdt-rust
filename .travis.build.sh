@@ -2,13 +2,21 @@
 set -e
 set -x
 
-cargo build
+RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
+
+
+root_dir=$(pwd)
 
 cd ontio-std
 cargo test --features=mock
 
 cd ../ontio-codegen
 cargo test --features=mock
+cd $root_dir
 
-cd ../examples/token-codegen
-cargo test --features=mock
+for dir in ./examples/* ; do
+ cd $dir
+ cargo test --features=mock;
+ cd $root_dir
+done
+
