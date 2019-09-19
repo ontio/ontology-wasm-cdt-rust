@@ -79,7 +79,7 @@ pub fn to_neo_bytes(data: U128) -> Vec<u8> {
 pub fn u128_from_neo_bytes(n: Vec<u8>) -> U128 {
     let mut temp: Vec<u8> = Vec::new();
     temp.extend_from_slice(n.as_slice());
-    if let Some(mut pos) = temp.iter().rev().position(|v| *v != 0) {
+    if let Some(_) = temp.iter().position(|v| *v != 0) {
         let mut res: Vec<u8> = Vec::new();
         temp.reverse();
         for i in temp.len()..16 {
