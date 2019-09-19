@@ -1,9 +1,12 @@
-use super::Decoder;
+use super::Decoder2;
 use super::Error;
-use crate::Vec;
 use byteorder::{ByteOrder, LittleEndian};
 
-pub(crate) fn varuint_encode_size(val: u64) -> usize {
+use crate::types::{Address, H256, U256};
+
+use core::mem::transmute;
+
+fn varuint_encode_size(val: u64) -> usize {
     if val < 0xfd {
         1
     } else if val <= 0xffff {
@@ -15,28 +18,48 @@ pub(crate) fn varuint_encode_size(val: u64) -> usize {
     }
 }
 
-pub struct Source {
-    buf: Vec<u8>,
+pub struct Source<'a> {
+    buf: &'a [u8],
     pos: usize,
 }
 
-impl Source {
-    pub fn new(data: Vec<u8>) -> Self {
+impl<'a> Source<'a> {
+    pub fn new(data: &'a [u8]) -> Self {
         Self { buf: data, pos: 0 }
     }
 
-    pub fn read<T: Decoder>(&mut self) -> Result<T, Error> {
-        T::decode(self)
-    }
-
-    pub(crate) fn next_bytes(&mut self, len: usize) -> Result<&[u8], Error> {
+    pub(crate) fn next_bytes(&mut self, len: usize) -> Result<&'a [u8], Error> {
         if self.buf.len() - self.pos < len {
             Err(Error::UnexpectedEOF)
         } else {
-            let bytes = &self.buf.as_slice()[self.pos..self.pos + len];
+            let bytes = &self.buf[self.pos..self.pos + len];
             self.pos += len;
             Ok(bytes)
         }
+    }
+
+    pub fn read_bytes(&mut self) -> Result<&'a [u8], Error> {
+        let n = self.read_varuint()?;
+        self.next_bytes(n as usize)
+    }
+
+    pub fn read<T: Decoder2<'a>>(&mut self) -> Result<T, Error> {
+        T::decode2(self)
+    }
+
+    pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {
+        let buf = self.next_bytes(20)?;
+        Ok(unsafe { transmute(buf.as_ptr()) })
+    }
+
+    pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
+        let buf = self.next_bytes(32)?;
+        Ok(unsafe { transmute(buf.as_ptr()) })
+    }
+
+    pub fn read_u256(&mut self) -> Result<U256, Error> {
+        let buf = self.next_bytes(32)?;
+        Ok(U256::from_little_endian(buf))
     }
 
     pub(crate) fn read_into(&mut self, buf: &mut [u8]) -> Result<(), Error> {
@@ -45,7 +68,7 @@ impl Source {
         Ok(())
     }
 
-    pub(crate) fn read_byte(&mut self) -> Result<u8, Error> {
+    pub fn read_byte(&mut self) -> Result<u8, Error> {
         if self.pos >= self.buf.len() {
             Err(Error::UnexpectedEOF)
         } else {
@@ -55,7 +78,7 @@ impl Source {
         }
     }
 
-    pub(crate) fn read_bool(&mut self) -> Result<bool, Error> {
+    pub fn read_bool(&mut self) -> Result<bool, Error> {
         match self.read_byte()? {
             0 => Ok(false),
             1 => Ok(true),
@@ -64,7 +87,7 @@ impl Source {
     }
 
     #[allow(unused)]
-    pub(crate) fn skip(&mut self, n: usize) -> Result<(), Error> {
+    pub fn skip(&mut self, n: usize) -> Result<(), Error> {
         if self.buf.len() - self.pos < n {
             Err(Error::UnexpectedEOF)
         } else {
@@ -74,29 +97,25 @@ impl Source {
     }
 
     #[allow(unused)]
-    pub(crate) fn backup(&mut self, n: usize) {
+    pub fn backup(&mut self, n: usize) {
         assert!(self.pos >= n);
         self.pos -= n;
     }
 
-    pub(crate) fn read_u16(&mut self) -> Result<u16, Error> {
+    pub fn read_u16(&mut self) -> Result<u16, Error> {
         Ok(LittleEndian::read_u16(self.next_bytes(2)?))
     }
 
-    pub(crate) fn read_u32(&mut self) -> Result<u32, Error> {
+    pub fn read_u32(&mut self) -> Result<u32, Error> {
         Ok(LittleEndian::read_u32(self.next_bytes(4)?))
     }
 
-    pub(crate) fn read_u64(&mut self) -> Result<u64, Error> {
+    pub fn read_u64(&mut self) -> Result<u64, Error> {
         Ok(LittleEndian::read_u64(self.next_bytes(8)?))
     }
 
-    pub(crate) fn read_u128(&mut self) -> Result<u128, Error> {
+    pub fn read_u128(&mut self) -> Result<u128, Error> {
         Ok(LittleEndian::read_u128(self.next_bytes(16)?))
-    }
-
-    pub(crate) fn read_i128(&mut self) -> Result<i128, Error> {
-        Ok(LittleEndian::read_i128(self.next_bytes(16)?))
     }
 
     pub fn read_varuint(&mut self) -> Result<u64, Error> {

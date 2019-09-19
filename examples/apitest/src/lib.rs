@@ -3,7 +3,7 @@
 
 extern crate ontio_std as ostd;
 use ostd::abi::Dispatcher;
-use ostd::abi::{Sink, ZeroCopySource};
+use ostd::abi::{Sink, Source};
 use ostd::contract::ont;
 use ostd::prelude::*;
 use ostd::str;
@@ -91,7 +91,7 @@ impl ApiTest for ApiTestInstance {
         let res = runtime::call_contract(contract, sink.bytes()).unwrap();
         let s = str::from_utf8(res.as_slice()).unwrap();
         console::debug(s);
-        let mut source = ZeroCopySource::new(&res);
+        let mut source = Source::new(&res);
         source.read().unwrap()
     }
     fn call_wasm_balance_of(&self, contract: &Address, addr: &Address) -> U128 {
@@ -99,7 +99,7 @@ impl ApiTest for ApiTestInstance {
         sink.write(("balance_of".to_string(), addr));
         let res = runtime::call_contract(contract, sink.bytes());
         res.map(|res| {
-            let mut source = ZeroCopySource::new(&res);
+            let mut source = Source::new(&res);
             source.read().unwrap()
         }).unwrap_or(0)
     }

@@ -2,25 +2,25 @@ use super::Error;
 use super::{Decoder2, Encoder};
 use super::{Sink};
 
-use crate::abi::{ZeroCopySource};
+use crate::abi::{Source};
 use crate::cmp;
 use crate::prelude::*;
 use crate::types::{Address, H256, U256};
 
 impl<'a> Decoder2<'a> for u8 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_byte()
     }
 }
 
 impl<'a> Decoder2<'a> for &'a Address {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_address()
     }
 }
 
 impl<'a> Decoder2<'a> for Address {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         let mut addr = Address::zero();
         source.read_into(addr.as_mut())?;
         Ok(addr)
@@ -28,19 +28,19 @@ impl<'a> Decoder2<'a> for Address {
 }
 
 impl<'a> Decoder2<'a> for &'a [u8] {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_bytes()
     }
 }
 //
 //impl<'a> Decoder2<'a> for Vec<u8> {
-//    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+//    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
 //        Ok(source.read_bytes()?.to_vec())
 //    }
 //}
 
 impl<'a, T: Decoder2<'a>> Decoder2<'a> for Vec<T> {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         let len = source.read_varuint()?;
         let mut value = Vec::with_capacity(cmp::min(len, 1024) as usize);
         for _i in 0..len {
@@ -52,57 +52,57 @@ impl<'a, T: Decoder2<'a>> Decoder2<'a> for Vec<T> {
 }
 
 impl<'a> Decoder2<'a> for &'a str {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         let buf = source.read_bytes()?;
         str::from_utf8(buf).map_err(|_| Error::InvalidUtf8)
     }
 }
 
 impl<'a> Decoder2<'a> for String {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         let s: &str = source.read()?;
         Ok(s.to_string())
     }
 }
 
 impl<'a> Decoder2<'a> for u16 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u16()
     }
 }
 
 impl<'a> Decoder2<'a> for u32 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u32()
     }
 }
 
 impl<'a> Decoder2<'a> for u64 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u64()
     }
 }
 
 impl<'a> Decoder2<'a> for bool {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_bool()
     }
 }
 
 impl<'a> Decoder2<'a> for &'a H256 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_h256()
     }
 }
 
 impl<'a> Decoder2<'a> for U256 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u256()
     }
 }
 
 impl<'a> Decoder2<'a> for u128 {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u128()
     }
 }
@@ -215,7 +215,7 @@ macro_rules! impl_abi_codec_fixed_array {
     () => {};
     ($num:expr) => {
         impl<'a> Decoder2<'a> for [u8; $num] {
-            fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+            fn decode2(source: &mut Source<'a>) -> Result<Self, Error> {
                 let mut array = [0;$num];
                 source.read_into(&mut array)?;
                 Ok(array)
@@ -263,7 +263,7 @@ macro_rules! for_each_tuple {
 for_each_tuple! {
     ($($item:ident)*) => {
         impl<'a, $($item: Decoder2<'a>),*> Decoder2<'a> for ($($item,)*) {
-            fn decode2(_source: &mut ZeroCopySource<'a>) -> Result<Self, Error> {
+            fn decode2(_source: &mut Source<'a>) -> Result<Self, Error> {
                 Ok(($(_source.read::<$item>()?,)*))
             }
         }

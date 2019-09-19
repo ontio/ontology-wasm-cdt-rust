@@ -2,7 +2,7 @@
 #![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
 use ostd::abi::{Decoder, Encoder};
-use ostd::abi::{Sink, ZeroCopySource};
+use ostd::abi::{Sink, Source};
 use ostd::base58;
 use ostd::contract::{ong, ont};
 use ostd::database;
@@ -174,7 +174,7 @@ fn is_ont_address(contract_addr: &Address) -> bool {
 #[no_mangle]
 pub fn invoke() {
     let input = runtime::input();
-    let mut source = ZeroCopySource::new(&input);
+    let mut source = Source::new(&input);
     let action: &[u8] = source.read().unwrap();
     let mut sink = Sink::new(12);
     match action {

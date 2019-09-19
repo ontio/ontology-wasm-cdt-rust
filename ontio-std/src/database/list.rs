@@ -1,4 +1,4 @@
-use crate::abi::{Decoder2, Encoder, Error, Sink, ZeroCopySource};
+use crate::abi::{Decoder2, Encoder, Error, Sink, Source};
 use crate::cmp::PartialEq;
 use crate::database;
 use crate::{format, String, Vec};
@@ -56,7 +56,7 @@ impl<T> ListStore<T>
 where
     for<'a> T: Decoder2<'a> + Encoder,
 {
-    fn init(key: String, source: &mut ZeroCopySource) -> Result<Self, Error> {
+    fn init(key: String, source: &mut Source) -> Result<Self, Error> {
         let next_key_id = source.read().unwrap();
         let index_size: Vec<(u32, u32)> = source.read().unwrap();
         let total = index_size.iter().map(|(_key, size)| size).sum();
@@ -80,7 +80,7 @@ where
         match database::get::<_, Vec<u8>>(&key) {
             None => ListStore::new(key),
             Some(data) => {
-                let mut source = ZeroCopySource::new(&data);
+                let mut source = Source::new(&data);
                 ListStore::init(key, &mut source).unwrap()
             }
         }
@@ -118,7 +118,7 @@ where
                 //read data from database
                 let key = format!("{}{}", self.key, bulk.0);
                 let data: Vec<u8> = database::get(key).unwrap();
-                let mut source = ZeroCopySource::new(&data);
+                let mut source = Source::new(&data);
                 let l = source.read_u32().unwrap();
                 let mut temp: Vec<T> = Vec::new();
                 for _ in 0..l {
@@ -159,7 +159,7 @@ where
                 //read data from database
                 let keyn = format!("{}{}", self.key, last_index_count.0);
                 let last_node_vec_data: Vec<u8> = database::get(keyn).unwrap();
-                let mut source = ZeroCopySource::new(&last_node_vec_data);
+                let mut source = Source::new(&last_node_vec_data);
                 let last_length = source.read_u32().unwrap();
                 let mut last_node_vec: Vec<T> = Vec::new();
                 for _ in 0..last_length {
@@ -218,7 +218,7 @@ where
                 let key = format!("{}{}", self.key, bulk.0);
                 match database::get::<_, Vec<u8>>(&key) {
                     Some(data) => {
-                        let mut source = ZeroCopySource::new(&data);
+                        let mut source = Source::new(&data);
                         let l = source.read_u32().unwrap();
                         let mut temp: Vec<T> = Vec::new();
                         for _ in 0..l {
@@ -271,7 +271,7 @@ where
         if self.cache.get(&bulk.0).is_none() {
             let key = format!("{}{}", self.key, bulk.0);
             let data: Vec<u8> = database::get(key).unwrap();
-            let mut source = ZeroCopySource::new(&data);
+            let mut source = Source::new(&data);
             let l = source.read_u32().unwrap();
             let mut temp: Vec<T> = Vec::new();
             for _ in 0..l {

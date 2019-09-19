@@ -95,7 +95,7 @@ For data types that implement the `Decoder` interface type, you can deserialize 
 example
 ```
 let input = runtime::input();
-let mut source = ZeroCopySource::new(&input);
+let mut source = Source::new(&input);
 let (from, to, amount) = source.read().unwrap();
 ```
 

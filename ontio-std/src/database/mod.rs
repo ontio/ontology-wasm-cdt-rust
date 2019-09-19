@@ -2,7 +2,7 @@ mod list;
 
 pub use self::list::ListStore;
 
-use super::abi::{Decoder2, Encoder, Sink, ZeroCopySource};
+use super::abi::{Decoder2, Encoder, Sink, Source};
 use super::prelude::*;
 use super::runtime;
 
@@ -11,7 +11,7 @@ where
     for<'a> T: Decoder2<'a> + 'static,
 {
     runtime::storage_read(key.as_ref()).map(|val| {
-        let mut source = ZeroCopySource::new(&val);
+        let mut source = Source::new(&val);
         source.read().unwrap()
     })
 }

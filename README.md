@@ -78,7 +78,7 @@ pub fn invoke() {
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Encoder, Sink, ZeroCopySource};
+use ostd::abi::{Encoder, Sink, Source};
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
@@ -118,7 +118,7 @@ fn total_supply() -> U256 {
 #[no_mangle]
 pub fn invoke() {
     let input = runtime::input();
-    let mut source = ZeroCopySource::new(&input);
+    let mut source = Source::new(&input);
     let action = source.read().unwrap();
     let mut sink = Sink::new(12);
     match action {

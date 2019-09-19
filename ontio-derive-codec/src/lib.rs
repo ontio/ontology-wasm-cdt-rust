@@ -59,7 +59,7 @@ pub fn derive_decoder(item: TokenStream) -> TokenStream {
                     .collect();
                 let implemented_decoder = quote! {
                     impl<'a> ontio_std::abi::Decoder2<'a> for #name {
-                        fn decode2(source: &mut ontio_std::abi::ZeroCopySource) -> Result<Self,
+                        fn decode2(source: &mut ontio_std::abi::Source) -> Result<Self,
                         ontio_std::abi::Error> {
                             return Ok(#name {
                             #(#get_selfs: source.read()?),*

@@ -1,10 +1,9 @@
 mod codec;
 mod sink;
-//mod source;
-mod zero_copy_source;
+mod source;
 
 pub use self::sink::Sink;
-pub use self::zero_copy_source::ZeroCopySource;
+pub use self::source::Source;
 
 pub use ontio_derive_codec::*;
 
@@ -25,5 +24,5 @@ pub trait Dispatcher {
 
 #[doc(hidden)]
 pub trait Decoder2<'a>: Sized {
-    fn decode2(source: &mut ZeroCopySource<'a>) -> Result<Self, Error>;
+    fn decode2(source: &mut Source<'a>) -> Result<Self, Error>;
 }
