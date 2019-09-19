@@ -6,6 +6,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(exclusive_range_pattern)]
 #![feature(proc_macro_hygiene)]
+#![feature(panic_info_message)]
 
 //#![feature(trace_macros)]
 
@@ -27,8 +28,17 @@ cfg_if::cfg_if! {
         /// Overrides the default panic_fmt
         #[no_mangle]
         #[panic_handler]
-        pub fn panic_fmt(_info: &core::panic::PanicInfo) -> ! {
-            unsafe { core::intrinsics::abort() }
+        pub fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
+            let msg = info.message().map(|msg| format!("{}", msg)).unwrap_or_default();
+            let (file, line) = if let Some(loc) = info.location() {
+                (loc.file(), loc.line())
+            } else {
+                ("", 0)
+            };
+
+
+            let panic_msg = format!("{} at {}:{}", msg, file, line);
+            runtime::panic(&panic_msg)
         }
 
         #[lang = "eh_personality"]
@@ -53,8 +63,9 @@ pub use alloc::vec::Vec;
 pub use alloc::{format, vec};
 
 pub mod prelude {
-    pub use crate::types::{Addr, Address, H256, U128, U256};
+    pub use crate::types::{Address, H256, U128, U256};
     pub use alloc::prelude::*;
+    pub use alloc::str;
     pub use alloc::string::{String, ToString};
     pub use alloc::vec::Vec;
     pub use alloc::{format, vec};

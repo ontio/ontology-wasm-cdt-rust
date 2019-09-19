@@ -6,9 +6,12 @@ use super::abi::{Decoder, Encoder, Sink, Source};
 use super::prelude::*;
 use super::runtime;
 
-pub fn get<K: AsRef<[u8]>, T: Decoder>(key: K) -> Option<T> {
+pub fn get<K: AsRef<[u8]>, T>(key: K) -> Option<T>
+where
+    for<'a> T: Decoder<'a> + 'static,
+{
     runtime::storage_read(key.as_ref()).map(|val| {
-        let mut source = Source::new(val);
+        let mut source = Source::new(&val);
         source.read().unwrap()
     })
 }

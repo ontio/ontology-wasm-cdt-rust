@@ -1,7 +1,7 @@
 #![no_std]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Encoder, Sink, ZeroCopySource};
+use ostd::abi::{Encoder, Sink, Source};
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
@@ -15,11 +15,11 @@ fn initialize() -> bool {
     true
 }
 
-fn balance_of(owner: &Addr) -> U128 {
+fn balance_of(owner: &Address) -> U128 {
     database::get(owner).unwrap_or(0)
 }
 
-fn transfer(from: &Addr, to: &Addr, amount: U128) -> bool {
+fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     assert!(runtime::check_witness(from));
 
     let frmbal = balance_of(from);
@@ -41,7 +41,7 @@ fn total_supply() -> U128 {
 #[no_mangle]
 pub fn invoke() {
     let input = runtime::input();
-    let mut source = ZeroCopySource::new(&input);
+    let mut source = Source::new(&input);
     let action = source.read().unwrap();
     let mut sink = Sink::new(12);
     match action {

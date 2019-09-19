@@ -1,4 +1,4 @@
-use super::types::{Addr, Address, H256};
+use super::types::{Address, H256};
 use super::{vec, Vec};
 
 mod env {
@@ -10,6 +10,7 @@ mod env {
         pub fn ontio_entry_address(dest: *mut u8);
         pub fn ontio_check_witness(addr: *const u8) -> u32;
         pub fn ontio_return(ptr: *const u8, len: u32) -> !;
+        pub fn ontio_panic(ptr: *const u8, len: u32) -> !;
         pub fn ontio_notify(ptr: *const u8, len: u32);
         pub fn ontio_input_length() -> u32;
         pub fn ontio_get_input(dst: *mut u8);
@@ -40,8 +41,8 @@ mod env {
 }
 
 //todo : return result
-pub fn call_contract<T: AsRef<Addr>>(addr: &T, input: &[u8]) -> Option<Vec<u8>> {
-    let addr: &[u8] = addr.as_ref().as_ref();
+pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
+    let addr: &[u8] = addr.as_ref();
     let res =
         unsafe { env::ontio_call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
     if res < 0 {
@@ -83,6 +84,7 @@ pub fn contract_create(
             addr.as_mut().as_mut_ptr(),
         )
     };
+    //todo bug
     if res < 0 {
         return None;
     } else {
@@ -234,8 +236,8 @@ pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
 }
 
 ///Check signature
-pub fn check_witness<T: AsRef<Addr>>(addr: T) -> bool {
-    unsafe { env::ontio_check_witness(addr.as_ref().as_ptr()) != 0 }
+pub fn check_witness(addr: &Address) -> bool {
+    unsafe { env::ontio_check_witness(addr.as_ptr()) != 0 }
 }
 
 /// Get input data from transaction or caller contract
@@ -263,5 +265,11 @@ pub fn ret(data: &[u8]) -> ! {
 pub fn notify(data: &[u8]) {
     unsafe {
         env::ontio_notify(data.as_ptr(), data.len() as u32);
+    }
+}
+
+pub fn panic(msg: &str) -> ! {
+    unsafe {
+        env::ontio_panic(msg.as_ptr(), msg.len() as u32);
     }
 }

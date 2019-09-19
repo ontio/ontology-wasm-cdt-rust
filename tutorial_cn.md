@@ -86,7 +86,7 @@ sink.write("transfer".to_string());
 示例
 ```
 let input = runtime::input();
-let mut source = ZeroCopySource::new(&input);
+let mut source = Source::new(&input);
 let (from, to, amount) = source.read().unwrap();
 ```
 
