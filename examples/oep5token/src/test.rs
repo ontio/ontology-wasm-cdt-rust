@@ -1,6 +1,6 @@
 use crate::{Oep5Token, Oep5TokenInstance};
 use ontio_std::mock::build_runtime;
-use ontio_std::types::{Address, U256};
+use ontio_std::types::Address;
 
 #[test]
 fn initialize() {
@@ -15,7 +15,7 @@ fn query_token_id_by_index() {
     let mut token = Oep5TokenInstance;
     let owner = Address::zero();
     assert_eq!(token.initialize(&owner), true);
-    let token_id = token.query_token_id_by_index(U256::from(1));
+    let token_id = token.query_token_id_by_index(1);
     println!("token_id: {}", token_id);
     assert_eq!("http://images.com/hearta.jpg", token.query_token_by_id(token_id));
 }
@@ -25,8 +25,8 @@ fn transfer() {
     let mut token = Oep5TokenInstance;
     let owner = Address::zero();
     assert_eq!(token.initialize(&owner), true);
-    assert_eq!(token.total_supply(), U256::from(2));
-    let token_id = token.query_token_id_by_index(U256::from(1));
+    assert_eq!(token.total_supply(), 2);
+    let token_id = token.query_token_id_by_index(1);
     assert_eq!(token.owner_of(token_id.clone()), owner.clone());
     let alice = Address::repeat_byte(1);
     build_runtime().witness(&[owner]);
@@ -42,8 +42,8 @@ fn transfer_multi() {
     assert_eq!(token.initialize(&owner), true);
     let alice = Address::repeat_byte(1);
     let bob = Address::repeat_byte(2);
-    let token_id_1 = token.query_token_id_by_index(U256::from(1));
-    let token_id_2 = token.query_token_id_by_index(U256::from(2));
+    let token_id_1 = token.query_token_id_by_index(1);
+    let token_id_2 = token.query_token_id_by_index(2);
     assert_eq!(token.owner_of(token_id_1.clone()), owner);
     assert_eq!(token.owner_of(token_id_2.clone()), owner);
     let states = [(alice.clone(), token_id_1.clone()), (bob.clone(), token_id_2.clone())];
@@ -59,7 +59,7 @@ fn approve() {
     let alice = Address::repeat_byte(1);
     build_runtime().witness(&[owner, alice]);
     assert_eq!(token.initialize(&owner), true);
-    let token_id = token.query_token_id_by_index(U256::from(1));
+    let token_id = token.query_token_id_by_index(1);
     assert_eq!(token.approve(&alice, token_id.clone()), true);
     assert_eq!(token.get_approved(token_id.clone()), alice.clone());
     assert_eq!(token.owner_of(token_id.clone()), owner.clone());

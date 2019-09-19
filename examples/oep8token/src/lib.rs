@@ -13,33 +13,33 @@ const SYMBOL: &'static str = "Symbol";
 const BALANCE: &'static str = "Balance";
 const TOTAL_SUPPLY: &'static str = "TotalSupply";
 const APPROVE: &'static str = "Approve";
-const ADMIN: Address = ostd::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
+const ADMIN: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
-#[ostd::abi_codegen::contract]
+#[ostd::macros::contract]
 pub trait Oep8Token {
     fn init(&mut self) -> bool;
     fn name(&self, token_id: String) -> String;
     fn symbol(&self, token_id: String) -> String;
-    fn total_supply(&self, token_id: String) -> U256;
-    fn balance_of(&self, address: &Address, token_id: String) -> U256;
-    fn transfer(&mut self, from: &Address, to: &Address, amount: U256, token_id: String) -> bool;
-    fn transfer_multi(&mut self, states: &[(Address, Address, U256, String)]) -> bool;
+    fn total_supply(&self, token_id: String) -> U128;
+    fn balance_of(&self, address: &Address, token_id: String) -> U128;
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U128, token_id: String) -> bool;
+    fn transfer_multi(&mut self, states: &[(Address, Address, U128, String)]) -> bool;
     fn approve(
-        &mut self, owner: &Address, spender: &Address, amount: U256, token_id: String,
+        &mut self, owner: &Address, spender: &Address, amount: U128, token_id: String,
     ) -> bool;
-    fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U256;
+    fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U128;
     fn transfer_from(
-        &mut self, spender: &Address, from: &Address, to: &Address, amount: U256, token_id: String,
+        &mut self, spender: &Address, from: &Address, to: &Address, amount: U128, token_id: String,
     ) -> bool;
-    fn approve_multi(&mut self, obj: &[(Address, Address, U256, String)]) -> bool;
-    fn transfer_from_multi(&mut self, obj: &[(Address, Address, Address, U256, String)]) -> bool;
+    fn approve_multi(&mut self, obj: &[(Address, Address, U128, String)]) -> bool;
+    fn transfer_from_multi(&mut self, obj: &[(Address, Address, Address, U128, String)]) -> bool;
     //optional
     fn create_multi_type_token(&mut self) -> bool;
     fn check_token_id(&self, token_id: String) -> bool;
     #[event]
-    fn Transfer(&self, from: &Address, to: &Address, amount: U256, token_id: String) {}
+    fn Transfer(&self, from: &Address, to: &Address, amount: U128, token_id: String) {}
     #[event]
-    fn Approve(&self, approves: &Address, receiver: &Address, amount: U256, token_id: String) {}
+    fn Approve(&self, approves: &Address, receiver: &Address, amount: U128, token_id: String) {}
 }
 
 pub(crate) struct Oep8TokenInstance;
@@ -61,19 +61,18 @@ impl Oep8Token for Oep8TokenInstance {
     fn symbol(&self, token_id: String) -> String {
         database::get(&utils::concat(token_id, SYMBOL)).unwrap_or_default()
     }
-    fn total_supply(&self, token_id: String) -> U256 {
+    fn total_supply(&self, token_id: String) -> U128 {
         database::get(&utils::concat(token_id, TOTAL_SUPPLY)).unwrap_or_default()
     }
-    fn balance_of(&self, address: &Address, token_id: String) -> U256 {
+    fn balance_of(&self, address: &Address, token_id: String) -> U128 {
         database::get(&utils::concat(token_id, (BALANCE, address))).unwrap_or_default()
     }
-    fn transfer(&mut self, from: &Address, to: &Address, amount: U256, token_id: String) -> bool {
-        assert!(U256::zero() < amount);
+    fn transfer(&mut self, from: &Address, to: &Address, amount: U128, token_id: String) -> bool {
         assert_eq!(self.check_token_id(token_id.clone()), true);
         assert!(runtime::check_witness(from));
         let balance_key = utils::concat(token_id.clone(), BALANCE);
         let from_key = utils::concat(&balance_key, from);
-        let from_balance = database::get(&from_key).unwrap_or(U256::zero());
+        let from_balance = database::get(&from_key).unwrap_or(0);
         if amount > from_balance {
             return false;
         }
@@ -83,12 +82,12 @@ impl Oep8Token for Oep8TokenInstance {
             database::put(from_key, from_balance - amount)
         }
         let to_key = utils::concat(&balance_key, to);
-        let to_balance = database::get(&to_key).unwrap_or(U256::zero());
+        let to_balance = database::get(&to_key).unwrap_or(0);
         database::put(&to_key, to_balance + amount);
         self.Transfer(&from, &to, amount, token_id);
         true
     }
-    fn transfer_multi(&mut self, states: &[(Address, Address, U256, String)]) -> bool {
+    fn transfer_multi(&mut self, states: &[(Address, Address, U128, String)]) -> bool {
         if states.is_empty() {
             return false;
         }
@@ -103,26 +102,26 @@ impl Oep8Token for Oep8TokenInstance {
         true
     }
     fn approve(
-        &mut self, owner: &Address, spender: &Address, amount: U256, token_id: String,
+        &mut self, owner: &Address, spender: &Address, amount: U128, token_id: String,
     ) -> bool {
         assert_eq!(runtime::check_witness(owner), true);
         assert_eq!(self.check_token_id(token_id.clone()), true);
         let owner_balance = self.balance_of(owner, token_id.clone());
         assert_eq!(owner_balance >= amount, true);
-        assert_eq!(amount > U256::zero(), true);
+        assert_eq!(amount > 0, true);
         let approve_key = utils::concat(token_id.clone(), (APPROVE, owner, spender));
         database::put(&approve_key, amount);
         self.Approve(owner, spender, amount, token_id);
         true
     }
-    fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U256 {
+    fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U128 {
         let approve_key = utils::concat(token_id, (APPROVE, owner, spender));
-        database::get(&approve_key).unwrap_or(U256::zero())
+        database::get(&approve_key).unwrap_or(0)
     }
     fn transfer_from(
-        &mut self, spender: &Address, from: &Address, to: &Address, amount: U256, token_id: String,
+        &mut self, spender: &Address, from: &Address, to: &Address, amount: U128, token_id: String,
     ) -> bool {
-        assert!(amount > U256::zero());
+        assert!(amount > 0);
         assert_eq!(runtime::check_witness(spender), true);
         let approval = self.allowance(from, spender, token_id.clone());
         assert!(amount <= approval);
@@ -134,7 +133,7 @@ impl Oep8Token for Oep8TokenInstance {
         database::put(&approve_key, approval - amount);
         true
     }
-    fn approve_multi(&mut self, obj: &[(Address, Address, U256, String)]) -> bool {
+    fn approve_multi(&mut self, obj: &[(Address, Address, U128, String)]) -> bool {
         if obj.is_empty() {
             return false;
         }
@@ -148,7 +147,7 @@ impl Oep8Token for Oep8TokenInstance {
         }
         true
     }
-    fn transfer_from_multi(&mut self, obj: &[(Address, Address, Address, U256, String)]) -> bool {
+    fn transfer_from_multi(&mut self, obj: &[(Address, Address, Address, U128, String)]) -> bool {
         if obj.is_empty() {
             return false;
         }
@@ -173,13 +172,7 @@ impl Oep8Token for Oep8TokenInstance {
             "TokenNameFifth",
         ];
         let token_symbol_list = ["TNF", "TNS", "TNH", "TNO", "TNI"];
-        let token_supply_list = [
-            U256::from(100000),
-            U256::from(200000),
-            U256::from(300000),
-            U256::from(400000),
-            U256::from(500000),
-        ];
+        let token_supply_list = [100000, 200000, 300000, 400000, 500000];
         for index in 0..5 {
             let token_name = token_name_list[index];
             let token_symbol = token_symbol_list[index];

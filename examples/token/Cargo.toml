@@ -11,3 +11,6 @@ path = "src/lib.rs"
 [dependencies]
 ontio-std = {path="../../ontio-std", features=["bump-alloc"]}
 
+[features]
+mock = ["ontio-std/mock"]
+

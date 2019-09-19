@@ -14,16 +14,6 @@ English | [中文](tutorial_cn.md)
 clone `https://github.com/ontio/ontology-wasm-cdt-rust.git` to local, go to the project root directory, execute `cargo doc` to generate ontio-cdk api doc。
 
 2. Data type conversion in contract
-- `u32`,`u64` and other basic data types are converted to U256
-- `U256` are converted to `u64`、`u32` and other basic data types
-
-For details, please refer to the method of `U256` in the api documentation.
-
-example
-```
-let u = U256::from(1);
-let n = u.as_u64();
-```
 - `u64` convert to `string`
 
 example
@@ -48,7 +38,7 @@ let flag = runtime::check_witness(&from);
 
 When calling other contracts in a contract, you need to serialize the parameters according to the parameters serialize standard of the target contract.
 - `wasm`contract invoke `neovm` contract
-   - `U256` should convert to byte array by `types::to_neo_bytes()` firstly, then invoke `sink.write()` to serialize;
+   - `U128` should convert to byte array by `types::to_neo_bytes()` firstly, then invoke `sink.write()` to serialize;
    - `Address` should be serialized by `sink.write_neovm_address()`。
    - parameter serialize step
     1. The method parameters of the target contract are serialized in reverse order.
@@ -116,7 +106,7 @@ example
     use ostd::contract::ont;
     ont::allowance(from, to)
     ```
-  - `approve(from: &Address, to: &Address, amount: U256)` one address approve another address transfer assets
+  - `approve(from: &Address, to: &Address, amount: U128)` one address approve another address transfer assets
     example
     ```
     use ostd::contract::ont;
@@ -152,12 +142,12 @@ example
 ```
 use ostd::database;
 database::put(from, frmbal);
-let balance = database::get(owner).unwrap_or(U256::zero());
+let balance = database::get(owner).unwrap_or(0);
 ```
 
 6. types
 - `Address`: address is a byte array of length 20
-- `U256`   : small endian large integer。
+- `U128`   : little endian integer
 
 7. runtime
 

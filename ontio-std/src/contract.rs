@@ -1,15 +1,23 @@
+use crate::prelude::*;
+
+pub struct TransferParam {
+    pub from: Address,
+    pub to: Address,
+    pub amount: U128,
+}
+
 pub mod ont {
-    use super::super::base58;
-    use super::super::types::{Address, U128};
+    use crate::macros::base58;
+    use crate::prelude::*;
+
     const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 
-    pub struct State {
-        pub from: Address,
-        pub to: Address,
-        pub amount: U128,
+    pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+        let state = [TransferParam { from: from.clone(), to: to.clone(), amount: val }];
+        super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, state.as_ref())
     }
 
-    pub fn transfer(transfer: &[State]) -> bool {
+    pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, transfer)
     }
 
@@ -31,12 +39,22 @@ pub mod ont {
 }
 
 pub mod ong {
-    use super::super::base58;
-    use super::super::types::{Address, U128};
+    use crate::prelude::*;
+
+    use crate::macros::base58;
+    use crate::types::{Address, U128};
+
     const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
-    pub fn transfer(transfer: &[super::ont::State]) -> bool {
+
+    pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+        let state = [TransferParam { from: from.clone(), to: to.clone(), amount: val }];
+        super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, state.as_ref())
+    }
+
+    pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, transfer)
     }
+
     pub fn balance_of(address: &Address) -> U128 {
         super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, &address)
     }
@@ -59,7 +77,7 @@ pub(crate) mod util {
 
     const VERSION: u8 = 0;
     pub(crate) fn transfer_inner(
-        contract_address: &Address, transfer: &[super::ont::State],
+        contract_address: &Address, transfer: &[super::TransferParam],
     ) -> bool {
         let mut sink = Sink::new(16);
         sink.write_native_varuint(transfer.len() as u64);
@@ -142,6 +160,7 @@ pub(crate) mod util {
         }
         0
     }
+
     pub(crate) fn balance_of_inner(contract_address: &Address, address: &Address) -> U128 {
         let mut sink = Sink::new(0);
         sink.write_native_address(address);

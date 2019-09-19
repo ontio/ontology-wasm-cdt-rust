@@ -10,7 +10,7 @@ pub fn get<K: AsRef<[u8]>, T>(key: K) -> Option<T>
 where
     for<'a> T: Decoder<'a> + 'static,
 {
-    runtime::storage_read(key.as_ref()).map(|val| {
+    runtime::storage_read(key.as_ref()).map(|val: Vec<u8>| {
         let mut source = Source::new(&val);
         source.read().unwrap()
     })

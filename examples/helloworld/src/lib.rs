@@ -4,7 +4,6 @@ extern crate ontio_std as ostd;
 use ostd::abi::{Sink, Source};
 use ostd::prelude::*;
 use ostd::runtime;
-use ostd::String;
 
 fn say_hello() -> String {
     return "hello world".to_string();

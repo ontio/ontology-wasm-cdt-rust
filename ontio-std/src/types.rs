@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use crate::String;
 use fixed_hash::construct_fixed_hash;
 
 construct_fixed_hash! {
@@ -49,8 +48,7 @@ fn to_hex_string(data: &[u8]) -> String {
 pub type Address = H160;
 
 pub type U128 = u128;
-
-pub use bigint::U256;
+pub type S128 = i128;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {

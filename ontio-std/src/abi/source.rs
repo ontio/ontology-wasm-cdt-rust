@@ -2,11 +2,11 @@ use super::Decoder;
 use super::Error;
 use byteorder::{ByteOrder, LittleEndian};
 
-use crate::types::{Address, H256, U256};
+use crate::types::{Address, H256};
 
 use core::mem::transmute;
 
-fn varuint_encode_size(val: u64) -> usize {
+pub(crate) fn varuint_encode_size(val: u64) -> usize {
     if val < 0xfd {
         1
     } else if val <= 0xffff {
@@ -55,11 +55,6 @@ impl<'a> Source<'a> {
     pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;
         Ok(unsafe { transmute(buf.as_ptr()) })
-    }
-
-    pub fn read_u256(&mut self) -> Result<U256, Error> {
-        let buf = self.next_bytes(32)?;
-        Ok(U256::from_little_endian(buf))
     }
 
     pub(crate) fn read_into(&mut self, buf: &mut [u8]) -> Result<(), Error> {

@@ -3,9 +3,8 @@ use super::Sink;
 use super::{Decoder, Encoder};
 
 use crate::abi::Source;
-use crate::cmp;
 use crate::prelude::*;
-use crate::types::{Address, H256, U256};
+use crate::types::{Address, H256};
 
 impl<'a> Decoder<'a> for u8 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
@@ -89,12 +88,6 @@ impl<'a> Decoder<'a> for &'a H256 {
     }
 }
 
-impl<'a> Decoder<'a> for U256 {
-    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-        source.read_u256()
-    }
-}
-
 impl<'a> Decoder<'a> for u128 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u128()
@@ -158,14 +151,6 @@ impl Encoder for Address {
 impl Encoder for H256 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(self.as_ref())
-    }
-}
-
-impl Encoder for U256 {
-    fn encode(&self, sink: &mut Sink) {
-        let mut buf = [0; 32];
-        self.to_little_endian(&mut buf);
-        sink.write_bytes(&buf)
     }
 }
 

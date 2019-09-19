@@ -1,5 +1,4 @@
-use super::types::{Address, H256};
-use super::{vec, Vec};
+use crate::prelude::*;
 
 mod env {
     extern "C" {
@@ -247,7 +246,7 @@ pub fn input() -> Vec<u8> {
     if len == 0 {
         Vec::new()
     } else {
-        let mut data = super::vec![0;len as usize];
+        let mut data = vec![0; len as usize];
         unsafe {
             env::ontio_get_input(data.as_mut_ptr());
         }

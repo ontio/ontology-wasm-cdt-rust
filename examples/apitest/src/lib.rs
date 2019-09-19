@@ -6,11 +6,10 @@ use ostd::abi::Dispatcher;
 use ostd::abi::{Sink, Source};
 use ostd::contract::ont;
 use ostd::prelude::*;
-use ostd::str;
 use ostd::types::to_neo_bytes;
 use ostd::{console, runtime};
 
-#[ostd::abi_codegen::contract]
+#[ostd::macros::contract]
 pub trait ApiTest {
     fn timestamp(&self) -> u64;
     fn block_height(&self) -> u32;
@@ -141,8 +140,7 @@ impl ApiTest for ApiTestInstance {
         }
     }
     fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U128) -> bool {
-        let state = ont::State { from: from.clone(), to: to.clone(), amount: amount };
-        ont::transfer(&[state])
+        ont::transfer(&from, &to, amount)
     }
     fn call_ont_approve(&self, from: &Address, to: &Address, amount: U128) -> bool {
         ont::approve(from, to, amount)

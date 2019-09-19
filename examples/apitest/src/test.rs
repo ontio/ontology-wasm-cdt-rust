@@ -2,12 +2,12 @@ extern crate hexutil;
 extern crate ontio_std as ostd;
 use crate::{ApiTest, ApiTestInstance};
 use ostd::mock::build_runtime;
+use ostd::prelude::*;
 use ostd::types::{Address, H256};
-use ostd::vec::Vec;
 
-const _from: Address = ostd::base58!("AeJGmTDUdSzMdrSHU2pa8rLMo23AAs53LM");
+const _from: Address = ostd::macros::base58!("AeJGmTDUdSzMdrSHU2pa8rLMo23AAs53LM");
 
-const _to: Address = ostd::base58!("AbPRaepcpBAFHz9zCj4619qch4Aq5hJARA");
+const _to: Address = ostd::macros::base58!("AbPRaepcpBAFHz9zCj4619qch4Aq5hJARA");
 
 #[test]
 fn test_runtime_api() {
@@ -43,5 +43,4 @@ fn test_runtime_api() {
         api.sha256(&[0; 20]).to_hex_string(),
         "906fd3cbc4401b7ffac44063f02c2693c332e653c3f2b5db00d3b87eb2c947de"
     );
-    build_runtime().s(&current_tx_hash);
 }

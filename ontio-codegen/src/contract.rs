@@ -9,6 +9,7 @@ pub fn quote(item: syn::Item) -> proc_macro2::TokenStream {
             let disp = generate_dispatcher(&contract);
             let trait_and_event = generate_event(&contract);
             quote! {
+                extern crate alloc;
                 #trait_and_event
                 #disp
             }
@@ -141,8 +142,8 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
                                 syn::Type::Slice(slice) => {
                                     let slice_elem = &slice.elem;
                                     match mutability {
-                                        Some(_) => quote! { source.read::<Vec<#slice_elem>>().expect(arg_decode_err).as_mut_slice() },
-                                        None => quote! { source.read::<Vec<#slice_elem>>().expect(arg_decode_err).as_slice() },
+                                        Some(_) => quote! { source.read::<alloc::vec::Vec<#slice_elem>>().expect(arg_decode_err).as_mut_slice() },
+                                        None => quote! { source.read::<alloc::vec::Vec<#slice_elem>>().expect(arg_decode_err).as_slice() },
                                     }
                                 }
                                 syn::Type::Path(ref path) => {
@@ -175,7 +176,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
                         Some(quote!{
                             #action_literal => {
                                 contract_instance.#action_name(#(source.read::<#args>().expect(arg_decode_err)),*);
-                                Vec::new()
+                                alloc::vec::Vec::new()
                             }
                         })
                     }
@@ -205,7 +206,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
         }
 
         impl<T: #contract_name> ontio_std::abi::Dispatcher for #dispatcher_name<T> {
-            fn dispatch(&mut self, payload: &[u8]) -> ontio_std::Vec<u8> {
+            fn dispatch(&mut self, payload: &[u8]) -> alloc::vec::Vec<u8> {
                 let contract_instance = &mut self.contract_instance;
                 // todo: avoid bytes copy
                 let mut source = ontio_std::abi::Source::new(payload);
