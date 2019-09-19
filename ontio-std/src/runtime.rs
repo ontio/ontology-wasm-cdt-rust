@@ -1,4 +1,4 @@
-use super::types::{Addr, Address, H256};
+use super::types::{Address, H256};
 use super::{vec, Vec};
 
 mod env {
@@ -41,8 +41,8 @@ mod env {
 }
 
 //todo : return result
-pub fn call_contract<T: AsRef<Addr>>(addr: &T, input: &[u8]) -> Option<Vec<u8>> {
-    let addr: &[u8] = addr.as_ref().as_ref();
+pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
+    let addr: &[u8] = addr.as_ref();
     let res =
         unsafe { env::ontio_call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
     if res < 0 {
@@ -84,6 +84,7 @@ pub fn contract_create(
             addr.as_mut().as_mut_ptr(),
         )
     };
+    //todo bug
     if res < 0 {
         return None;
     } else {
@@ -235,8 +236,8 @@ pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
 }
 
 ///Check signature
-pub fn check_witness<T: AsRef<Addr>>(addr: T) -> bool {
-    unsafe { env::ontio_check_witness(addr.as_ref().as_ptr()) != 0 }
+pub fn check_witness(addr: &Address) -> bool {
+    unsafe { env::ontio_check_witness(addr.as_ptr()) != 0 }
 }
 
 /// Get input data from transaction or caller contract

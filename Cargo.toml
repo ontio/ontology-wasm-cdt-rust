@@ -4,7 +4,6 @@ members = [
     "ontio-codegen",
     "ontio-bump-alloc",
     "examples/token",
-    "examples/token-zero-copy",
     "examples/token-codegen",
     "examples/oep5token",
     "examples/oep8token",

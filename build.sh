@@ -14,7 +14,7 @@ fi
 [[ -z $(which ontio-wasm-build) ]] && cargo install --git=https://github.com/ontio/ontio-wasm-build
 
 # clean origial build 
-rm ./target/wasm32-unknown-unknown/release/*.wasm
+rm -rf ./target/wasm32-unknown-unknown/release/*.wasm
 
 # clean origial build 
 RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
