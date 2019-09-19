@@ -4,7 +4,6 @@ use core::convert::TryInto;
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use fixed_hash::construct_fixed_hash;
-use core::convert::TryInto;
 
 construct_fixed_hash! {
     pub struct H256(32);
