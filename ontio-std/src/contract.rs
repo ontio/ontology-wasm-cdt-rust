@@ -72,8 +72,7 @@ pub mod ong {
 pub(crate) mod util {
     use super::super::abi::Sink;
     use super::super::runtime;
-    use super::super::types::{to_neo_bytes, Address, U128};
-    use core::convert::TryInto;
+    use super::super::types::{u128_from_neo_bytes, u128_to_neo_bytes, Address, U128};
 
     const VERSION: u8 = 0;
     pub(crate) fn transfer_inner(
@@ -85,7 +84,7 @@ pub(crate) mod util {
         for state in transfer.iter() {
             sink.write_native_address(&state.from);
             sink.write_native_address(&state.to);
-            sink.write(to_neo_bytes(state.amount));
+            sink.write(u128_to_neo_bytes(state.amount));
         }
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
@@ -106,7 +105,7 @@ pub(crate) mod util {
         let mut sink = Sink::new(16);
         sink.write_native_address(from);
         sink.write_native_address(to);
-        sink.write(to_neo_bytes(amount));
+        sink.write(u128_to_neo_bytes(amount));
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
         sink_param.write("approve");
@@ -127,7 +126,7 @@ pub(crate) mod util {
         sink.write_native_address(sender);
         sink.write_native_address(from);
         sink.write_native_address(to);
-        sink.write(to_neo_bytes(amount));
+        sink.write(u128_to_neo_bytes(amount));
         let mut sink_param = Sink::new(16);
         sink_param.write(VERSION);
         sink_param.write("transferFrom");
@@ -154,8 +153,7 @@ pub(crate) mod util {
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
-                return U128::from_le_bytes(data.as_slice().try_into().unwrap());
-                // todo: impl from neobytes
+                return u128_from_neo_bytes(&data);
             }
         }
         0
@@ -171,8 +169,7 @@ pub(crate) mod util {
         let res = runtime::call_contract(contract_address, sink_param.bytes());
         if let Some(data) = res {
             if data.len() != 0 {
-                return U128::from_le_bytes(data.as_slice().try_into().unwrap());
-                // todo: impl from neobytes
+                return u128_from_neo_bytes(&data);
             }
         }
         0
