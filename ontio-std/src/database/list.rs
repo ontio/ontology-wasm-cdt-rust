@@ -7,8 +7,7 @@ use alloc::collections::BTreeMap;
 //slice default size
 const INDEX_SIZE: u32 = 64;
 
-pub struct ListStore<T:Encoder>
-{
+pub struct ListStore<T: Encoder> {
     key: String,
     need_flush: Vec<u32>, //index,store all index which slice need update
     size: u32,
@@ -17,8 +16,7 @@ pub struct ListStore<T:Encoder>
     cache: BTreeMap<u32, Vec<T>>, //index, vec
 }
 
-impl<T:Encoder> Drop for ListStore<T>
-{
+impl<T: Encoder> Drop for ListStore<T> {
     fn drop(&mut self) {
         self.flush();
     }
@@ -44,8 +42,7 @@ where
         false
     }
 }
-impl<T:Encoder> ListStore<T>
-{
+impl<T: Encoder> ListStore<T> {
     fn encode(&self, sink: &mut Sink) {
         sink.write(self.next_key_id);
         sink.write(&self.index_size);
@@ -283,8 +280,7 @@ where
     }
 }
 
-impl<T: Encoder> ListStore<T>
-{
+impl<T: Encoder> ListStore<T> {
     pub fn flush(&mut self) {
         if !self.need_flush.is_empty() {
             let need_flush = self.need_flush.to_vec();

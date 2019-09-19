@@ -101,7 +101,8 @@ impl ApiTest for ApiTestInstance {
         res.map(|res| {
             let mut source = Source::new(&res);
             source.read().unwrap()
-        }).unwrap_or(0)
+        })
+        .unwrap_or(0)
     }
 
     fn call_wasm_transfer(

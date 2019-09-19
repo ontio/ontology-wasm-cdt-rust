@@ -1,8 +1,8 @@
 use super::Error;
+use super::Sink;
 use super::{Decoder, Encoder};
-use super::{Sink};
 
-use crate::abi::{Source};
+use crate::abi::Source;
 use crate::cmp;
 use crate::prelude::*;
 use crate::types::{Address, H256, U256};
@@ -131,7 +131,6 @@ impl Encoder for u128 {
     }
 }
 
-
 impl Encoder for i128 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(&self.to_le_bytes())
@@ -150,20 +149,17 @@ impl Encoder for bool {
     }
 }
 
-
 impl Encoder for Address {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(self.as_ref())
     }
 }
 
-
 impl Encoder for H256 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(self.as_ref())
     }
 }
-
 
 impl Encoder for U256 {
     fn encode(&self, sink: &mut Sink) {
@@ -172,7 +168,6 @@ impl Encoder for U256 {
         sink.write_bytes(&buf)
     }
 }
-
 
 impl<T: Encoder> Encoder for Vec<T> {
     fn encode(&self, sink: &mut Sink) {
@@ -277,4 +272,3 @@ for_each_tuple! {
         }
     }
 }
-
