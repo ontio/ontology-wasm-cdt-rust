@@ -32,12 +32,6 @@ impl<'a> Decoder<'a> for &'a [u8] {
         source.read_bytes()
     }
 }
-//
-//impl<'a> Decoder<'a> for Vec<u8> {
-//    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-//        Ok(source.read_bytes()?.to_vec())
-//    }
-//}
 
 impl<'a, T: Decoder<'a>> Decoder<'a> for Vec<T> {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
@@ -104,6 +98,12 @@ impl<'a> Decoder<'a> for U256 {
 impl<'a> Decoder<'a> for u128 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u128()
+    }
+}
+
+impl<'a> Decoder<'a> for i128 {
+    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+        Ok(source.read_u128()? as i128)
     }
 }
 
