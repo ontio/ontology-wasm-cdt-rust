@@ -1,4 +1,4 @@
-use super::Decoder2;
+use super::Decoder;
 use super::Error;
 use byteorder::{ByteOrder, LittleEndian};
 
@@ -43,8 +43,8 @@ impl<'a> Source<'a> {
         self.next_bytes(n as usize)
     }
 
-    pub fn read<T: Decoder2<'a>>(&mut self) -> Result<T, Error> {
-        T::decode2(self)
+    pub fn read<T: Decoder<'a>>(&mut self) -> Result<T, Error> {
+        T::decode(self)
     }
 
     pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {

@@ -23,6 +23,6 @@ pub trait Dispatcher {
 }
 
 #[doc(hidden)]
-pub trait Decoder2<'a>: Sized {
-    fn decode2(source: &mut Source<'a>) -> Result<Self, Error>;
+pub trait Decoder<'a>: Sized {
+    fn decode(source: &mut Source<'a>) -> Result<Self, Error>;
 }

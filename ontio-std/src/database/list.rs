@@ -1,4 +1,4 @@
-use crate::abi::{Decoder2, Encoder, Error, Sink, Source};
+use crate::abi::{Decoder, Encoder, Error, Sink, Source};
 use crate::cmp::PartialEq;
 use crate::database;
 use crate::{format, String, Vec};
@@ -26,7 +26,7 @@ impl<T:Encoder> Drop for ListStore<T>
 
 impl<T> ListStore<T>
 where
-    for<'a> T: Decoder2<'a> + Encoder + PartialEq,
+    for<'a> T: Decoder<'a> + Encoder + PartialEq,
 {
     #[allow(unused)]
     pub(crate) fn contains(&mut self, value: &T) -> bool {
@@ -54,7 +54,7 @@ impl<T:Encoder> ListStore<T>
 
 impl<T> ListStore<T>
 where
-    for<'a> T: Decoder2<'a> + Encoder,
+    for<'a> T: Decoder<'a> + Encoder,
 {
     fn init(key: String, source: &mut Source) -> Result<Self, Error> {
         let next_key_id = source.read().unwrap();
@@ -308,7 +308,7 @@ impl<T: Encoder> ListStore<T>
 
 pub struct Iterator<'a, T>
 where
-    for<'b> T: Decoder2<'b> + Encoder + 'static,
+    for<'b> T: Decoder<'b> + Encoder + 'static,
 {
     cursor: u32,
     list: &'a mut ListStore<T>,
@@ -316,7 +316,7 @@ where
 
 impl<'a, T> Iterator<'a, T>
 where
-    for<'b> T: Decoder2<'b> + Encoder,
+    for<'b> T: Decoder<'b> + Encoder,
 {
     fn new(cursor: u32, list: &mut ListStore<T>) -> Iterator<T> {
         Iterator { cursor: cursor, list: list }
