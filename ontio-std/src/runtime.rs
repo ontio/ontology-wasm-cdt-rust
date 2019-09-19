@@ -10,6 +10,7 @@ mod env {
         pub fn ontio_entry_address(dest: *mut u8);
         pub fn ontio_check_witness(addr: *const u8) -> u32;
         pub fn ontio_return(ptr: *const u8, len: u32) -> !;
+        pub fn ontio_panic(ptr: *const u8, len: u32) -> !;
         pub fn ontio_notify(ptr: *const u8, len: u32);
         pub fn ontio_input_length() -> u32;
         pub fn ontio_get_input(dst: *mut u8);
@@ -263,5 +264,11 @@ pub fn ret(data: &[u8]) -> ! {
 pub fn notify(data: &[u8]) {
     unsafe {
         env::ontio_notify(data.as_ptr(), data.len() as u32);
+    }
+}
+
+pub fn panic(msg: &str) -> ! {
+    unsafe {
+        env::ontio_panic(msg.as_ptr(), msg.len() as u32);
     }
 }
