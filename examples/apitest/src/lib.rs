@@ -6,7 +6,7 @@ use ostd::abi::Dispatcher;
 use ostd::abi::{Sink, Source};
 use ostd::contract::ont;
 use ostd::prelude::*;
-use ostd::types::to_neo_bytes;
+use ostd::types::u128_to_neo_bytes;
 use ostd::{console, runtime};
 
 #[ostd::macros::contract]
@@ -120,7 +120,7 @@ impl ApiTest for ApiTestInstance {
         &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
         let mut sink = Sink::new(16);
-        sink.write(to_neo_bytes(amount));
+        sink.write(u128_to_neo_bytes(amount));
         sink.write_neovm_address(to);
         sink.write_neovm_address(from);
         sink.write(83u8);

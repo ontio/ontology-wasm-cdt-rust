@@ -56,7 +56,7 @@ impl Address {
     }
 }
 
-pub fn to_neo_bytes(data: U128) -> Vec<u8> {
+pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
     let temp = data.to_le_bytes();
     if let Some(pos) = temp.iter().rev().position(|v| *v != 0) {
         let mut res: Vec<u8> = Vec::new();
@@ -69,6 +69,51 @@ pub fn to_neo_bytes(data: U128) -> Vec<u8> {
     } else {
         vec![0]
     }
+}
+
+pub fn i128_to_neo_bytes(data: S128) -> Vec<u8> {
+    if data >= 0 {
+        return u128_to_neo_bytes(data as u128);
+    }
+    let temp = data.to_le_bytes();
+    if let Some(pos) = temp.iter().rev().position(|v| *v != 255) {
+        let mut res: Vec<u8> = Vec::new();
+        let end = temp.len() - pos;
+        res.extend_from_slice(&temp[0..end]);
+        if temp[end - 1] < 0x80 {
+            res.push(255);
+        }
+        return res;
+    } else {
+        vec![255]
+    }
+}
+
+pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
+    if buf.len() == 0 {
+        return 0;
+    }
+    let neg = buf[buf.len() - 1] >= 0x80;
+    let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
+
+    let mut result = [0u8; 16];
+    if (buf.len() > 16 && neg == true) || (buf.len() > 17 && neg == false) {
+        return default;
+    }
+    if buf.len() == 17 && buf[16] != 0 {
+        return default;
+    }
+
+    let copy = cmp::min(buf.len(), 16);
+    {
+        let (left, right) = result.split_at_mut(copy);
+        left.copy_from_slice(&buf[0..copy]);
+        if neg {
+            right.iter_mut().for_each(|v| *v = 255);
+        }
+    }
+
+    U128::from_le_bytes(result)
 }
 
 impl H160 {
@@ -85,11 +130,49 @@ impl H256 {
 
 #[test]
 fn test_to_neo_bytes() {
-    let raw_data = [0u128, 128, 1024, 10000, 8380656, 8446192];
-    let expected_data = ["00", "8000", "0004", "1027", "f0e07f", "f0e08000"];
-    for (data, exp) in raw_data.into_iter().zip(&expected_data) {
-        let res = to_neo_bytes(*data);
+    let case_data = [
+        (0i128, "00"),
+        (128, "8000"),
+        (1024, "0004"),
+        (10000, "1027"),
+        (8380656, "f0e07f"),
+        (8446192, "f0e08000"),
+        (-1, "ff"),
+        (1, "01"),
+        (120, "78"),
+        (128, "8000"),
+        (255, "ff00"),
+        (1024, "0004"),
+        (-9223372036854775808, "0000000000000080"),
+        (9223372036854775807, "ffffffffffffff7f"),
+        (90123123981293054321, "71e975a9c4a7b5e204"),
+    ];
+
+    for (data, exp) in case_data.into_iter() {
+        let res = i128_to_neo_bytes(*data);
         let r = to_hex_string(res.as_slice());
         assert_eq!(r, exp.to_string());
+
+        let u = u128_from_neo_bytes(&res);
+        assert_eq!(u, *data as u128);
+    }
+}
+
+#[test]
+fn test_from_neo_bytes() {
+    for _i in 0..100000 {
+        let v: i128 = rand::random();
+        let bs = u128_to_neo_bytes(v as U128);
+
+        let u = u128_from_neo_bytes(&bs);
+        assert_eq!(v as U128, u);
+    }
+
+    for _i in 0..100000 {
+        let v: u128 = rand::random();
+        let bs = u128_to_neo_bytes(v);
+
+        let u = u128_from_neo_bytes(&bs);
+        assert_eq!(v as U128, u);
     }
 }
