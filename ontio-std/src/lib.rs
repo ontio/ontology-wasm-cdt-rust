@@ -59,7 +59,7 @@ extern crate alloc;
 
 pub mod prelude {
     pub use crate::contract::TransferParam;
-    pub use crate::types::{Address, H256, S128, U128};
+    pub use crate::types::{Address, H256, I128, U128};
     pub use alloc::boxed::Box;
     pub use alloc::prelude::*;
     pub use alloc::str;

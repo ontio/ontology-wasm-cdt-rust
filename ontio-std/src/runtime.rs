@@ -36,6 +36,7 @@ mod env {
             author_len: u32, email_ptr: *const u8, email_len: u32, desc_ptr: *const u8,
             desc_len: u32, new_addr_ptr: *mut u8,
         ) -> u32;
+        pub fn ontio_contract_delete() -> !;
     }
 }
 
@@ -63,9 +64,9 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
 ///contract create
 pub fn contract_create(
     code: &[u8], need_storage: u32, name: &str, ver: &str, author: &str, email: &str, desc: &str,
-) -> Option<Address> {
+) -> Address {
     let mut addr: Address = Address::zero();
-    let res = unsafe {
+    unsafe {
         env::ontio_contract_create(
             code.as_ptr(),
             code.len() as u32,
@@ -83,20 +84,16 @@ pub fn contract_create(
             addr.as_mut().as_mut_ptr(),
         )
     };
-    //todo bug
-    if res < 0 {
-        return None;
-    } else {
-        Some(addr)
-    }
+
+    addr
 }
 
 ///contract migrate
 pub fn contract_migrate(
     code: &[u8], vm_type: u32, name: &str, version: &str, author: &str, email: &str, desc: &str,
-) -> Option<Address> {
+) -> Address {
     let mut addr: Address = Address::zero();
-    let res = unsafe {
+    unsafe {
         env::ontio_contract_migrate(
             code.as_ptr(),
             code.len() as u32,
@@ -114,16 +111,15 @@ pub fn contract_migrate(
             addr.as_mut().as_mut_ptr(),
         )
     };
-    if res < 0 {
-        return None;
-    }
-    Some(addr)
+
+    addr
 }
-//pub fn contract_delete() {
-//    unsafe {
-//        env::ontio_contract_delete();
-//    }
-//}
+
+pub fn contract_delete() -> ! {
+    unsafe {
+        env::ontio_contract_delete();
+    }
+}
 
 pub fn storage_write(key: &[u8], val: &[u8]) {
     unsafe {
