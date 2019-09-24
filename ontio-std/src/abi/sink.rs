@@ -51,12 +51,12 @@ impl Sink {
         self.write_bytes(&buf)
     }
 
-    pub(crate) fn write_u128(&mut self, val:u128) {
+    pub(crate) fn write_u128(&mut self, val: u128) {
         self.write_bytes(&val.to_le_bytes())
     }
 
-    pub(crate) fn write_i128(&mut self, val:i128) {
-        self.write_bytes(&val.   to_le_bytes())
+    pub(crate) fn write_i128(&mut self, val: i128) {
+        self.write_bytes(&val.to_le_bytes())
     }
 
     pub(crate) fn write_varuint(&mut self, val: u64) {
