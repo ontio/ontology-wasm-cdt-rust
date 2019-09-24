@@ -48,7 +48,7 @@ fn to_hex_string(data: &[u8]) -> String {
 pub type Address = H160;
 
 pub type U128 = u128;
-pub type S128 = i128;
+pub type I128 = i128;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {
@@ -71,7 +71,7 @@ pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
     }
 }
 
-pub fn i128_to_neo_bytes(data: S128) -> Vec<u8> {
+pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
     if data >= 0 {
         return u128_to_neo_bytes(data as u128);
     }
