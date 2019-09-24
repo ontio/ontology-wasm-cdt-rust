@@ -1,10 +1,12 @@
 mod codec;
+mod event_builder;
 mod sink;
 mod source;
 
 pub use self::sink::Sink;
 pub use self::source::Source;
 use crate::prelude::*;
+pub use event_builder::EventBuilder;
 
 pub use ontio_derive_codec::*;
 

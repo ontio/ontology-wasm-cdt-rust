@@ -3,7 +3,7 @@
 
 extern crate ontio_std as ostd;
 use ostd::abi::Dispatcher;
-use ostd::abi::{Sink, Source};
+use ostd::abi::{EventBuilder, Sink, Source};
 use ostd::contract::ont;
 use ostd::prelude::*;
 use ostd::types::u128_to_neo_bytes;

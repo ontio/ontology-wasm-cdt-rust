@@ -78,7 +78,7 @@ pub(crate) mod util {
     pub(crate) fn transfer_inner(
         contract_address: &Address, transfer: &[super::TransferParam],
     ) -> bool {
-        let mut sink = Sink::new(16);
+        let mut sink = Sink::new(64);
         sink.write_native_varuint(transfer.len() as u64);
 
         for state in transfer.iter() {
@@ -86,7 +86,7 @@ pub(crate) mod util {
             sink.write_native_address(&state.to);
             sink.write(u128_to_neo_bytes(state.amount));
         }
-        let mut sink_param = Sink::new(16);
+        let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
         sink_param.write("transfer");
         sink_param.write(sink.bytes());
@@ -102,11 +102,11 @@ pub(crate) mod util {
     pub(crate) fn approve_inner(
         contract_address: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
-        let mut sink = Sink::new(16);
+        let mut sink = Sink::new(64);
         sink.write_native_address(from);
         sink.write_native_address(to);
         sink.write(u128_to_neo_bytes(amount));
-        let mut sink_param = Sink::new(16);
+        let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
         sink_param.write("approve");
         sink_param.write(sink.bytes());
@@ -122,12 +122,12 @@ pub(crate) mod util {
     pub(crate) fn transfer_from_inner(
         contract_address: &Address, sender: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
-        let mut sink = Sink::new(16);
+        let mut sink = Sink::new(64);
         sink.write_native_address(sender);
         sink.write_native_address(from);
         sink.write_native_address(to);
         sink.write(u128_to_neo_bytes(amount));
-        let mut sink_param = Sink::new(16);
+        let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
         sink_param.write("transferFrom");
         sink_param.write(sink.bytes());
@@ -143,10 +143,10 @@ pub(crate) mod util {
     pub(crate) fn allowance_inner(
         contract_address: &Address, from: &Address, to: &Address,
     ) -> U128 {
-        let mut sink = Sink::new(0);
+        let mut sink = Sink::new(64);
         sink.write_native_address(from);
         sink.write_native_address(to);
-        let mut sink_param = Sink::new(0);
+        let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
         sink_param.write("allowance");
         sink_param.write(sink.bytes());
@@ -160,9 +160,9 @@ pub(crate) mod util {
     }
 
     pub(crate) fn balance_of_inner(contract_address: &Address, address: &Address) -> U128 {
-        let mut sink = Sink::new(0);
+        let mut sink = Sink::new(64);
         sink.write_native_address(address);
-        let mut sink_param = Sink::new(0);
+        let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
         sink_param.write("balanceOf");
         sink_param.write(sink.bytes());
