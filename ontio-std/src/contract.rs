@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 pub mod neo {
     use crate::prelude::*;
-    pub fn call_method<T: crate::abi::NeoParamEncoder>(
+    pub fn call_contract<T: crate::abi::NeoParamEncoder>(
         contract_address: &Address, param: T,
     ) -> Option<Vec<u8>> {
         let mut builder = crate::abi::NeoParamBuilder::new();

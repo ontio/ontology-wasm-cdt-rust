@@ -72,7 +72,9 @@ pub struct NeoParamParser<'a> {
 
 impl<'a> NeoParamParser<'a> {
     pub fn new(bs: &'a [u8]) -> Self {
-        Self { source: Source::new(bs) }
+        let mut source = Source::new(bs);
+        let version = source.read_byte();
+        Self { source }
     }
     pub fn read<T: NeoParamDecoder<'a>>(&mut self) -> Result<T, Error> {
         T::deserialize(self)
@@ -90,7 +92,7 @@ impl<'a> NeoParamParser<'a> {
 
     pub fn bytearray(&mut self) -> Result<&'a [u8], Error> {
         let ty = self.source.read_byte()?;
-        if ty != TYPE_BYTEARRAY {
+        if ty != TYPE_BYTEARRAY ||ty == TYPE_STRING {
             return Err(Error::TypeInconsistency);
         }
         let l = self.source.read_u32()?;
@@ -115,10 +117,17 @@ impl<'a> NeoParamParser<'a> {
 
     pub fn bool(&mut self) -> Result<bool, Error> {
         let ty = self.source.read_byte()?;
-        if ty != TYPE_BOOL {
-            return Err(Error::TypeInconsistency);
+        if ty == TYPE_BOOL {
+            return self.source.read_bool();
+        } else if ty == TYPE_INT {
+            let res = self.source.read_u128()?;
+            if res != 0 {
+                return Ok(true);
+            } else {
+                return Ok(false);
+            }
         }
-        self.source.read_bool()
+        return Err(Error::TypeInconsistency);
     }
 
     pub fn h256(&mut self) -> Result<&'a H256, Error> {
