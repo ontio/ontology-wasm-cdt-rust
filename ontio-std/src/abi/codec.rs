@@ -1,6 +1,6 @@
 use super::Error;
 use super::Sink;
-use super::{Decoder, Encoder};
+use super::{Decoder, Encoder, NeoParamBuilder, NeoParamDecoder, NeoParamEncoder, NeoParamParser};
 
 use crate::abi::Source;
 use crate::prelude::*;
@@ -250,6 +250,24 @@ for_each_tuple! {
 
         impl<$($item: Encoder),*> Encoder for ($($item,)*) {
             fn encode(&self, _sink: &mut Sink) {
+                #[allow(non_snake_case)]
+                let ($($item,)*) = self;
+                $(_sink.write($item);)*
+            }
+        }
+    }
+}
+
+//trace_macros!(true);
+for_each_tuple! {
+    ($($item:ident)*) => {
+        impl<'a, $($item: NeoParamDecoder<'a>),*> NeoParamDecoder<'a> for ($($item,)*) {
+            fn deserialize(_source: &mut NeoParamParser<'a>) -> Result<Self, Error> {
+                Ok(($(_source.read::<$item>()?,)*))
+            }
+        }
+        impl<$($item: NeoParamEncoder),*> NeoParamEncoder for ($($item,)*) {
+            fn serialize(&self, _sink: &mut NeoParamBuilder) {
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
                 $(_sink.write($item);)*
