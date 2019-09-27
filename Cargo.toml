@@ -9,7 +9,8 @@ members = [
     "examples/oep8token",
     "examples/apitest",
     "examples/helloworld",
-    "examples/red-envlope"
+    "examples/red-envlope",
+    "examples/call-neovm"
 ]
 
 [profile.release]

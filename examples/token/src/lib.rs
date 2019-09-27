@@ -1,7 +1,8 @@
 #![no_std]
+#![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
-
-use ostd::abi::{Encoder, Sink, Source};
+use ostd::abi::{Encoder, EventBuilder, Sink, Source};
+use ostd::macros::base58;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
@@ -10,8 +11,11 @@ const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
 const TOTAL_SUPPLY: U128 = 100000000000;
 
+const ADMIN: Address = base58!("AQf4Mzu1YJrhz9f3aRkkwSm9n3qhXGSh4p");
+
 fn initialize() -> bool {
     database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);
+    database::put(ADMIN, TOTAL_SUPPLY);
     true
 }
 
@@ -30,7 +34,12 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
 
     database::put(from, frmbal - amount);
     database::put(to, tobal + amount);
-    notify(("Transfer", from, to, amount));
+    let mut eb = EventBuilder::new();
+    let mut eb = eb.string("Transfer");
+    let mut eb = eb.address(from);
+    let mut eb = eb.address(to);
+    let mut eb = eb.number(amount);
+    eb.notify();
     true
 }
 
@@ -61,10 +70,4 @@ pub fn invoke() {
     }
 
     runtime::ret(sink.bytes())
-}
-
-fn notify<T: Encoder>(msg: T) {
-    let mut sink = Sink::new(16);
-    sink.write(msg);
-    runtime::notify(sink.bytes());
 }
