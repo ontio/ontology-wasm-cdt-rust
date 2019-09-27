@@ -89,7 +89,7 @@ impl<'a> NeoParamDecoder<'a> for &'a Address {
 }
 
 impl<'a, T: NeoParamDecoder<'a>> NeoParamDecoder<'a> for &'a T {
-    fn deserialize(parser: &mut NeoParamParser) -> Result<&'a T, Error> {
+    fn deserialize(parser: &mut NeoParamParser<'a>) -> Result<&'a T, Error> {
         parser.read()
     }
 }

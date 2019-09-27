@@ -74,7 +74,7 @@ impl<'a> NeoParamParser<'a> {
         Self { source: Source::new(bs) }
     }
     pub fn read<T: NeoParamDecoder<'a>>(&mut self) -> Result<T, Error> {
-        T::deserialize(&mut self)
+        T::deserialize(self)
     }
 
     pub fn string(&mut self) -> Result<&'a str, Error> {
