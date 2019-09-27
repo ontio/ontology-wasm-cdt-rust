@@ -5,6 +5,7 @@ use super::{Decoder, Encoder, NeoParamBuilder, NeoParamDecoder, NeoParamEncoder,
 use crate::abi::Source;
 use crate::prelude::*;
 use crate::types::{Address, H256};
+use byteorder::{ByteOrder, LittleEndian};
 
 impl<'a> Decoder<'a> for u8 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
@@ -267,10 +268,14 @@ for_each_tuple! {
             }
         }
         impl<$($item: NeoParamEncoder),*> NeoParamEncoder for ($($item,)*) {
-            fn serialize(&self, _sink: &mut NeoParamBuilder) {
+            fn serialize(&self, _builder: &mut NeoParamBuilder) {
+                _builder.sink.write_byte(crate::abi::neo_param_builder::TYPE_LIST);
+                let mut count = 0u32;
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
-                $(_sink.write($item);)*
+                $($item;count +=1;)*
+                _builder.sink.write_u32(count);
+                $(_builder.write($item);)*
             }
         }
     }

@@ -2,6 +2,7 @@ use super::Error;
 use super::{NeoParamDecoder, NeoParamEncoder, Sink, Source};
 use crate::prelude::*;
 use crate::runtime;
+use byteorder::{ByteOrder, LittleEndian};
 
 const DEFAULT_CAP: usize = 128;
 const TYPE_BYTEARRAY: u8 = 0x00;
@@ -11,17 +12,17 @@ const TYPE_BOOL: u8 = 0x03;
 const TYPE_INT: u8 = 0x04;
 const TYPE_H256: u8 = 0x05;
 
-const TYPE_LIST: u8 = 0x10;
+pub const TYPE_LIST: u8 = 0x10;
 
 pub struct NeoParamBuilder {
-    sink: Sink,
+    pub(crate) sink: Sink,
 }
 
 impl NeoParamBuilder {
     pub fn new() -> Self {
-        let mut eb = NeoParamBuilder { sink: Sink::new(DEFAULT_CAP) };
-        eb.sink.write_byte(0u8);
-        eb
+        let mut builder = NeoParamBuilder { sink: Sink::new(DEFAULT_CAP) };
+        builder.sink.write_byte(0u8);
+        builder
     }
 
     pub fn write<T: NeoParamEncoder>(&mut self, val: T) {
@@ -60,8 +61,8 @@ impl NeoParamBuilder {
         self.sink.write_bytes(hash.as_ref());
     }
 
-    pub fn bytes(&self) -> &[u8] {
-        self.sink.bytes()
+    pub fn bytes(self) -> Vec<u8> {
+        self.sink.into()
     }
 }
 

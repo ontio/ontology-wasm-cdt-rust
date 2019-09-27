@@ -3,12 +3,11 @@ use crate::prelude::*;
 pub mod neo {
     use crate::prelude::*;
     pub fn call_method<T: crate::abi::NeoParamEncoder>(
-        contract_address: &Address, method: &str, param: T,
+        contract_address: &Address, param: T,
     ) -> Option<Vec<u8>> {
         let mut builder = crate::abi::NeoParamBuilder::new();
-        builder.string(method);
         param.serialize(&mut builder);
-        crate::runtime::call_contract(contract_address, builder.bytes())
+        crate::runtime::call_contract(contract_address, &builder.bytes())
     }
 }
 
