@@ -14,12 +14,12 @@ pub const TYPE_H256: u8 = 0x05;
 pub const TYPE_LIST: u8 = 0x10;
 
 pub struct EventBuilder {
-    common: NeoParamBuilderCommon,
+    common: VmValueBuilderCommon,
 }
 
 impl EventBuilder {
     pub fn new() -> Self {
-        let mut eb = EventBuilder { common: NeoParamBuilderCommon::new() };
+        let mut eb = EventBuilder { common: VmValueBuilderCommon::new() };
         eb.common.sink.write_bytes(b"evt\0");
         eb.common.sink.write_byte(TYPE_LIST);
         eb.common.sink.write_u32(eb.common.num_entry);
@@ -58,12 +58,12 @@ impl EventBuilder {
     }
 }
 
-pub struct NeoParamBuilderCommon {
+pub struct VmValueBuilderCommon {
     pub(crate) sink: Sink,
     num_entry: u32,
 }
 
-impl NeoParamBuilderCommon {
+impl VmValueBuilderCommon {
     pub(crate) fn new() -> Self {
         let sink = Sink::new(12);
         Self { sink, num_entry: 0u32 }

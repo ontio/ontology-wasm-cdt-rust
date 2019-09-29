@@ -1,6 +1,6 @@
 use super::Error;
 use super::{
-    NeoParamBuilderCommon, Sink, Source, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
+    VmValueBuilderCommon, Sink, Source, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
     TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
 };
 use crate::prelude::*;
@@ -8,12 +8,12 @@ use crate::runtime;
 use byteorder::{ByteOrder, LittleEndian};
 
 pub struct VmValueBuilder {
-    pub(crate) common: NeoParamBuilderCommon,
+    pub(crate) common: VmValueBuilderCommon,
 }
 
 impl VmValueBuilder {
     pub fn new() -> Self {
-        let mut common = NeoParamBuilderCommon::new();
+        let mut common = VmValueBuilderCommon::new();
         let mut builder = VmValueBuilder { common };
         builder.common.sink.write_byte(0u8);
         builder

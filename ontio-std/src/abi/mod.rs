@@ -9,7 +9,7 @@ pub use self::sink::Sink;
 pub use self::source::Source;
 use crate::prelude::*;
 pub use event_builder::EventBuilder;
-pub use event_builder::NeoParamBuilderCommon;
+pub use event_builder::VmValueBuilderCommon;
 pub use event_builder::{
     TYPE_ADDRESS, TYPE_BOOL, TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
 };
