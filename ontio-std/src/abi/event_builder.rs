@@ -3,15 +3,15 @@ use crate::prelude::*;
 use crate::runtime;
 use byteorder::{ByteOrder, LittleEndian};
 
-pub const DEFAULT_CAP: usize = 128;
-pub const TYPE_BYTEARRAY: u8 = 0x00;
-pub const TYPE_STRING: u8 = 0x01;
-pub const TYPE_ADDRESS: u8 = 0x02;
-pub const TYPE_BOOL: u8 = 0x03;
-pub const TYPE_INT: u8 = 0x04;
-pub const TYPE_H256: u8 = 0x05;
+pub(crate) const DEFAULT_CAP: usize = 128;
+pub(crate) const TYPE_BYTEARRAY: u8 = 0x00;
+pub(crate) const TYPE_STRING: u8 = 0x01;
+pub(crate) const TYPE_ADDRESS: u8 = 0x02;
+pub(crate) const TYPE_BOOL: u8 = 0x03;
+pub(crate) const TYPE_INT: u8 = 0x04;
+pub(crate) const TYPE_H256: u8 = 0x05;
 
-pub const TYPE_LIST: u8 = 0x10;
+pub(crate) const TYPE_LIST: u8 = 0x10;
 
 pub struct EventBuilder {
     common: VmValueBuilderCommon,
@@ -26,28 +26,34 @@ impl EventBuilder {
 
         eb
     }
-    pub fn string(&mut self, method: &str) {
+    pub fn string(mut self, method: &str) -> Self {
         self.common.string(method);
+        self
     }
 
-    pub fn bytearray(&mut self, bytes: &[u8]) {
+    pub fn bytearray(mut self, bytes: &[u8]) -> Self {
         self.common.bytearray(bytes);
+        self
     }
 
-    pub fn address(&mut self, address: &Address) {
+    pub fn address(mut self, address: &Address) -> Self {
         self.common.address(address);
+        self
     }
 
-    pub fn number(&mut self, amount: U128) {
+    pub fn number(mut self, amount: U128) -> Self {
         self.common.number(amount);
+        self
     }
 
-    pub fn bool(&mut self, b: bool) {
+    pub fn bool(mut self, b: bool) -> Self {
         self.common.bool(b);
+        self
     }
 
-    pub fn h256(&mut self, hash: H256) {
+    pub fn h256(mut self, hash: H256) -> Self {
         self.common.h256(hash);
+        self
     }
 
     pub fn notify(self) {
@@ -58,7 +64,7 @@ impl EventBuilder {
     }
 }
 
-pub struct VmValueBuilderCommon {
+pub(crate) struct VmValueBuilderCommon {
     pub(crate) sink: Sink,
     num_entry: u32,
 }

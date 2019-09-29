@@ -1,6 +1,6 @@
 use super::Error;
 use super::{
-    VmValueBuilderCommon, Sink, Source, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
+    Sink, Source, VmValueBuilderCommon, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
     TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
 };
 use crate::prelude::*;
@@ -53,7 +53,7 @@ impl VmValueBuilder {
 }
 
 pub struct VmValueParser<'a> {
-    pub(crate) source: Source<'a>,
+    pub source: Source<'a>,
 }
 
 impl<'a> VmValueParser<'a> {
