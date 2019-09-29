@@ -26,6 +26,7 @@ pub enum Error {
     IrregularData,
     InvalidUtf8,
     TypeInconsistency,
+    LengthInconsistency,
 }
 
 pub trait Encoder {

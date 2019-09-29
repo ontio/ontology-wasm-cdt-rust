@@ -268,7 +268,12 @@ for_each_tuple! {
                 if ty != crate::abi::event_builder::TYPE_LIST {
                      return Err(Error::TypeInconsistency);
                 }
+                let mut count = 0u32;
+                $(let _ :$item; count +=1;)*
                 let l = _parser.source.read_u32()?;
+                if l!= count {
+                    return Err(Error::LengthInconsistency);
+                }
                 Ok(($(_parser.read::<$item>()?,)*))
             }
         }
