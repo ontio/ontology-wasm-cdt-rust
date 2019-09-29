@@ -2,10 +2,10 @@ use crate::prelude::*;
 
 pub mod neo {
     use crate::prelude::*;
-    pub fn call_contract<T: crate::abi::NeoParamEncoder>(
+    pub fn call_contract<T: crate::abi::VmValueEncoder>(
         contract_address: &Address, param: T,
     ) -> Option<Vec<u8>> {
-        let mut builder = crate::abi::NeoParamBuilder::new();
+        let mut builder = crate::abi::VmValueBuilder::new();
         param.serialize(&mut builder);
         crate::runtime::call_contract(contract_address, &builder.bytes())
     }

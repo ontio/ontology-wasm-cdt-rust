@@ -1,82 +1,69 @@
 use super::Error;
-use super::{NeoParamDecoder, NeoParamEncoder, Sink, Source};
+use super::{
+    NeoParamBuilderCommon, Sink, Source, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
+    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
+};
 use crate::prelude::*;
 use crate::runtime;
 use byteorder::{ByteOrder, LittleEndian};
 
-const DEFAULT_CAP: usize = 128;
-const TYPE_BYTEARRAY: u8 = 0x00;
-const TYPE_STRING: u8 = 0x01;
-const TYPE_ADDRESS: u8 = 0x02;
-const TYPE_BOOL: u8 = 0x03;
-const TYPE_INT: u8 = 0x04;
-const TYPE_H256: u8 = 0x05;
-
-pub const TYPE_LIST: u8 = 0x10;
-
-pub struct NeoParamBuilder {
-    pub(crate) sink: Sink,
+pub struct VmValueBuilder {
+    pub(crate) common: NeoParamBuilderCommon,
 }
 
-impl NeoParamBuilder {
+impl VmValueBuilder {
     pub fn new() -> Self {
-        let mut builder = NeoParamBuilder { sink: Sink::new(DEFAULT_CAP) };
-        builder.sink.write_byte(0u8);
+        let mut common = NeoParamBuilderCommon::new();
+        let mut builder = VmValueBuilder { common };
+        builder.common.sink.write_byte(0u8);
         builder
     }
 
-    pub fn write<T: NeoParamEncoder>(&mut self, val: T) {
+    pub fn write<T: VmValueEncoder>(&mut self, val: T) {
         val.serialize(self)
     }
 
     pub fn string(&mut self, method: &str) {
-        self.sink.write_byte(TYPE_STRING);
-        self.sink.write_u32(method.len() as u32);
-        self.sink.write_bytes(method.as_bytes());
+        self.common.string(method);
     }
 
     pub fn bytearray(&mut self, bytes: &[u8]) {
-        self.sink.write_byte(TYPE_BYTEARRAY);
-        self.sink.write_u32(bytes.len() as u32);
-        self.sink.write_bytes(bytes);
+        self.common.bytearray(bytes);
     }
 
     pub fn address(&mut self, address: &Address) {
-        self.sink.write_byte(TYPE_ADDRESS);
-        self.sink.write_bytes(address.as_bytes());
+        self.common.address(address);
     }
 
     pub fn number(&mut self, amount: U128) {
-        self.sink.write_byte(TYPE_INT);
-        self.sink.write_u128(amount);
+        self.common.number(amount);
     }
 
     pub fn bool(&mut self, b: bool) {
-        self.sink.write_byte(TYPE_BOOL);
-        self.sink.write_bool(b);
+        self.common.bool(b);
     }
 
     pub fn h256(&mut self, hash: H256) {
-        self.sink.write_byte(TYPE_H256);
-        self.sink.write_bytes(hash.as_ref());
+        self.common.h256(hash);
     }
 
     pub fn bytes(self) -> Vec<u8> {
-        self.sink.into()
+        self.common.sink.into()
     }
 }
 
-pub struct NeoParamParser<'a> {
-    source: Source<'a>,
+pub struct VmValueParser<'a> {
+    pub(crate) source: Source<'a>,
 }
 
-impl<'a> NeoParamParser<'a> {
+impl<'a> VmValueParser<'a> {
     pub fn new(bs: &'a [u8]) -> Self {
         let mut source = Source::new(bs);
         let version = source.read_byte();
         Self { source }
     }
-    pub fn read<T: NeoParamDecoder<'a>>(&mut self) -> Result<T, Error> {
+
+    pub fn read<T: VmValueDecoder<'a>>(&mut self) -> Result<T, Error> {
         T::deserialize(self)
     }
 
@@ -92,7 +79,7 @@ impl<'a> NeoParamParser<'a> {
 
     pub fn bytearray(&mut self) -> Result<&'a [u8], Error> {
         let ty = self.source.read_byte()?;
-        if ty != TYPE_BYTEARRAY ||ty == TYPE_STRING {
+        if ty != TYPE_BYTEARRAY || ty == TYPE_STRING {
             return Err(Error::TypeInconsistency);
         }
         let l = self.source.read_u32()?;

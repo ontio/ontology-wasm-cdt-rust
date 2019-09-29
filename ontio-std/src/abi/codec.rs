@@ -1,6 +1,6 @@
 use super::Error;
 use super::Sink;
-use super::{Decoder, Encoder, NeoParamBuilder, NeoParamDecoder, NeoParamEncoder, NeoParamParser};
+use super::{Decoder, Encoder, VmValueBuilder, VmValueDecoder, VmValueEncoder, VmValueParser};
 
 use crate::abi::Source;
 use crate::prelude::*;
@@ -262,19 +262,24 @@ for_each_tuple! {
 //trace_macros!(true);
 for_each_tuple! {
     ($($item:ident)*) => {
-        impl<'a, $($item: NeoParamDecoder<'a>),*> NeoParamDecoder<'a> for ($($item,)*) {
-            fn deserialize(_source: &mut NeoParamParser<'a>) -> Result<Self, Error> {
-                Ok(($(_source.read::<$item>()?,)*))
+        impl<'a, $($item: VmValueDecoder<'a>),*> VmValueDecoder<'a> for ($($item,)*) {
+            fn deserialize(_parser: &mut VmValueParser<'a>) -> Result<Self, Error> {
+                let ty = _parser.source.read_byte()?;
+                if ty != crate::abi::event_builder::TYPE_LIST {
+                     return Err(Error::TypeInconsistency);
+                }
+                let l = _parser.source.read_u32()?;
+                Ok(($(_parser.read::<$item>()?,)*))
             }
         }
-        impl<$($item: NeoParamEncoder),*> NeoParamEncoder for ($($item,)*) {
-            fn serialize(&self, _builder: &mut NeoParamBuilder) {
-                _builder.sink.write_byte(crate::abi::neo_param_builder::TYPE_LIST);
+        impl<$($item: VmValueEncoder),*> VmValueEncoder for ($($item,)*) {
+            fn serialize(&self, _builder: &mut VmValueBuilder) {
+                _builder.common.sink.write_byte(crate::abi::event_builder::TYPE_LIST);
                 let mut count = 0u32;
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
                 $($item;count +=1;)*
-                _builder.sink.write_u32(count);
+                _builder.common.sink.write_u32(count);
                 $(_builder.write($item);)*
             }
         }

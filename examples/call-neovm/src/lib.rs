@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene)]
 #![no_std]
 extern crate ontio_std as ostd;
-use ostd::abi::{EventBuilder, NeoParamDecoder, NeoParamEncoder, NeoParamParser, Sink, Source};
+use ostd::abi::{EventBuilder, Sink, Source, VmValueDecoder, VmValueEncoder, VmValueParser};
 use ostd::contract::{neo, ont};
 use ostd::prelude::*;
 use ostd::runtime;
@@ -47,20 +47,29 @@ pub fn invoke() {
         b"init" => {
             let res = neo::call_contract(&Neo_Contract_Addr, ("init", ()));
             if let res2 = res.unwrap() {
-                let mut parser = NeoParamParser::new(res2.as_slice());
+                let mut parser = VmValueParser::new(res2.as_slice());
                 let r = parser.bool();
                 sink.write(r.unwrap_or(false));
             } else {
                 sink.write(false);
             }
         }
-
+        b"name" => {
+            let res = neo::call_contract(&Neo_Contract_Addr, ("name", ()));
+            if let res2 = res.unwrap() {
+                let mut parser = VmValueParser::new(res2.as_slice());
+                let r = parser.string();
+                sink.write(r.unwrap_or(""));
+            } else {
+                sink.write("");
+            }
+        }
         b"balanceOf" => {
             let addr: Address = source.read().unwrap();
             let res = neo::call_contract(&Neo_Contract_Addr, ("balanceOf", (addr)));
             if let res2 = res.unwrap() {
                 debug((hexutil::to_hex(&res2) + "balanceof").as_str());
-                let mut parser = NeoParamParser::new(&res2);
+                let mut parser = VmValueParser::new(&res2);
                 let r = parser.number().unwrap_or(0u128);
                 sink.write(r);
             } else {
@@ -79,7 +88,7 @@ pub fn invoke() {
                 let data = res.unwrap();
                 debug("11111111");
                 debug(hexutil::to_hex(data.as_slice()).as_str());
-                let mut parser = NeoParamParser::new(&data);
+                let mut parser = VmValueParser::new(&data);
                 let boo = parser.bool().unwrap_or(false);
                 sink.write(boo);
             } else {
@@ -105,7 +114,8 @@ fn testcase() -> String {
     [
         [{"method":"contract_create","expected":"address:AJBZbWexyCdJtJyiG9PjLjYhrzyZtF5iQn"},
         {"method":"init","expected":"bool:true"},
-        {"method":"balanceOf", "param":"address:AbtTQJYKfQxq4UdygDsbLVjE8uRrJ2H3tP","expected":"int:1000000000"},
+        {"method":"init","expected":"bool:true"},
+        {"method":"balanceOf", "param":"address:ANxmS9tQuem9AkTjzcHEUh1KURDd6hNuGA","expected":"int:1000000000"},
         {"env":{"witness":["AbtTQJYKfQxq4UdygDsbLVjE8uRrJ2H3tP"]}, "method":"transfer", "param":"address:AbtTQJYKfQxq4UdygDsbLVjE8uRrJ2H3tP,address:AWJNqh9W4NDGmFSCHR4Mp5G9VBKR5r2juF, int:100","expected":"bool:true"},
         {"method":"balanceOf", "param":"address:AWJNqh9W4NDGmFSCHR4Mp5G9VBKR5r2juF","expected":"int:100"}
         ]
