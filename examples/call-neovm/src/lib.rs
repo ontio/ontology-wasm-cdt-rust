@@ -10,12 +10,6 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use ostd::console::debug;
 
-use alloc::borrow::ToOwned;
-use core::convert::TryInto;
-use core::ops::Add;
-use hexutil::to_hex;
-use ostd::types::u128_to_neo_bytes;
-
 pub mod neovm;
 use neovm::{Neo_Contract, Neo_Contract_Addr};
 
@@ -70,7 +64,6 @@ pub fn invoke() {
             let addr: Address = source.read().unwrap();
             let res = neo::call_contract(&Neo_Contract_Addr, ("balanceOf", (addr,)));
             if let res2 = res.unwrap() {
-                debug((hexutil::to_hex(&res2) + "balanceof").as_str());
                 let mut parser = VmValueParser::new(&res2);
                 let r = parser.bytearray().unwrap_or(b"0");
                 sink.write(u128_from_neo_bytes(r));
@@ -88,8 +81,6 @@ pub fn invoke() {
 
             if res.is_some() {
                 let data = res.unwrap();
-                debug("11111111");
-                debug(hexutil::to_hex(data.as_slice()).as_str());
                 let mut parser = VmValueParser::new(&data);
                 let boo = parser.bool().unwrap_or(false);
                 sink.write(boo);
