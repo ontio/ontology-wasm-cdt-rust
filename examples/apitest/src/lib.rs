@@ -1,5 +1,6 @@
 #![cfg_attr(not(feature = "mock"), no_std)]
 #![feature(proc_macro_hygiene)]
+#![allow(clippy::too_many_arguments)]
 
 extern crate ontio_std as ostd;
 use ostd::abi::Dispatcher;
@@ -36,6 +37,7 @@ pub trait ApiTest {
     fn call_ont_transfer_from(
         &self, sender: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool;
+
     fn contract_migrate(
         &self, code: Vec<u8>, vm_type: u32, name: &str, version: &str, author: &str, email: &str,
         desc: &str,
@@ -70,10 +72,10 @@ impl ApiTest for ApiTestInstance {
     fn check_witness(&self, addr: &Address) -> bool {
         let b = runtime::check_witness(addr);
         if b {
-            runtime::notify("success".as_bytes());
+            runtime::notify(b"success");
             true
         } else {
-            runtime::notify("failed".as_bytes());
+            runtime::notify(b"failed");
             false
         }
     }
@@ -110,12 +112,9 @@ impl ApiTest for ApiTestInstance {
         let mut sink = Sink::new(16);
         sink.write(("transfer".to_string(), from, to, amount));
         let res = runtime::call_contract(contract, sink.bytes());
-        if res.is_some() {
-            true
-        } else {
-            false
-        }
+        res.is_some()
     }
+
     fn call_neovm_transfer(
         &self, contract: &Address, from: &Address, to: &Address, amount: U128,
     ) -> bool {
@@ -129,12 +128,11 @@ impl ApiTest for ApiTestInstance {
         sink.write(103u8);
         sink.write(contract);
         let res = runtime::call_contract(contract, sink.bytes());
-        if res.is_some() {
-            let data = res.unwrap();
-            runtime::notify("true".as_bytes());
+        if let Some(data) = res {
+            runtime::notify(b"true");
             let s = str::from_utf8(data.as_slice()).unwrap();
             console::debug(s);
-            return true;
+            true
         } else {
             false
         }

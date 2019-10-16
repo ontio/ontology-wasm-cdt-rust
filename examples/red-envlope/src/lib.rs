@@ -33,7 +33,7 @@ struct EnvlopeStruct {
 }
 
 fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: Address) -> bool {
-    if runtime::check_witness(&owner) == false {
+    if !runtime::check_witness(&owner) {
         return false;
     }
     if is_ont_address(&token_addr) {
@@ -67,16 +67,16 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
         }
     }
     let es = EnvlopeStruct {
-        token_addr: token_addr.clone(),
+        token_addr,
         total_amount: amount,
         total_package_count: pack_count,
         remain_amount: amount,
         remain_package_count: pack_count,
         records: Vec::new(),
     };
-    database::put(re_key.clone(), es);
+    database::put(&re_key, es);
     runtime::notify(hash_bytes);
-    return true;
+    true
 }
 
 fn query_envlope(hash: &str) -> String {
@@ -90,11 +90,12 @@ fn query_envlope(hash: &str) -> String {
         return format!("token_addr:{}, total_amount: {}, total_package_count: {}, remain_amount: {}, remain_package_count: {},\
         records:[{:?}]", r.token_addr.to_hex_string(), r.total_amount,r.total_package_count,r.remain_amount,r.remain_package_count,records);
     }
-    return "".to_string();
+
+    "".to_string()
 }
 
 fn claim_envlope(account: &Address, hash: &str) -> bool {
-    if runtime::check_witness(account) == false {
+    if !runtime::check_witness(account) {
         return false;
     }
     let claim_key = [CLAIM_PREFIX.as_bytes(), hash.as_bytes(), account.as_ref()].concat();
@@ -108,13 +109,13 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
         return false;
     }
     let mut est = es.unwrap();
-    if est.remain_amount <= 0 {
+    if est.remain_amount == 0 {
         return false;
     }
-    if est.remain_package_count <= 0 {
+    if est.remain_package_count == 0 {
         return false;
     }
-    let mut record = ReceiveRecord { account: account.clone(), amount: 0 };
+    let mut record = ReceiveRecord { account: *account, amount: 0 };
     let mut claim_amount = 0;
     if est.remain_package_count == 1 {
         claim_amount = est.remain_amount;
@@ -129,10 +130,10 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
 
         if claim_amount == 0 {
             claim_amount = 1;
-        } else if is_ont_address(&est.token_addr) {
-            if est.remain_amount - claim_amount < est.remain_package_count - 1 {
-                claim_amount = est.remain_amount - est.remain_package_count;
-            }
+        } else if is_ont_address(&est.token_addr)
+            && est.remain_amount - claim_amount < est.remain_package_count - 1
+        {
+            claim_amount = est.remain_amount - est.remain_package_count;
         }
         record.amount = claim_amount;
     }
@@ -154,7 +155,7 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     }
     database::put(claim_key, claim_amount);
     database::put(re_key, est);
-    return true;
+    true
 }
 
 fn is_ong_address(contract_addr: &Address) -> bool {

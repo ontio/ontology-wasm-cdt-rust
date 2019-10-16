@@ -4,14 +4,12 @@ use byteorder::{ByteOrder, LittleEndian};
 
 use crate::types::{Address, H256};
 
-use core::mem::transmute;
-
 pub(crate) fn varuint_encode_size(val: u64) -> usize {
     if val < 0xfd {
         1
     } else if val <= 0xffff {
         3
-    } else if val <= 0xFFFFFFFF {
+    } else if val <= 0xFFFF_FFFF {
         5
     } else {
         9
@@ -49,12 +47,12 @@ impl<'a> Source<'a> {
 
     pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {
         let buf = self.next_bytes(20)?;
-        Ok(unsafe { transmute(buf.as_ptr()) })
+        Ok(unsafe { &*(buf.as_ptr() as *const Address) })
     }
 
     pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;
-        Ok(unsafe { transmute(buf.as_ptr()) })
+        Ok(unsafe { &*(buf.as_ptr() as *const H256) })
     }
 
     pub(crate) fn read_into(&mut self, buf: &mut [u8]) -> Result<(), Error> {
@@ -120,9 +118,12 @@ impl<'a> Source<'a> {
             0xFF => self.read_u64().map(|v| (9, v)),
             val => Ok((1, val as u64)),
         }
-        .and_then(|(len, val)| match len == varuint_encode_size(val) {
-            true => Ok(val),
-            false => Err(Error::IrregularData),
+        .and_then(|(len, val)| {
+            if len == varuint_encode_size(val) {
+                Ok(val)
+            } else {
+                Err(Error::IrregularData)
+            }
         })
     }
 }

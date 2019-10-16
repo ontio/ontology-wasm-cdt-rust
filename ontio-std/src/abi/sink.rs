@@ -66,7 +66,7 @@ impl Sink {
         } else if val < 0xFFFF {
             self.write_byte(0xFD);
             self.write_u16(val as u16);
-        } else if val <= 0xFFFFFFFF {
+        } else if val <= 0xFFFF_FFFF {
             self.write_byte(0xFE);
             self.write_u32(val as u32);
         } else {
