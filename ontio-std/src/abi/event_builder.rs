@@ -140,15 +140,6 @@ impl EventBuilder {
     }
 
     ///This function will call the notify interface in the runtime module to push the event out.
-    ///# Example
-    ///```
-    /// # use ontio_std::abi::EventBuilder;
-    /// # use ontio_std::runtime;
-    /// # fn main() {
-    ///   let hash = runtime::sha256("test");
-    ///   EventBuilder::new().h256(hash).notify();
-    /// # }
-    ///```
     pub fn notify(self) {
         let num_entry = self.num_entry;
         let mut buf = self.sink.into();
