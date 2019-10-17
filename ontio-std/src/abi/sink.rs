@@ -14,9 +14,12 @@ impl Sink {
     ///
     ///# Example
     ///```
-    ///let mut sink = Sink::new(0);
-    /// sink.write("123");
-    ///assert_eq!(sink.bytes(),[3,49,50,51]);
+    /// # use ontio_std::abi::Sink;
+    /// # fn main() {
+    ///    let mut sink = Sink::new(0);
+    ///    sink.write("123");
+    ///    assert_eq!(sink.bytes(),[3,49,50,51]);
+    /// # }
     ///```
     ///
     pub fn new(cap: usize) -> Self {
@@ -26,11 +29,15 @@ impl Sink {
     ///All data types that implement the encode interface can be serialized by calling the write method
     ///# Example
     ///```
-    ///let mut sink = Sink::new(0);
-    ///let addr = Address::repeat_byte(1u8);
-    ///sink.write(addr);
-    ///sink.write("123");
-    ///sink.write(123 as U128);
+    /// # use ontio_std::abi::Sink;
+    /// # use ontio_std::types::U128;
+    /// # fn main() {
+    ///  let mut sink = Sink::new(0);
+    ///  let addr = Address::repeat_byte(1u8);
+    ///  sink.write(addr);
+    ///  sink.write("123");
+    ///  sink.write(123 as U128);
+    /// # }
     ///```
     pub fn write<T: Encoder>(&mut self, val: T) {
         val.encode(self)
@@ -93,27 +100,12 @@ impl Sink {
         }
     }
 
-    ///When the contract needs to call a method in the native contract, it needs to use this method to serialize the address of the native contract
-    ///# Example
-    /// ```
-    ///use ostd::macros::base58;
-    ///const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
-    ///let mut sink = Sink::new(0);
-    ///sink.write_native_address(&ONT_CONTRACT_ADDRESS);
-    /// ```
-    pub fn write_native_address(&mut self, address: &Address) {
+    pub(crate) fn write_native_address(&mut self, address: &Address) {
         self.write_byte(20);
         self.write(address);
     }
-    ///When the contract needs to call a method in the neovm contract, it needs to use this method to serialize the address of the neovm contract
-    ///# Example
-    /// ```
-    ///use ostd::macros::base58;
-    ///const oep4_address: Address = base58!("AbtTQJYKfQxq4UdygDsbLVjE8uRrJ2H3tP");
-    ///let mut sink = Sink::new(0);
-    ///sink.write_native_address(&oep4_address);
-    /// ```
-    pub fn write_neovm_address(&mut self, address: &Address) {
+
+    pub(crate) fn write_neovm_address(&mut self, address: &Address) {
         self.write_native_address(address)
     }
 
@@ -126,15 +118,24 @@ impl Sink {
     /// # Example
     /// ```
     /// use ostd::macros::base58;
-    /// const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
-    /// let mut sink = Sink::new(0);
-    /// sink.write_native_address(&ONT_CONTRACT_ADDRESS);
-    /// assert_eq!(sink.bytes(),[20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+    /// use ontio_std::types::Address;
+    /// use ontio_std::abi::Sink;
+    /// # fn main() {
+    ///   const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
+    ///   let mut sink = Sink::new(0);
+    ///   sink.write(&ONT_CONTRACT_ADDRESS);
+    ///   assert_eq!(sink.into(), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1].to_vec())
+    /// # }
     /// ```
     pub fn bytes(&self) -> &[u8] {
         &self.buf
     }
 
+    ///Used to get the serialized result in Vec<u8> format
+    /// # Example
+    /// # fn main() {
+    ///
+    /// # }
     pub fn into(self) -> Vec<u8> {
         self.buf
     }
