@@ -139,7 +139,7 @@ impl EventBuilder {
         self
     }
 
-    ///Push H256 type event in contract
+    ///This function will call the notify interface in the runtime module to push the event out.
     ///# Example
     ///```
     /// # use ontio_std::abi::EventBuilder;

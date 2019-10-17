@@ -10,7 +10,9 @@ pub struct Sink {
 }
 
 impl Sink {
-    ///Create a new sink entity, Specify initial capacity.In the process of serialization, the length of the parameter will be serialized first, and then the content of the parameter will be serialized
+    ///Create a new sink entity, Specify initial capacity.
+    ///For indefinite length parameters, the length of the parameter will be serialized first, and then the content of the parameter will be serialized.
+
     ///
     ///# Example
     ///```
