@@ -56,7 +56,7 @@ cfg_if::cfg_if! {
 }
 
 extern crate alloc;
-
+///The prelude module provides common data types in the contract, and introduces some functions in the rust core library.
 pub mod prelude {
     pub use crate::contract::TransferParam;
     pub use crate::types::{Address, H256, I128, U128};
@@ -70,12 +70,19 @@ pub mod prelude {
     pub use core::prelude::v1::*;
 }
 
+///The abi module provides serialization and deserialization methods for different data types in the contract
 pub mod abi;
+///The console module provides the debug function, which is used to print the log information in the contract and facilitate the debugging of the contract.
 pub mod console;
+///The contract module provides the method to call the asset ont, ong on the ontology chain.
 pub mod contract;
+///The database module provides the interface to save the data in the contract to the chain and query the data from the chain.
 pub mod database;
+///The runtime module provides an interface to interact with the chain in the contract
 pub mod runtime;
+///The types module provides common data types such as address, U128, hash, etc.
 pub mod types;
+///Macro module provides common macro functions, such as base58! To convert base58 encoded address to address type
 pub mod macros {
     pub use ontio_codegen::base58;
     pub use ontio_codegen::contract;
