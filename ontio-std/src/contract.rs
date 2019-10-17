@@ -1,5 +1,8 @@
 use crate::prelude::*;
 
+///Used when a transaction contains transfers between multiple addresses.
+///
+///
 pub struct TransferParam {
     pub from: Address,
     pub to: Address,
