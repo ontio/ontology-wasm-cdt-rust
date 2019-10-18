@@ -475,12 +475,23 @@ pub fn ret(data: &[u8]) -> ! {
     }
 }
 
+#[doc(hidden)]
 pub fn notify(data: &[u8]) {
     unsafe {
         env::ontio_notify(data.as_ptr(), data.len() as u32);
     }
 }
-
+/// When the function is executed, all writes to the chain will be cancelled, and the error message will be returned.
+///
+/// # Example
+///
+/// ```
+/// # use ontio_std::runtime::panic;
+/// # fn main() {
+///   panic("panic");
+/// # }
+/// ```
+///
 pub fn panic(msg: &str) -> ! {
     unsafe {
         env::ontio_panic(msg.as_ptr(), msg.len() as u32);

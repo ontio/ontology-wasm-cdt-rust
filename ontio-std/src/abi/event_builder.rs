@@ -94,6 +94,7 @@ impl EventBuilder {
     ///# Example
     ///```
     /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::types::U128;
     /// # fn main() {
     ///   EventBuilder::new().number(123 as U128).notify();
     /// # }
