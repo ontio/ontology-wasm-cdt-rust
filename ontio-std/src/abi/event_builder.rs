@@ -78,6 +78,7 @@ impl EventBuilder {
     ///# Example
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::types::Address;
     /// # fn main() {
     ///   let addr = Address::repeat_byte(1u8);
     ///   EventBuilder::new().address(addr).notify();

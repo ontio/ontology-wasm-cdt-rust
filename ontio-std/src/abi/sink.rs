@@ -32,7 +32,7 @@ impl Sink {
     ///# Example
     ///```
     /// # use ontio_std::abi::Sink;
-    /// # use ontio_std::types::U128;
+    /// # use ontio_std::types::{U128,Address};
     /// # fn main() {
     ///  let mut sink = Sink::new(0);
     ///  let addr = Address::repeat_byte(1u8);
@@ -119,7 +119,7 @@ impl Sink {
     ///Used to get the serialized result in bytearray format
     /// # Example
     /// ```
-    /// use ostd::macros::base58;
+    /// use ontio_std::macros::base58;
     /// use ontio_std::types::Address;
     /// use ontio_std::abi::Sink;
     /// # fn main() {

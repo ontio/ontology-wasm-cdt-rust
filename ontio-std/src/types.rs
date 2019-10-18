@@ -151,7 +151,6 @@ impl H160 {
     }
 }
 
-
 impl H256 {
     pub const fn new(val: [u8; 32]) -> Self {
         H256(val)

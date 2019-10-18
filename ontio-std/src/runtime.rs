@@ -48,7 +48,7 @@ mod env {
 /// input: Parameters required to call the target contract method
 ///
 /// # Example
-/// ```
+/// ```no_run
 /// # use ontio_std::abi::Sink;
 /// # use ontio_std::runtime;
 /// # fn main() {
@@ -96,11 +96,12 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
 /// return value: new contract address
 ///
 /// # Example
-/// ```
+/// ```no_run
 /// # use ontio_std::abi::{Sink, Source};
 /// # use ontio_std::runtime;
 /// # fn main() {
-///     let mut source = Source::new(&runtime::input());
+///     let input = runtime::input();
+///     let mut source = Source::new(&input);
 ///     let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
 ///     let res = runtime::contract_create(code, need_storage, name, ver, author, email, desc);
 /// # }
@@ -151,11 +152,12 @@ pub fn contract_create(
 /// return value: new contract address
 ///
 /// # Example
-/// ```
+/// ```no_run
 /// # use ontio_std::abi::{Sink, Source};
 /// # use ontio_std::runtime;
 /// # fn main() {
-///     let mut source = Source::new(&runtime::input());
+///     let input = runtime::input();
+///     let mut source = Source::new(&input);
 ///     let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
 ///     let res = runtime::contract_migrate(code, need_storage, name, ver, author, email, desc);
 /// # }
@@ -196,7 +198,7 @@ pub fn contract_delete() -> ! {
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let key = "key";
@@ -215,7 +217,7 @@ pub fn storage_write(key: &[u8], val: &[u8]) {
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let key = "key";
@@ -232,7 +234,7 @@ pub fn storage_delete(key: &[u8]) {
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let key = "key";
@@ -278,7 +280,7 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
 /// Get timestamp in current block
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::timestamp();
@@ -292,7 +294,7 @@ pub fn timestamp() -> u64 {
 /// Get current block height
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::block_height();
@@ -306,7 +308,7 @@ pub fn block_height() -> u32 {
 /// Get the address of current executing contract
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::address();
@@ -324,7 +326,7 @@ pub fn address() -> Address {
 ///return Caller's contract address
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::caller();
@@ -341,7 +343,7 @@ pub fn caller() -> Address {
 /// return the entry address
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::entry_address();
@@ -358,7 +360,7 @@ pub fn entry_address() -> Address {
 ///return current block hash
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::current_blockhash();
@@ -376,7 +378,7 @@ pub fn current_blockhash() -> H256 {
 ///return current tx hash
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::current_txhash();
@@ -393,7 +395,7 @@ pub fn current_txhash() -> H256 {
 /// Calculate the hash value
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # fn main() {
 ///   let res = runtime::sha256("test");
@@ -412,11 +414,12 @@ pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
 ///Check signature
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # use ontio_std::abi::Source;
 /// # fn main() {
-///   let mut source = Source::new(&runtime::input());
+///   let input = runtime::input();
+///   let mut source = Source::new(&input);
 ///   let addr = source.read();
 ///   let res = runtime::check_witness(addr);
 /// # }
@@ -429,7 +432,7 @@ pub fn check_witness(addr: &Address) -> bool {
 /// Get input data from transaction or caller contract
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # use ontio_std::abi::Source;
 /// # fn main() {
@@ -456,11 +459,12 @@ pub fn input() -> Vec<u8> {
 /// return the result of execution and exit contract execution
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime;
 /// # use ontio_std::abi::{Source, Sink};
 /// # fn main() {
-///   let mut source = Source::new(&runtime::input());
+///   let input = runtime::input();
+///   let mut source = Source::new(&input);
 ///   let addr = source.read();
 ///   let res = runtime::check_witness(addr);
 ///   let mut sink = Sink::new(16);
@@ -485,7 +489,7 @@ pub fn notify(data: &[u8]) {
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// # use ontio_std::runtime::panic;
 /// # fn main() {
 ///   panic("panic");

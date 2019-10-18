@@ -151,7 +151,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
-    /// # use ontio_std::types::U128;
+    /// # use ontio_std::types::{U128,Address};
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
@@ -178,7 +178,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
-    /// # use ontio_std::types::U128;
+    /// # use ontio_std::types::{U128,Address};
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
@@ -200,6 +200,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
+    /// # use ontio_std::types::Address;
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
@@ -217,6 +218,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
+    /// # use ontio_std::types::Address;
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
@@ -234,6 +236,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
+    /// # use ontio_std::types::Address;
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
@@ -251,7 +254,7 @@ impl<'a> Source<'a> {
     /// # Example
     /// ```
     /// # use ontio_std::abi::{Source, Sink};
-    /// # use ontio_std::types::U128;
+    /// # use ontio_std::types::{U128,Address};
     /// # fn main() {
     ///    let mut sink = Sink::new(0);
     ///    let addr = Address::repeat_byte(1);
