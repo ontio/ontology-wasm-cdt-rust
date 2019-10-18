@@ -1,20 +1,32 @@
 use crate::prelude::*;
 
 ///Used when a transaction contains transfers between multiple addresses.
-///
-///
 pub struct TransferParam {
+    ///
     pub from: Address,
     pub to: Address,
     pub amount: U128,
 }
 
+///This module provides the operation API related to ont assets, such as balanceof, transfer, etc.
 pub mod ont {
     use crate::macros::base58;
     use crate::prelude::*;
 
     const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 
+    ///Transfer method of ont assets
+    /// # Example
+    /// ```
+    /// # use ontio_std::contract::ont;
+    /// # use ontio_std::abi::{Sink, Source};
+    /// # use ontio_std::runtime::input;
+    /// # fn main() {
+    ///     let mut source = Source::new(&input());
+    ///     let (from, to, amount) = source.read().unwrap();
+    ///     ont::transfer(from,to, amount);
+    /// # }
+    /// ```
     pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, state.as_ref())
