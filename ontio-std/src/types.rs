@@ -4,7 +4,7 @@ use fixed_hash::construct_fixed_hash;
 construct_fixed_hash! {
 /// A byte array of length 32 representing the block hash, etc.
 ///
-/// #Example
+/// # Example
 /// ```
 /// # use ontio_std::runtime;
 /// # use ontio_std::types::H256;

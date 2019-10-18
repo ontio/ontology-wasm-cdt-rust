@@ -27,7 +27,7 @@ impl Default for EventBuilder {
 impl EventBuilder {
     ///Create a new eventbuilder instance to push &str, bytearray, Address, U128, bool, H256 type data in the contract.
     ///# Example
-    /// ```
+    /// ```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # fn main(){
     ///   let mut eb = EventBuilder::new();
@@ -44,7 +44,7 @@ impl EventBuilder {
 
     ///Push &str type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # fn main() {
     ///   EventBuilder::new().string("notify").notify();
@@ -60,7 +60,7 @@ impl EventBuilder {
     }
     ///Push bytearray type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # fn main() {
     ///   EventBuilder::new().bytearray("notify".as_bytes()).notify();
@@ -76,7 +76,7 @@ impl EventBuilder {
     }
     ///Push Address type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # fn main() {
     ///   let addr = Address::repeat_byte(1u8);
@@ -92,7 +92,7 @@ impl EventBuilder {
     }
     ///Push U128 type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
     /// # fn main() {
@@ -108,7 +108,7 @@ impl EventBuilder {
     }
     ///Push bool type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
     /// # fn main() {
@@ -124,7 +124,7 @@ impl EventBuilder {
     }
     ///Push H256 type event in contract
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::runtime;
     /// # fn main() {
