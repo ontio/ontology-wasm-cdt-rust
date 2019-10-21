@@ -18,7 +18,6 @@ pub mod ont {
     ///Transfer method of ont assets, Transfer ont assets from the from address to the to address
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::ont;
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -36,7 +35,6 @@ pub mod ont {
     ///transfer_multi method of ont assets,Multiple transfers in one transaction
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -63,7 +61,6 @@ pub mod ont {
     ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -80,7 +77,6 @@ pub mod ont {
     ///Query the balance of ont assets
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -97,7 +93,6 @@ pub mod ont {
     ///This method is used in conjunction with the approve method to query the number of approve
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -114,7 +109,6 @@ pub mod ont {
     ///Spender transfers a certain amount of ont from from-address to to-address
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -142,7 +136,6 @@ pub mod ong {
     ///Transfer method of ong assets, Transfer ont assets from the from address to the to address
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::ong;
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -160,7 +153,6 @@ pub mod ong {
     ///transfer_multi method of ong assets,Multiple transfers in one transaction
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -186,7 +178,6 @@ pub mod ong {
     ///Query the balance of ong assets
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -219,7 +210,6 @@ pub mod ong {
     ///This method is used in conjunction with the approve method to query the number of approve
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ong};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
@@ -236,7 +226,6 @@ pub mod ong {
     ///Spender transfers a certain amount of ong from from-address to to-address
     /// # Example
     /// ```no_run
-    /// #
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;

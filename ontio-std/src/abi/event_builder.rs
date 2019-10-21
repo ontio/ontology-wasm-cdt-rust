@@ -29,9 +29,7 @@ impl EventBuilder {
     ///# Example
     /// ```no_run
     /// # use ontio_std::abi::EventBuilder;
-    /// # fn main(){
     ///   let mut eb = EventBuilder::new();
-    /// # }
     /// ```
     pub fn new() -> Self {
         let mut eb = EventBuilder { sink: Sink::new(DEFAULT_CAP), num_entry: 0 };
@@ -46,9 +44,7 @@ impl EventBuilder {
     ///# Example
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
-    /// # fn main() {
     ///   EventBuilder::new().string("notify").notify();
-    /// # }
     ///```
     pub fn string(mut self, method: &str) -> Self {
         self.sink.write_byte(TYPE_STRING);
@@ -62,9 +58,7 @@ impl EventBuilder {
     ///# Example
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
-    /// # fn main() {
     ///   EventBuilder::new().bytearray("notify".as_bytes()).notify();
-    /// # }
     ///```
     pub fn bytearray(mut self, bytes: &[u8]) -> Self {
         self.sink.write_byte(TYPE_BYTEARRAY);
@@ -79,10 +73,8 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::Address;
-    /// # fn main() {
     ///   let addr = Address::repeat_byte(1u8);
     ///   EventBuilder::new().address(&addr).notify();
-    /// }
     ///```
     pub fn address(mut self, address: &Address) -> Self {
         self.sink.write_byte(TYPE_ADDRESS);
@@ -96,9 +88,7 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
-    /// # fn main() {
     ///   EventBuilder::new().number(123 as U128).notify();
-    /// # }
     ///```
     pub fn number(mut self, amount: U128) -> Self {
         self.sink.write_byte(TYPE_INT);
@@ -112,9 +102,7 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
-    /// # fn main() {
     ///   EventBuilder::new().number(123 as U128).notify();
-    /// # }
     ///```
     pub fn bool(mut self, b: bool) -> Self {
         self.sink.write_byte(TYPE_BOOL);
@@ -128,10 +116,8 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::runtime;
-    /// # fn main() {
     ///   let hash = runtime::sha256("test");
     ///   EventBuilder::new().h256(hash).notify();
-    /// # }
     ///```
     pub fn h256(mut self, hash: H256) -> Self {
         self.sink.write_byte(TYPE_H256);
