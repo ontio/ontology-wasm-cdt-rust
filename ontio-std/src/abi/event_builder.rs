@@ -81,7 +81,7 @@ impl EventBuilder {
     /// # use ontio_std::types::Address;
     /// # fn main() {
     ///   let addr = Address::repeat_byte(1u8);
-    ///   EventBuilder::new().address(addr).notify();
+    ///   EventBuilder::new().address(&addr).notify();
     /// }
     ///```
     pub fn address(mut self, address: &Address) -> Self {

@@ -119,6 +119,7 @@ impl Sink {
     ///Used to get the serialized result in bytearray format
     /// # Example
     /// ```
+    /// #![feature(proc_macro_hygiene)]
     /// use ontio_std::macros::base58;
     /// use ontio_std::types::Address;
     /// use ontio_std::abi::Sink;

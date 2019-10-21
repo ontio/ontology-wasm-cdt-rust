@@ -23,7 +23,8 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input= input();
+    ///     let mut source = Source::new(&input);
     ///     let (from, to, amount) = source.read().unwrap();
     ///     ont::transfer(from,to, amount);
     /// # }
@@ -39,10 +40,21 @@ pub mod ont {
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
+    /// # use ontio_std::types::{Address, U128};
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
-    ///     let trs: Vec<TransferParam> = source.read().unwrap();
-    ///     ont::transfer_multi(trs.as_slice());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
+    ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
+    ///     let mut ts = Vec::<TransferParam>::new();
+    ///     for tr in trs.iter() {
+    ///         let trans = TransferParam{
+    ///            from:tr.0,
+    ///            to:tr.1,
+    ///            amount:tr.2,
+    ///         };
+    ///         ts.push(trans)
+    ///     }
+    ///     ont::transfer_multi(ts.as_slice());
     /// # }
     /// ```
     pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
@@ -56,7 +68,8 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let (from,to,amount) = source.read().unwrap();
     ///     ont::approve(from, to, amount);
     /// # }
@@ -72,7 +85,8 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
     ///     ont::balance_of(addr);
     /// # }
@@ -88,7 +102,8 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input= input();
+    ///     let mut source = Source::new(&input);
     ///     let (from, to) = source.read().unwrap();
     ///     ont::allowance(from,to);
     /// # }
@@ -104,7 +119,8 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input= input();
+    ///     let mut source = Source::new(&input);
     ///     let (spender, from, to, amount) = source.read().unwrap();
     ///     ont::transfer_from(spender, from, to, amount);
     /// # }
@@ -131,7 +147,8 @@ pub mod ong {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let (from, to, amount) = source.read().unwrap();
     ///     ong::transfer(from,to, amount);
     /// # }
@@ -147,10 +164,20 @@ pub mod ong {
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
+    /// # use ontio_std::types::{Address,U128};
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
-    ///     let trs: Vec<TransferParam> = source.read().unwrap();
-    ///     ong::transfer_multi(trs.as_slice());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
+    ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
+    ///     let mut transfers = Vec::<TransferParam>::new();
+    ///     for tr in trs.iter() {
+    ///         transfers.push(TransferParam{
+    ///             from:tr.0,
+    ///             to:tr.1,
+    ///             amount:tr.2,
+    ///         })
+    ///     }
+    ///     ong::transfer_multi(transfers.as_slice());
     /// # }
     /// ```
     pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
@@ -164,7 +191,8 @@ pub mod ong {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
     ///     ong::balance_of(addr);
     /// # }
@@ -174,13 +202,13 @@ pub mod ong {
     }
     ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
     /// # Example
-    /// ```
-    /// # #[no_run]
+    /// ```no_run
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let (from,to,amount) = source.read().unwrap();
     ///     ong::approve(from, to, amount);
     /// # }
@@ -196,7 +224,8 @@ pub mod ong {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let (from, to) = source.read().unwrap();
     ///     ong::allowance(from,to);
     /// # }
@@ -212,7 +241,8 @@ pub mod ong {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # fn main() {
-    ///     let mut source = Source::new(&input());
+    ///     let input = input();
+    ///     let mut source = Source::new(&input);
     ///     let (spender, from, to, amount) = source.read().unwrap();
     ///     ong::transfer_from(spender, from, to, amount);
     /// # }

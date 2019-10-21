@@ -51,10 +51,12 @@ mod env {
 /// ```no_run
 /// # use ontio_std::abi::Sink;
 /// # use ontio_std::runtime;
+/// # use ontio_std::types::Address;
 /// # fn main() {
 ///     let mut sink = Sink::new(16);
-///     sink.write(("balance_of".to_string(), addr));
-///     let res = runtime::call_contract(contract, sink.bytes());
+///     let addr = Address::repeat_byte(1u8);
+///     sink.write(("balance_of".to_string(), &addr));
+///     let res = runtime::call_contract(&addr, sink.bytes());
 /// # }
 /// ```
 pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
@@ -420,7 +422,7 @@ pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
 /// # fn main() {
 ///   let input = runtime::input();
 ///   let mut source = Source::new(&input);
-///   let addr = source.read();
+///   let addr = source.read().unwrap();
 ///   let res = runtime::check_witness(addr);
 /// # }
 /// ```
@@ -436,8 +438,9 @@ pub fn check_witness(addr: &Address) -> bool {
 /// # use ontio_std::runtime;
 /// # use ontio_std::abi::Source;
 /// # fn main() {
-///   let mut source = Source::new(&runtime::input());
-///   let addr = source.read();
+///   let input = runtime::input();
+///   let mut source = Source::new(&input);
+///   let addr = source.read().unwrap();
 ///   let res = runtime::check_witness(addr);
 /// # }
 /// ```
@@ -465,7 +468,7 @@ pub fn input() -> Vec<u8> {
 /// # fn main() {
 ///   let input = runtime::input();
 ///   let mut source = Source::new(&input);
-///   let addr = source.read();
+///   let addr = source.read().unwrap();
 ///   let res = runtime::check_witness(addr);
 ///   let mut sink = Sink::new(16);
 ///   sink.write(res);

@@ -65,10 +65,11 @@ fn to_hex_string(data: &[u8]) -> String {
 ///
 /// #Eample
 /// ```
-/// use ontio_std::macros::base58;
+/// #![feature(proc_macro_hygiene)]
 /// use ontio_std::types::Address;
+/// use ontio_std::macros::base58;
 /// # fn main() {
-///    const ADMIN: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
+///    const ADMIN: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 /// # }
 /// ```
 ///
