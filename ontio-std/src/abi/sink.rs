@@ -15,13 +15,11 @@ impl Sink {
 
     ///
     ///# Example
-    ///```
+    ///```no_run
     /// # use ontio_std::abi::Sink;
-    /// # fn main() {
-    ///    let mut sink = Sink::new(0);
-    ///    sink.write("123");
-    ///    assert_eq!(sink.bytes(),[3,49,50,51]);
-    /// # }
+    /// let mut sink = Sink::new(0);
+    /// sink.write("123");
+    /// assert_eq!(sink.bytes(),[3,49,50,51]);
     ///```
     ///
     pub fn new(cap: usize) -> Self {
@@ -33,13 +31,11 @@ impl Sink {
     ///```
     /// # use ontio_std::abi::Sink;
     /// # use ontio_std::types::{U128,Address};
-    /// # fn main() {
-    ///  let mut sink = Sink::new(0);
-    ///  let addr = Address::repeat_byte(1u8);
-    ///  sink.write(addr);
-    ///  sink.write("123");
-    ///  sink.write(123 as U128);
-    /// # }
+    ///   let mut sink = Sink::new(0);
+    ///   let addr = Address::repeat_byte(1u8);
+    ///   sink.write(addr);
+    ///   sink.write("123");
+    ///   sink.write(123 as U128);
     ///```
     pub fn write<T: Encoder>(&mut self, val: T) {
         val.encode(self)
@@ -123,12 +119,10 @@ impl Sink {
     /// use ontio_std::macros::base58;
     /// use ontio_std::types::Address;
     /// use ontio_std::abi::Sink;
-    /// # fn main() {
-    ///   const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
-    ///   let mut sink = Sink::new(0);
-    ///   sink.write(&ONT_CONTRACT_ADDRESS);
-    ///   assert_eq!(sink.into(), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1].to_vec())
-    /// # }
+    /// const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
+    /// let mut sink = Sink::new(0);
+    /// sink.write(&ONT_CONTRACT_ADDRESS);
+    /// assert_eq!(sink.into(), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1].to_vec())
     /// ```
     pub fn bytes(&self) -> &[u8] {
         &self.buf

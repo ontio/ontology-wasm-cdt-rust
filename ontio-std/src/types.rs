@@ -8,12 +8,9 @@ construct_fixed_hash! {
 /// ```
 /// # use ontio_std::runtime;
 /// # use ontio_std::types::H256;
-///
-/// # fn main() {
-///     let block_hash:H256 = runtime::current_blockhash();
-///     let tx_hash:H256 = runtime::current_txhash();
-///     let hash:H256 = runtime::sha256("test");
-/// # }
+///   let block_hash:H256 = runtime::current_blockhash();
+///   let tx_hash:H256 = runtime::current_txhash();
+///   let hash:H256 = runtime::sha256("test");
 /// ```
     pub struct H256(32);
 }
@@ -68,9 +65,7 @@ fn to_hex_string(data: &[u8]) -> String {
 /// #![feature(proc_macro_hygiene)]
 /// use ontio_std::types::Address;
 /// use ontio_std::macros::base58;
-/// # fn main() {
-///    const ADMIN: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
-/// # }
+/// const ADMIN: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 /// ```
 ///
 pub type Address = H160;

@@ -8,9 +8,7 @@ mod env {
 /// # Example
 /// ```no_run
 /// # use ontio_std::console;
-/// # fn main() {
-///    console::debug("test");
-/// # }
+/// console::debug("test");
 /// ```
 pub fn debug(msg: &str) {
     unsafe {

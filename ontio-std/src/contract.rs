@@ -21,12 +21,10 @@ pub mod ont {
     /// # use ontio_std::contract::ont;
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
-    ///     let input= input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from, to, amount) = source.read().unwrap();
-    ///     ont::transfer(from,to, amount);
-    /// # }
+    ///   let input= input();
+    ///   let mut source = Source::new(&input);
+    ///   let (from, to, amount) = source.read().unwrap();
+    ///   ont::transfer(from,to, amount);
     /// ```
     pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
@@ -39,7 +37,6 @@ pub mod ont {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # use ontio_std::types::{Address, U128};
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
@@ -53,7 +50,6 @@ pub mod ont {
     ///         ts.push(trans)
     ///     }
     ///     ont::transfer_multi(ts.as_slice());
-    /// # }
     /// ```
     pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, transfer)
@@ -64,12 +60,10 @@ pub mod ont {
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from,to,amount) = source.read().unwrap();
-    ///     ont::approve(from, to, amount);
-    /// # }
+    ///   let input = input();
+    ///   let mut source = Source::new(&input);
+    ///   let (from,to,amount) = source.read().unwrap();
+    ///   ont::approve(from, to, amount);
     /// ```
     pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner(&ONT_CONTRACT_ADDRESS, from, to, amount)
@@ -80,12 +74,10 @@ pub mod ont {
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
     ///     ont::balance_of(addr);
-    /// # }
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
         super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, &address)
@@ -96,12 +88,10 @@ pub mod ont {
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
-    ///     let input= input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from, to) = source.read().unwrap();
-    ///     ont::allowance(from,to);
-    /// # }
+    ///   let input= input();
+    ///   let mut source = Source::new(&input);
+    ///   let (from, to) = source.read().unwrap();
+    ///   ont::allowance(from,to);
     /// ```
     pub fn allowance(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner(&ONT_CONTRACT_ADDRESS, from, to)
@@ -112,12 +102,10 @@ pub mod ont {
     /// # use ontio_std::contract::{ont,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
-    ///     let input= input();
-    ///     let mut source = Source::new(&input);
-    ///     let (spender, from, to, amount) = source.read().unwrap();
-    ///     ont::transfer_from(spender, from, to, amount);
-    /// # }
+    ///   let input= input();
+    ///   let mut source = Source::new(&input);
+    ///   let (spender, from, to, amount) = source.read().unwrap();
+    ///   ont::transfer_from(spender, from, to, amount);
     /// ```
     pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
@@ -139,12 +127,10 @@ pub mod ong {
     /// # use ontio_std::contract::ong;
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from, to, amount) = source.read().unwrap();
-    ///     ong::transfer(from,to, amount);
-    /// # }
+    ///   let input = input();
+    ///   let mut source = Source::new(&input);
+    ///   let (from, to, amount) = source.read().unwrap();
+    ///   ong::transfer(from,to, amount);
     /// ```
     pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
@@ -157,7 +143,6 @@ pub mod ong {
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
     /// # use ontio_std::types::{Address,U128};
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
@@ -170,7 +155,6 @@ pub mod ong {
     ///         })
     ///     }
     ///     ong::transfer_multi(transfers.as_slice());
-    /// # }
     /// ```
     pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, transfer)
@@ -181,12 +165,10 @@ pub mod ong {
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
     ///     ong::balance_of(addr);
-    /// # }
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
         super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, &address)
@@ -197,12 +179,10 @@ pub mod ong {
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (from,to,amount) = source.read().unwrap();
     ///     ong::approve(from, to, amount);
-    /// # }
     /// ```
     pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner(&ONG_CONTRACT_ADDRESS, from, to, amount)
@@ -213,12 +193,10 @@ pub mod ong {
     /// # use ontio_std::contract::{ong};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (from, to) = source.read().unwrap();
     ///     ong::allowance(from,to);
-    /// # }
     /// ```
     pub fn allowance(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner(&ONG_CONTRACT_ADDRESS, from, to)
@@ -229,12 +207,10 @@ pub mod ong {
     /// # use ontio_std::contract::{ong,TransferParam};
     /// # use ontio_std::abi::{Sink, Source};
     /// # use ontio_std::runtime::input;
-    /// # fn main() {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (spender, from, to, amount) = source.read().unwrap();
     ///     ong::transfer_from(spender, from, to, amount);
-    /// # }
     /// ```
     pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
