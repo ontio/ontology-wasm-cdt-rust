@@ -60,7 +60,7 @@ fn to_hex_string(data: &[u8]) -> String {
 
 /// Byte array of length 20
 ///
-/// #Example
+/// # Example
 /// ```
 /// #![feature(proc_macro_hygiene)]
 /// use ontio_std::types::Address;
