@@ -41,6 +41,22 @@ mod env {
 }
 
 //todo : return result
+/// With this method, another contract can be called, When calling Neo contract and native contract across contracts, the parameter construction is slightly different. Please refer to the corresponding examples.
+///
+/// addr: Called contract address
+///
+/// input: Parameters required to call the target contract method
+///
+/// # Example
+/// ```no_run
+/// # use ontio_std::abi::Sink;
+/// # use ontio_std::runtime;
+/// # use ontio_std::types::Address;
+/// let mut sink = Sink::new(16);
+/// let addr = Address::repeat_byte(1u8);
+/// sink.write(("balance_of".to_string(), &addr));
+/// let res = runtime::call_contract(&addr, sink.bytes());
+/// ```
 pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
     let addr: &[u8] = addr.as_ref();
     let res =
@@ -61,7 +77,34 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
     Some(output)
 }
 
-///contract create
+/// Create a new contract based on the parameters passed in
+///
+/// code: new contract code
+///
+/// need_storage:
+///
+/// name: contract name
+///
+/// ver: contract version
+///
+/// author: contract author
+///
+/// email: contract email
+///
+/// desc: contract desc
+///
+/// return value: new contract address
+///
+/// # Example
+/// ```no_run
+/// # use ontio_std::abi::{Sink, Source};
+/// # use ontio_std::runtime;
+///   let input = runtime::input();
+///   let mut source = Source::new(&input);
+///   let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
+///   let res = runtime::contract_create(code, need_storage, name, ver, author, email, desc);
+/// ```
+///
 pub fn contract_create(
     code: &[u8], need_storage: u32, name: &str, ver: &str, author: &str, email: &str, desc: &str,
 ) -> Address {
@@ -89,6 +132,33 @@ pub fn contract_create(
 }
 
 ///contract migrate
+///
+/// code: new contract code
+///
+/// need_storage:
+///
+/// name: contract name
+///
+/// ver: contract version
+///
+/// author: contract author
+///
+/// email: contract email
+///
+/// desc: contract desc
+///
+/// return value: new contract address
+///
+/// # Example
+/// ```no_run
+/// # use ontio_std::abi::{Sink, Source};
+/// # use ontio_std::runtime;
+/// let input = runtime::input();
+/// let mut source = Source::new(&input);
+/// let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
+/// let res = runtime::contract_migrate(code, need_storage, name, ver, author, email, desc);
+/// ```
+///
 pub fn contract_migrate(
     code: &[u8], vm_type: u32, name: &str, version: &str, author: &str, email: &str, desc: &str,
 ) -> Address {
@@ -114,25 +184,54 @@ pub fn contract_migrate(
 
     addr
 }
-
+///delete the contract
 pub fn contract_delete() -> ! {
     unsafe {
         env::ontio_contract_delete();
     }
 }
-
+///Save key-value as a key-value pair
+///
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let key = "key";
+/// let value = "value";
+/// runtime::storage_write(key.as_bytes(), value.as_bytes());
+/// ```
+///
 pub fn storage_write(key: &[u8], val: &[u8]) {
     unsafe {
         env::ontio_storage_write(key.as_ptr(), key.len() as u32, val.as_ptr(), val.len() as u32);
     }
 }
 
+///Delete key-value pairs according to the key
+///
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let key = "key";
+/// runtime::storage_delete(key.as_bytes());
+/// ```
+///
 pub fn storage_delete(key: &[u8]) {
     unsafe {
         env::ontio_storage_delete(key.as_ptr(), key.len() as u32);
     }
 }
-
+///Read key-value pairs according to key.
+///
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let key = "key";
+/// let res = runtime::storage_read(key.as_bytes());
+/// ```
+///
 pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
     const INITIAL: usize = 32;
     let mut val = vec![0; INITIAL];
@@ -169,16 +268,37 @@ pub fn storage_read(key: &[u8]) -> Option<Vec<u8>> {
 }
 
 /// Get timestamp in current block
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::timestamp();
+/// ```
+///
 pub fn timestamp() -> u64 {
     unsafe { env::ontio_timestamp() }
 }
 
 /// Get current block height
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::block_height();
+/// ```
+///
 pub fn block_height() -> u32 {
     unsafe { env::ontio_block_height() }
 }
 
 /// Get the address of current executing contract
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::address();
+/// ```
+///
 pub fn address() -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
@@ -188,6 +308,13 @@ pub fn address() -> Address {
     addr
 }
 ///return Caller's contract address
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::caller();
+/// ```
+///
 pub fn caller() -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
@@ -196,6 +323,13 @@ pub fn caller() -> Address {
     addr
 }
 /// return the entry address
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::entry_address();
+/// ```
+///
 pub fn entry_address() -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
@@ -204,6 +338,13 @@ pub fn entry_address() -> Address {
     addr
 }
 ///return current block hash
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::current_blockhash();
+/// ```
+///
 pub fn current_blockhash() -> H256 {
     let temp: [u8; 32] = [0; 32];
     let block_hash = H256::new(temp);
@@ -213,6 +354,13 @@ pub fn current_blockhash() -> H256 {
     block_hash
 }
 ///return current tx hash
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::current_txhash();
+/// ```
+///
 pub fn current_txhash() -> H256 {
     let tx_hash = H256::zero();
     unsafe {
@@ -220,7 +368,14 @@ pub fn current_txhash() -> H256 {
     }
     tx_hash
 }
-
+/// Calculate the hash value
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let res = runtime::sha256("test");
+/// ```
+///
 pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
     let data = data.as_ref();
     let mut hash = H256::zero();
@@ -231,11 +386,33 @@ pub fn sha256(data: impl AsRef<[u8]>) -> H256 {
 }
 
 ///Check signature
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// # use ontio_std::abi::Source;
+/// let input = runtime::input();
+/// let mut source = Source::new(&input);
+/// let addr = source.read().unwrap();
+/// let res = runtime::check_witness(addr);
+/// ```
+///
 pub fn check_witness(addr: &Address) -> bool {
     unsafe { env::ontio_check_witness(addr.as_ptr()) != 0 }
 }
 
 /// Get input data from transaction or caller contract
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// # use ontio_std::abi::Source;
+/// let input = runtime::input();
+/// let mut source = Source::new(&input);
+/// let addr = source.read().unwrap();
+/// let res = runtime::check_witness(addr);
+/// ```
+///
 pub fn input() -> Vec<u8> {
     let len = unsafe { env::ontio_input_length() };
 
@@ -251,18 +428,41 @@ pub fn input() -> Vec<u8> {
 }
 
 /// return the result of execution and exit contract execution
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// # use ontio_std::abi::{Source, Sink};
+///   let input = runtime::input();
+///   let mut source = Source::new(&input);
+///   let addr = source.read().unwrap();
+///   let res = runtime::check_witness(addr);
+///   let mut sink = Sink::new(16);
+///   sink.write(res);
+///   runtime::ret(sink.bytes());
+/// ```
+///
 pub fn ret(data: &[u8]) -> ! {
     unsafe {
         env::ontio_return(data.as_ptr(), data.len() as u32);
     }
 }
-///Save event
+
+#[doc(hidden)]
 pub fn notify(data: &[u8]) {
     unsafe {
         env::ontio_notify(data.as_ptr(), data.len() as u32);
     }
 }
-
+/// When the function is executed, all writes to the chain will be cancelled, and the error message will be returned.
+///
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime::panic;
+///   panic("panic");
+/// ```
+///
 pub fn panic(msg: &str) -> ! {
     unsafe {
         env::ontio_panic(msg.as_ptr(), msg.len() as u32);
