@@ -34,7 +34,7 @@ pub fn quote(method_name: String, func: &syn::ItemFn) -> proc_macro2::TokenStrea
             "&[u8]" => quote! {es = es.bytearray(#pat)},
             "bool" => quote! {es = es.bool(#pat)},
             "H256" => quote! {es = es.h256(#pat)},
-            _ => panic!("not support type"),
+            _ => panic!("not support type: {}", param_type.as_str()),
         }
     });
 

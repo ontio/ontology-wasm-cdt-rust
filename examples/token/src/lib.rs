@@ -1,7 +1,9 @@
 #![no_std]
+#![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
 
-use ostd::abi::{Encoder, Sink, Source};
+use ostd::abi::{Sink, Source};
+use ostd::macros::event;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
@@ -10,8 +12,11 @@ const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
 const TOTAL_SUPPLY: U128 = 100_000_000_000;
 
+const _ADDR_ADMIN: Address = ostd::macros::base58!("ANT97HNwurK2LE2LEiU72MsSD684nPyJMX");
+
 fn initialize() -> bool {
     database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);
+    database::put(_ADDR_ADMIN, TOTAL_SUPPLY);
     true
 }
 
@@ -30,12 +35,31 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
 
     database::put(from, frmbal - amount);
     database::put(to, tobal + amount);
-    notify(("Transfer", from, to, amount));
+    notify::transfer(from, to, amount);
+    notify::transfer_name(from, to, amount);
+    notify::transfer_test(from, to, amount);
+    let h = runtime::sha256("test");
+    notify::event_test(true, b"test", "test", h);
     true
 }
 
 fn total_supply() -> U128 {
     database::get(KEY_TOTAL_SUPPLY).unwrap()
+}
+
+mod notify {
+    use super::*;
+    #[event]
+    pub fn transfer(from: &Address, to: &Address, amount: U128) {}
+
+    #[event(name = mytransfer)]
+    pub fn transfer_name(from: &Address, to: &Address, amount: U128) {}
+
+    #[event]
+    pub fn transfer_test(from: &Address, to: &Address, amount: U128) {}
+
+    #[event]
+    pub fn event_test(boo: bool, bs: &[u8], ss: &str, h: H256) {}
 }
 
 #[no_mangle]
@@ -61,10 +85,4 @@ pub fn invoke() {
     }
 
     runtime::ret(sink.bytes())
-}
-
-fn notify<T: Encoder>(msg: T) {
-    let mut sink = Sink::new(16);
-    sink.write(msg);
-    runtime::notify(sink.bytes());
 }

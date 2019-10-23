@@ -6,6 +6,7 @@ use ostd::abi::{Sink, Source};
 use ostd::contract::{ong, ont};
 use ostd::database;
 use ostd::macros::base58;
+use ostd::macros::event;
 use ostd::prelude::*;
 use ostd::runtime;
 
@@ -19,20 +20,20 @@ const CLAIM_PREFIX: &str = "CLAIM_PREFIX_";
 #[derive(Encoder, Decoder)]
 struct ReceiveRecord {
     account: Address,
-    amount: u64,
+    amount: u128,
 }
 
 #[derive(Encoder, Decoder)]
 struct EnvlopeStruct {
     token_addr: Address,
-    total_amount: u64,
-    total_package_count: u64,
-    remain_amount: u64,
-    remain_package_count: u64,
+    total_amount: u128,
+    total_package_count: u128,
+    remain_amount: u128,
+    remain_package_count: u128,
     records: Vec<ReceiveRecord>,
 }
 
-fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: Address) -> bool {
+fn create_red_envlope(owner: Address, pack_count: u128, amount: u128, token_addr: Address) -> bool {
     if !runtime::check_witness(&owner) {
         return false;
     }
@@ -75,7 +76,12 @@ fn create_red_envlope(owner: Address, pack_count: u64, amount: u64, token_addr: 
         records: Vec::new(),
     };
     database::put(&re_key, es);
-    runtime::notify(hash_bytes);
+    create_red_envlope_event(
+        owner.as_ref(),
+        pack_count as U128,
+        amount as U128,
+        token_addr.as_ref(),
+    );
     true
 }
 
@@ -126,7 +132,7 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
         part.copy_from_slice(&random.as_bytes()[..8]);
         let random_num = U128::from_le_bytes(part) as u64;
         let percent = random_num % 100 + 1;
-        let mut claim_amount = est.remain_amount * percent / 100;
+        let mut claim_amount = est.remain_amount * percent as u128 / 100;
 
         if claim_amount == 0 {
             claim_amount = 1;
@@ -155,6 +161,7 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     }
     database::put(claim_key, claim_amount);
     database::put(re_key, est);
+    claim_envlope_event(account, hash);
     true
 }
 
@@ -165,6 +172,13 @@ fn is_ong_address(contract_addr: &Address) -> bool {
 fn is_ont_address(contract_addr: &Address) -> bool {
     contract_addr == &ONT_CONTRACT_ADDRESS
 }
+
+#[event]
+fn create_red_envlope_event(owner: &Address, pack_count: U128, amount: U128, token_addr: &Address) {
+}
+
+#[event]
+fn claim_envlope_event(account: &Address, hash: &str) {}
 
 #[no_mangle]
 pub fn invoke() {
