@@ -2,12 +2,14 @@
 #![feature(proc_macro_hygiene)]
 
 extern crate proc_macro;
+use heck::MixedCase;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Lit};
 
 mod base58;
 mod contract;
+mod event;
 
 #[proc_macro_attribute]
 pub fn contract(_metadata: TokenStream, input: TokenStream) -> TokenStream {
@@ -15,6 +17,27 @@ pub fn contract(_metadata: TokenStream, input: TokenStream) -> TokenStream {
     let stream = contract::quote(item);
 
     stream.into()
+}
+
+#[proc_macro_attribute]
+pub fn event(metadata: TokenStream, input: TokenStream) -> TokenStream {
+    match syn::parse::<syn::Item>(input).unwrap() {
+        syn::Item::Fn(ref func) => {
+            use quote::ToTokens;
+            let mut method_name;
+            if metadata.is_empty() {
+                method_name = func.sig.ident.clone().into_token_stream().to_string();
+            } else {
+                method_name = metadata.to_string();
+                method_name = method_name.replace("name", "");
+                method_name = method_name.replace("=", "");
+            }
+            method_name = method_name.to_mixed_case();
+            let stream = event::quote(method_name, func);
+            stream.into()
+        }
+        _ => panic!("Only fn is allowed"),
+    }
 }
 
 #[proc_macro]
@@ -61,4 +84,19 @@ mod tests {
     fn base58() {
         const _ADDR: Address = ontio_std::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     }
+
+    mod notify {
+        use ontio_std::types::{Address, U128};
+        #[ontio_std::macros::event]
+        fn transfer(from: &Address, to: &Address, amount: U128) {}
+
+        #[ontio_std::macros::event]
+        fn transfer_name(from: &Address) {}
+
+        #[ontio_std::macros::event(name=transfer_test)]
+        fn transfer_name2(from: &Address) {}
+    }
+
+    #[test]
+    fn event() {}
 }
