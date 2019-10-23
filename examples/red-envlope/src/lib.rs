@@ -50,18 +50,18 @@ fn create_red_envlope(owner: Address, pack_count: u128, amount: u128, token_addr
     let re_key = [RE_PREFIX.as_bytes(), hash_bytes].concat();
     let self_addr = runtime::address();
     if is_ont_address(&token_addr) {
-        let res = ont::transfer(&owner, &self_addr, amount as u128);
+        let res = ont::transfer(&owner, &self_addr, amount);
         if !res {
             return false;
         }
     } else if is_ong_address(&token_addr) {
-        let res = ong::transfer(&owner, &self_addr, amount as u128);
+        let res = ong::transfer(&owner, &self_addr, amount);
         if !res {
             return false;
         }
     } else {
         let mut sink = Sink::new(16);
-        sink.write(("transfer", self_addr, owner, amount as u128));
+        sink.write(("transfer", self_addr, owner, amount));
         let res = runtime::call_contract(&token_addr, sink.bytes());
         if res.is_none() {
             return false;
@@ -76,12 +76,7 @@ fn create_red_envlope(owner: Address, pack_count: u128, amount: u128, token_addr
         records: Vec::new(),
     };
     database::put(&re_key, es);
-    create_red_envlope_event(
-        owner.as_ref(),
-        pack_count as U128,
-        amount as U128,
-        token_addr.as_ref(),
-    );
+    create_red_envlope_event(owner.as_ref(), pack_count, amount, token_addr.as_ref());
     true
 }
 
@@ -148,9 +143,9 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     est.records.push(record);
     let self_addr = runtime::address();
     if is_ont_address(&est.token_addr) {
-        return ont::transfer(&self_addr, &account, claim_amount as u128);
+        return ont::transfer(&self_addr, &account, claim_amount);
     } else if is_ong_address(&est.token_addr) {
-        return ong::transfer(&self_addr, &account, claim_amount as u128);
+        return ong::transfer(&self_addr, &account, claim_amount);
     } else {
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, account, claim_amount));
