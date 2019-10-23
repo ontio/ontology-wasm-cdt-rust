@@ -86,6 +86,7 @@ pub mod types;
 pub mod macros {
     pub use ontio_codegen::base58;
     pub use ontio_codegen::contract;
+    pub use ontio_codegen::event;
 }
 
 #[cfg(feature = "mock")]
