@@ -6,13 +6,13 @@ use ostd::abi::Encoder;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
-const INITED: &'static str = "Initialized";
+const INITED: &str = "Initialized";
 //const TOKEN_ID_LIST: [u8; 5]= [1,2,3,4,5];
-const NAME: &'static str = "name";
-const SYMBOL: &'static str = "Symbol";
-const BALANCE: &'static str = "Balance";
-const TOTAL_SUPPLY: &'static str = "TotalSupply";
-const APPROVE: &'static str = "Approve";
+const NAME: &str = "name";
+const SYMBOL: &str = "Symbol";
+const BALANCE: &str = "Balance";
+const TOTAL_SUPPLY: &str = "TotalSupply";
+const APPROVE: &str = "Approve";
 const ADMIN: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 #[ostd::macros::contract]
@@ -46,7 +46,7 @@ pub(crate) struct Oep8TokenInstance;
 
 impl Oep8Token for Oep8TokenInstance {
     fn init(&mut self) -> bool {
-        if database::get::<_, bool>(INITED).unwrap_or_default() == true {
+        if database::get::<_, bool>(INITED).unwrap_or_default() {
             return false;
         } else {
             assert!(runtime::check_witness(&ADMIN));
@@ -92,7 +92,7 @@ impl Oep8Token for Oep8TokenInstance {
             return false;
         }
         for state in states.iter() {
-            if self.transfer(&state.0, &state.1, state.2, state.3.clone()) == false {
+            if !self.transfer(&state.0, &state.1, state.2, state.3.clone()) {
                 panic!(
                     "transfer failed, from:{},to:{},amount:{},token_id:{}",
                     state.0, state.1, state.2, state.3
@@ -138,7 +138,7 @@ impl Oep8Token for Oep8TokenInstance {
             return false;
         }
         for o in obj.iter() {
-            if self.approve(&o.0, &o.1, o.2, o.3.clone()) == false {
+            if !self.approve(&o.0, &o.1, o.2, o.3.clone()) {
                 panic!(
                     "approve_multi failed! from:{}, to:{}, amount: {},token_id:{}",
                     &o.0, &o.1, o.2, o.3
@@ -152,7 +152,7 @@ impl Oep8Token for Oep8TokenInstance {
             return false;
         }
         for o in obj.iter() {
-            if self.transfer_from(&o.0, &o.1, &o.2, o.3, o.4.clone()) == false {
+            if !self.transfer_from(&o.0, &o.1, &o.2, o.3, o.4.clone()) {
                 panic!(
                     "transfer_from_multi failed, spender:{}, from:{}, to:{}, amount:{},token_id:{}",
                     &o.0, &o.1, &o.2, o.3, o.4
@@ -172,7 +172,7 @@ impl Oep8Token for Oep8TokenInstance {
             "TokenNameFifth",
         ];
         let token_symbol_list = ["TNF", "TNS", "TNH", "TNO", "TNI"];
-        let token_supply_list = [100000, 200000, 300000, 400000, 500000];
+        let token_supply_list = [100_000, 200_000, 300_000, 400_000, 500_000];
         for index in 0..5 {
             let token_name = token_name_list[index];
             let token_symbol = token_symbol_list[index];
@@ -187,10 +187,7 @@ impl Oep8Token for Oep8TokenInstance {
         true
     }
     fn check_token_id(&self, token_id: String) -> bool {
-        if database::get::<_, String>(&utils::concat(token_id, NAME)).is_some() == false {
-            return false;
-        }
-        true
+        database::get::<_, String>(&utils::concat(token_id, NAME)).is_some()
     }
 }
 

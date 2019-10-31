@@ -4,6 +4,12 @@ mod env {
     }
 }
 
+///Used to print the debug information in the contract, which can be seen in the log of the ontology node
+/// # Example
+/// ```no_run
+/// # use ontio_std::console;
+/// console::debug("test");
+/// ```
 pub fn debug(msg: &str) {
     unsafe {
         env::ontio_debug(msg.as_ptr(), msg.len() as u32);

@@ -2,24 +2,37 @@ use crate::prelude::*;
 use fixed_hash::construct_fixed_hash;
 
 construct_fixed_hash! {
+/// A byte array of length 32 representing the block hash, etc.
+///
+/// # Example
+/// ```
+/// # use ontio_std::runtime;
+/// # use ontio_std::types::H256;
+///   let block_hash:H256 = runtime::current_blockhash();
+///   let tx_hash:H256 = runtime::current_txhash();
+///   let hash:H256 = runtime::sha256("test");
+/// ```
     pub struct H256(32);
 }
 
 construct_fixed_hash! {
+/// A byte array of length 20 representing the Address.
+///
     pub struct H160(20);
 }
 
 impl AsRef<H160> for H160 {
     fn as_ref(&self) -> &H160 {
-        return self;
+        self
     }
 }
 
 impl AsRef<H256> for H256 {
     fn as_ref(&self) -> &H256 {
-        return self;
+        self
     }
 }
+
 impl H256 {
     pub fn to_hex_string(&self) -> String {
         to_hex_string_reverse(&self.0)
@@ -45,8 +58,19 @@ fn to_hex_string(data: &[u8]) -> String {
     s
 }
 
+/// Byte array of length 20
+///
+/// # Example
+/// ```
+/// #![feature(proc_macro_hygiene)]
+/// use ontio_std::types::Address;
+/// use ontio_std::macros::base58;
+/// const ADMIN: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
+/// ```
+///
 pub type Address = H160;
 
+/// Byte array of length 16
 pub type U128 = u128;
 pub type I128 = i128;
 
@@ -55,7 +79,7 @@ impl Address {
         to_hex_string_reverse(&self.0)
     }
 }
-
+#[doc(hidden)]
 pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
     let temp = data.to_le_bytes();
     if let Some(pos) = temp.iter().rev().position(|v| *v != 0) {
@@ -65,12 +89,12 @@ pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
         if temp[end - 1] >= 0x80 {
             res.push(0);
         }
-        return res;
+        res
     } else {
         vec![0]
     }
 }
-
+#[doc(hidden)]
 pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
     if data >= 0 {
         return u128_to_neo_bytes(data as u128);
@@ -83,21 +107,22 @@ pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
         if temp[end - 1] < 0x80 {
             res.push(255);
         }
-        return res;
+
+        res
     } else {
         vec![255]
     }
 }
-
+#[doc(hidden)]
 pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
-    if buf.len() == 0 {
+    if buf.is_empty() {
         return 0;
     }
     let neg = buf[buf.len() - 1] >= 0x80;
     let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
 
     let mut result = [0u8; 16];
-    if (buf.len() > 16 && neg == true) || (buf.len() > 17 && neg == false) {
+    if (buf.len() > 16 && neg) || (buf.len() > 17 && !neg) {
         return default;
     }
     if buf.len() == 17 && buf[16] != 0 {

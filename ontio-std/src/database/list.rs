@@ -28,7 +28,7 @@ where
 {
     #[allow(unused)]
     pub(crate) fn contains(&mut self, value: &T) -> bool {
-        if self.size <= 0 {
+        if self.size == 0 {
             return false;
         } else {
             for i in 0..self.size {
@@ -82,9 +82,15 @@ where
             }
         }
     }
+
     pub fn len(&self) -> u32 {
         self.size
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn pop(&mut self) -> Option<T> {
         if self.size == 0 {
             None
@@ -130,9 +136,9 @@ where
                 self.need_flush.push(bulk.0);
             }
             //update index_size
-            bulk.1 = bulk.1 - 1;
+            bulk.1 -= 1;
             //update list size
-            self.size = self.size - 1;
+            self.size -= 1;
             val
         }
     }
@@ -152,9 +158,9 @@ where
             //update the last index_count and the last key->data
             let mut last_index_count = self.index_size.last_mut().unwrap();
             //if data not in cache
-            if !self.cache.contains_key(&last_index_count.0) {
+            let keyn = format!("{}{}", self.key, last_index_count.0);
+            self.cache.entry(last_index_count.0).or_insert_with(|| {
                 //read data from database
-                let keyn = format!("{}{}", self.key, last_index_count.0);
                 let last_node_vec_data: Vec<u8> = database::get(keyn).unwrap();
                 let mut source = Source::new(&last_node_vec_data);
                 let last_length = source.read_u32().unwrap();
@@ -162,8 +168,8 @@ where
                 for _ in 0..last_length {
                     last_node_vec.push(source.read().unwrap());
                 }
-                self.cache.insert(last_index_count.0, last_node_vec);
-            }
+                last_node_vec
+            });
             //if data in cache
             if let Some(last_node_vec) = self.cache.get_mut(&last_index_count.0) {
                 //if the slice is filled
@@ -175,7 +181,7 @@ where
                     self.cache.insert(self.next_key_id, temp);
                     self.index_size.push((self.next_key_id, 1));
                     self.need_flush.push(self.next_key_id);
-                    self.next_key_id = self.next_key_id + 1;
+                    self.next_key_id += 1;
                 } else {
                     //if slice is not filled
                     last_node_vec.push(payload);
@@ -184,11 +190,11 @@ where
                         self.need_flush.push(last_index_count.0);
                     }
                     //update index_count
-                    last_index_count.1 = last_index_count.1 + 1
+                    last_index_count.1 += 1
                 }
             }
         }
-        self.size = self.size + 1;
+        self.size += 1;
     }
 
     pub fn insert(&mut self, index: u32, payload: T) {
@@ -227,8 +233,8 @@ where
                     None => unreachable!(),
                 }
             }
-            bulk.1 = bulk.1 + 1;
-            self.size = self.size + 1;
+            bulk.1 += 1;
+            self.size += 1;
         }
     }
 
@@ -258,7 +264,7 @@ where
             .index_size
             .iter()
             .take_while(|&x| {
-                end = end + x.1;
+                end += x.1;
                 end <= index
             })
             .count();
@@ -276,7 +282,7 @@ where
             }
             self.cache.insert(bulk.0, temp);
         }
-        return self.cache.get(&bulk.0).unwrap().get((index - start) as usize);
+        self.cache.get(&bulk.0).unwrap().get((index - start) as usize)
     }
 }
 
@@ -315,7 +321,7 @@ where
     for<'b> T: Decoder<'b> + Encoder,
 {
     fn new(cursor: u32, list: &mut ListStore<T>) -> Iterator<T> {
-        Iterator { cursor: cursor, list: list }
+        Iterator { cursor, list }
     }
 
     pub fn has_next(&self) -> bool {
@@ -330,7 +336,7 @@ where
             return None;
         }
         let temp = self.list.get(self.cursor);
-        self.cursor = self.cursor + 1;
+        self.cursor += 1;
         temp
     }
 }

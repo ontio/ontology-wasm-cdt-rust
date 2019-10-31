@@ -10,14 +10,27 @@ pub(crate) const TYPE_ADDRESS: u8 = 0x02;
 pub(crate) const TYPE_BOOL: u8 = 0x03;
 pub(crate) const TYPE_INT: u8 = 0x04;
 pub(crate) const TYPE_H256: u8 = 0x05;
-
 pub(crate) const TYPE_LIST: u8 = 0x10;
+
+///Entity used to push events in a contract.
 
 pub struct EventBuilder {
     common: VmValueBuilderCommon,
 }
 
+impl Default for EventBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EventBuilder {
+    ///Create a new eventbuilder instance to push &str, bytearray, Address, U128, bool, H256 type data in the contract.
+    ///# Example
+    /// ```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    ///   let mut eb = EventBuilder::new();
+    /// ```
     pub fn new() -> Self {
         let mut eb = EventBuilder { common: VmValueBuilderCommon::new() };
         eb.common.sink.write_bytes(b"evt\0");
@@ -26,6 +39,13 @@ impl EventBuilder {
 
         eb
     }
+
+    ///Push &str type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    ///   EventBuilder::new().string("notify").notify();
+    ///```
     pub fn string(mut self, method: &str) -> Self {
         self.common.string(method);
         self
@@ -81,32 +101,68 @@ impl VmValueBuilderCommon {
         self.num_entry += 1;
     }
 
-    pub fn bytearray(&mut self, bytes: &[u8]) {
+    ///Push bytearray type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    ///   EventBuilder::new().bytearray("notify".as_bytes()).notify();
+    ///```
+    pub fn bytearray(mut self, bytes: &[u8]) {
         self.sink.write_byte(TYPE_BYTEARRAY);
         self.sink.write_u32(bytes.len() as u32);
         self.sink.write_bytes(bytes);
         self.num_entry += 1;
     }
 
-    pub fn address(&mut self, address: &Address) {
+    ///Push Address type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::types::Address;
+    ///   let addr = Address::repeat_byte(1u8);
+    ///   EventBuilder::new().address(&addr).notify();
+    ///```
+    pub fn address(mut self, address: &Address) {
         self.sink.write_byte(TYPE_ADDRESS);
         self.sink.write_bytes(address.as_bytes());
         self.num_entry += 1;
     }
 
-    pub fn number(&mut self, amount: U128) {
+    ///Push U128 type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::types::U128;
+    ///   EventBuilder::new().number(123 as U128).notify();
+    ///```
+    pub fn number(mut self, amount: U128) {
         self.sink.write_byte(TYPE_INT);
         self.sink.write_u128(amount);
         self.num_entry += 1;
     }
 
-    pub fn bool(&mut self, b: bool) {
+    ///Push bool type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::types::U128;
+    ///   EventBuilder::new().number(123 as U128).notify();
+    ///```
+    pub fn bool(mut self, b: bool) {
         self.sink.write_byte(TYPE_BOOL);
         self.sink.write_bool(b);
         self.num_entry += 1;
     }
-
-    pub fn h256(&mut self, hash: H256) {
+   
+    ///Push H256 type event in contract
+    ///# Example
+    ///```no_run
+    /// # use ontio_std::abi::EventBuilder;
+    /// # use ontio_std::runtime;
+    ///   let hash = runtime::sha256("test");
+    ///   EventBuilder::new().h256(hash).notify();
+    ///```
+    pub fn h256(mut self, hash: H256) {
         self.sink.write_byte(TYPE_H256);
         self.sink.write_bytes(hash.as_ref());
         self.num_entry += 1;

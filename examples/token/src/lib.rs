@@ -3,13 +3,14 @@
 extern crate ontio_std as ostd;
 use ostd::abi::{Encoder, EventBuilder, Sink, Source};
 use ostd::macros::base58;
+use ostd::macros::event;
 use ostd::prelude::*;
 use ostd::{database, runtime};
 
 const KEY_TOTAL_SUPPLY: &str = "total_supply";
 const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
-const TOTAL_SUPPLY: U128 = 100000000000;
+const TOTAL_SUPPLY: U128 = 100_000_000_000;
 
 const ADMIN: Address = base58!("AQf4Mzu1YJrhz9f3aRkkwSm9n3qhXGSh4p");
 
@@ -40,11 +41,31 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     let mut eb = eb.address(to);
     let mut eb = eb.number(amount);
     eb.notify();
+    notify::transfer(from, to, amount);
+    notify::transfer_name(from, to, amount);
+    notify::transfer_test(from, to, amount);
+    let h = runtime::sha256("test");
+    notify::event_test(true, b"test", "test", h);
     true
 }
 
 fn total_supply() -> U128 {
     database::get(KEY_TOTAL_SUPPLY).unwrap()
+}
+
+mod notify {
+    use super::*;
+    #[event]
+    pub fn transfer(from: &Address, to: &Address, amount: U128) {}
+
+    #[event(name = mytransfer)]
+    pub fn transfer_name(from: &Address, to: &Address, amount: U128) {}
+
+    #[event]
+    pub fn transfer_test(from: &Address, to: &Address, amount: U128) {}
+
+    #[event]
+    pub fn event_test(boo: bool, bs: &[u8], ss: &str, h: H256) {}
 }
 
 #[no_mangle]

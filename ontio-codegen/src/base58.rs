@@ -11,7 +11,7 @@ pub fn dhash256<D: AsRef<[u8]>>(data: D) -> [u8; 32] {
     hash
 }
 
-const CHARS: &'static str = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const CHARS: &str = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const PREFIX: u8 = 23;
 
 #[allow(dead_code)]
@@ -71,7 +71,7 @@ pub fn decode_base58(val: &str) -> Result<[u8; 20], String> {
     }
 
     let hash = dhash256(&origin_data[..21]);
-    if &origin_data[21..] != &hash[0..4] {
+    if origin_data[21..] != hash[0..4] {
         return Err(format!(
             "hash check failed, expected:{:?}, got: {:?}",
             &origin_data[21..],
