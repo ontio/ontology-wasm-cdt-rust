@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
-use ostd::abi::{Encoder, EventBuilder, Sink, Source};
+use ostd::abi::{EventBuilder, Sink, Source};
 use ostd::macros::base58;
 use ostd::macros::event;
 use ostd::prelude::*;
@@ -35,12 +35,12 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
 
     database::put(from, frmbal - amount);
     database::put(to, tobal + amount);
-    let mut eb = EventBuilder::new();
-    let mut eb = eb.string("Transfer");
-    let mut eb = eb.address(from);
-    let mut eb = eb.address(to);
-    let mut eb = eb.number(amount);
-    eb.notify();
+    EventBuilder::new()
+    .string("Transfer")
+    .address(from)
+    .address(to)
+    .number(amount)
+    .notify();
     notify::transfer(from, to, amount);
     notify::transfer_name(from, to, amount);
     notify::transfer_test(from, to, amount);

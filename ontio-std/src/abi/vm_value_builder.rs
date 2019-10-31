@@ -1,19 +1,23 @@
 use super::Error;
 use super::{
-    Sink, Source, VmValueBuilderCommon, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
-    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
+    Source, VmValueBuilderCommon, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
+    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_STRING,
 };
 use crate::prelude::*;
-use crate::runtime;
-use byteorder::{ByteOrder, LittleEndian};
 
 pub struct VmValueBuilder {
     pub(crate) common: VmValueBuilderCommon,
 }
 
+impl Default for VmValueBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl VmValueBuilder {
     pub fn new() -> Self {
-        let mut common = VmValueBuilderCommon::new();
+        let common = VmValueBuilderCommon::new();
         let mut builder = VmValueBuilder { common };
         builder.common.sink.write_byte(0u8);
         builder
@@ -59,7 +63,7 @@ pub struct VmValueParser<'a> {
 impl<'a> VmValueParser<'a> {
     pub fn new(bs: &'a [u8]) -> Self {
         let mut source = Source::new(bs);
-        let version = source.read_byte();
+        let _version = source.read_byte(); //version
         Self { source }
     }
 
@@ -114,7 +118,7 @@ impl<'a> VmValueParser<'a> {
                 return Ok(false);
             }
         }
-        return Err(Error::TypeInconsistency);
+        Err(Error::TypeInconsistency)
     }
 
     pub fn h256(&mut self) -> Result<&'a H256, Error> {

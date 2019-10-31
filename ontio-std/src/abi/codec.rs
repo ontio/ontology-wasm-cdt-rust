@@ -5,7 +5,6 @@ use super::{Decoder, Encoder, VmValueBuilder, VmValueDecoder, VmValueEncoder, Vm
 use crate::abi::Source;
 use crate::prelude::*;
 use crate::types::{Address, H256};
-use byteorder::{ByteOrder, LittleEndian};
 
 impl<'a> Decoder<'a> for u8 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
@@ -268,6 +267,7 @@ for_each_tuple! {
                 if ty != crate::abi::event_builder::TYPE_LIST {
                      return Err(Error::TypeInconsistency);
                 }
+                #[allow(unused_mut)]
                 let mut count = 0u32;
                 $(let _ :$item; count +=1;)*
                 let l = _parser.source.read_u32()?;
@@ -280,10 +280,11 @@ for_each_tuple! {
         impl<$($item: VmValueEncoder),*> VmValueEncoder for ($($item,)*) {
             fn serialize(&self, _builder: &mut VmValueBuilder) {
                 _builder.common.sink.write_byte(crate::abi::event_builder::TYPE_LIST);
+                 #[allow(unused_mut)]
                 let mut count = 0u32;
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
-                $($item;count +=1;)*
+                $(let _ = $item;count +=1;)*
                 _builder.common.sink.write_u32(count);
                 $(_builder.write($item);)*
             }

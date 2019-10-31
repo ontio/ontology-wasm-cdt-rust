@@ -10,7 +10,9 @@ members = [
     "examples/apitest",
     "examples/helloworld",
     "examples/red-envlope",
-    "examples/call-neovm"
+    "examples/call-neovm",
+    "examples/invoke-native-test",
+    "examples/notify-test"
 ]
 
 [profile.release]

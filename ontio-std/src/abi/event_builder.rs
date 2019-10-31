@@ -3,7 +3,6 @@ use crate::prelude::*;
 use crate::runtime;
 use byteorder::{ByteOrder, LittleEndian};
 
-pub(crate) const DEFAULT_CAP: usize = 128;
 pub(crate) const TYPE_BYTEARRAY: u8 = 0x00;
 pub(crate) const TYPE_STRING: u8 = 0x01;
 pub(crate) const TYPE_ADDRESS: u8 = 0x02;
@@ -107,7 +106,7 @@ impl VmValueBuilderCommon {
     /// # use ontio_std::abi::EventBuilder;
     ///   EventBuilder::new().bytearray("notify".as_bytes()).notify();
     ///```
-    pub fn bytearray(mut self, bytes: &[u8]) {
+    pub fn bytearray(&mut self, bytes: &[u8]) {
         self.sink.write_byte(TYPE_BYTEARRAY);
         self.sink.write_u32(bytes.len() as u32);
         self.sink.write_bytes(bytes);
@@ -122,7 +121,7 @@ impl VmValueBuilderCommon {
     ///   let addr = Address::repeat_byte(1u8);
     ///   EventBuilder::new().address(&addr).notify();
     ///```
-    pub fn address(mut self, address: &Address) {
+    pub fn address(&mut self, address: &Address) {
         self.sink.write_byte(TYPE_ADDRESS);
         self.sink.write_bytes(address.as_bytes());
         self.num_entry += 1;
@@ -135,7 +134,7 @@ impl VmValueBuilderCommon {
     /// # use ontio_std::types::U128;
     ///   EventBuilder::new().number(123 as U128).notify();
     ///```
-    pub fn number(mut self, amount: U128) {
+    pub fn number(&mut self, amount: U128) {
         self.sink.write_byte(TYPE_INT);
         self.sink.write_u128(amount);
         self.num_entry += 1;
@@ -148,12 +147,12 @@ impl VmValueBuilderCommon {
     /// # use ontio_std::types::U128;
     ///   EventBuilder::new().number(123 as U128).notify();
     ///```
-    pub fn bool(mut self, b: bool) {
+    pub fn bool(&mut self, b: bool) {
         self.sink.write_byte(TYPE_BOOL);
         self.sink.write_bool(b);
         self.num_entry += 1;
     }
-   
+
     ///Push H256 type event in contract
     ///# Example
     ///```no_run
@@ -162,7 +161,7 @@ impl VmValueBuilderCommon {
     ///   let hash = runtime::sha256("test");
     ///   EventBuilder::new().h256(hash).notify();
     ///```
-    pub fn h256(mut self, hash: H256) {
+    pub fn h256(&mut self, hash: H256) {
         self.sink.write_byte(TYPE_H256);
         self.sink.write_bytes(hash.as_ref());
         self.num_entry += 1;

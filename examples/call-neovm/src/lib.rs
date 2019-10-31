@@ -1,20 +1,19 @@
 #![feature(proc_macro_hygiene)]
 #![no_std]
 extern crate ontio_std as ostd;
-use ostd::abi::{EventBuilder, Sink, Source, VmValueDecoder, VmValueEncoder, VmValueParser};
-use ostd::contract::{neo, ont};
+use ostd::abi::{Sink, Source,VmValueParser};
+use ostd::contract::{neo};
 use ostd::prelude::*;
 use ostd::runtime;
 use ostd::types::{u128_from_neo_bytes, U128};
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use ostd::console::debug;
 
 pub mod neovm;
-use neovm::{Neo_Contract, Neo_Contract_Addr};
+use neovm::{NEO_CONTRACT, NEO_CONTRACT_ADDR};
 
+#[allow(dead_code)]
 pub struct TestContext<'a> {
-    admin: &'a Address,
     map: BTreeMap<String, &'a Address>,
 }
 
@@ -26,8 +25,8 @@ pub fn invoke() {
     let mut sink = Sink::new(12);
     match action {
         b"contract_create" => {
-            let code = hexutil::read_hex(Neo_Contract);
-            let code_bs = code.unwrap_or(Vec::new());
+            let code = hexutil::read_hex(NEO_CONTRACT);
+            let code_bs = code.unwrap_or_default();
             let contract_addr = runtime::contract_create(
                 code_bs.as_slice(),
                 1,
@@ -41,29 +40,31 @@ pub fn invoke() {
         }
 
         b"init" => {
-            let res = neo::call_contract(&Neo_Contract_Addr, ("init", ()));
-            if let res2 = res.unwrap() {
-                let mut parser = VmValueParser::new(res2.as_slice());
-                let r = parser.bool();
-                sink.write(r.unwrap_or(false));
-            } else {
-                sink.write(false);
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("init", ()));
+            match res {
+                Some(res2) => {
+                    let mut parser = VmValueParser::new(res2.as_slice());
+                    let r = parser.bool();
+                    sink.write(r.unwrap_or(false));
+                }
+                _ => sink.write(false),
             }
         }
         b"name" => {
-            let res = neo::call_contract(&Neo_Contract_Addr, ("name", ()));
-            if let res2 = res.unwrap() {
-                let mut parser = VmValueParser::new(res2.as_slice());
-                let r = parser.bytearray();
-                sink.write(r.unwrap_or(b""));
-            } else {
-                sink.write("");
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("name", ()));
+            match res {
+                Some(res2) => {
+                    let mut parser = VmValueParser::new(res2.as_slice());
+                    let r = parser.bytearray();
+                    sink.write(r.unwrap_or(b""));
+                }
+                _ => sink.write(""),
             }
         }
         b"balanceOf" => {
             let addr: Address = source.read().unwrap();
-            let res = neo::call_contract(&Neo_Contract_Addr, ("balanceOf", (addr,)));
-            if let res2 = res.unwrap() {
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("balanceOf", (addr,)));
+            if let Some(res2) = res {
                 let mut parser = VmValueParser::new(&res2);
                 let r = parser.bytearray().unwrap_or(b"0");
                 sink.write(u128_from_neo_bytes(r));
@@ -77,10 +78,8 @@ pub fn invoke() {
             let amount: U128 = source.read().unwrap();
 
             let res =
-                neo::call_contract(&Neo_Contract_Addr, ("transfer", (from_addr, to_addr, amount)));
-
-            if res.is_some() {
-                let data = res.unwrap();
+                neo::call_contract(&NEO_CONTRACT_ADDR, ("transfer", (from_addr, to_addr, amount)));
+            if let Some(data) = res {
                 let mut parser = VmValueParser::new(&data);
                 let boo = parser.bool().unwrap_or(false);
                 sink.write(boo);
@@ -94,12 +93,13 @@ pub fn invoke() {
     runtime::ret(sink.bytes())
 }
 
+#[allow(dead_code)]
 fn get_tc<'a>(source: &mut Source<'a>) -> TestContext<'a> {
-    let mut map = BTreeMap::new();
-    let admin = source.read().unwrap();
-    let n = source.read_varuint().unwrap_or(0);
+    let map = BTreeMap::new();
+    let _admin:Address = source.read().unwrap();
+    let _n = source.read_varuint().unwrap_or(0);
 
-    TestContext { admin, map }
+    TestContext { map }
 }
 
 fn testcase() -> String {

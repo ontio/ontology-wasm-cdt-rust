@@ -11,7 +11,7 @@ use crate::prelude::*;
 pub use event_builder::EventBuilder;
 pub(crate) use event_builder::VmValueBuilderCommon;
 pub(crate) use event_builder::{
-    TYPE_ADDRESS, TYPE_BOOL, TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
+    TYPE_ADDRESS, TYPE_BOOL, TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_STRING,
 };
 pub use vm_value_builder::VmValueBuilder;
 pub use vm_value_builder::VmValueParser;

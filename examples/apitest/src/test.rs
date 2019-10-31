@@ -5,13 +5,13 @@ use ostd::mock::build_runtime;
 use ostd::prelude::*;
 use ostd::types::{Address, H256};
 
-const _from: Address = ostd::macros::base58!("AeJGmTDUdSzMdrSHU2pa8rLMo23AAs53LM");
+const _FROM: Address = ostd::macros::base58!("AeJGmTDUdSzMdrSHU2pa8rLMo23AAs53LM");
 
-const _to: Address = ostd::macros::base58!("AbPRaepcpBAFHz9zCj4619qch4Aq5hJARA");
+const _TO: Address = ostd::macros::base58!("AbPRaepcpBAFHz9zCj4619qch4Aq5hJARA");
 
 #[test]
 fn test_runtime_api() {
-    let mut api = ApiTestInstance;
+    let api = ApiTestInstance;
     build_runtime().timestamp(100);
     assert_eq!(api.timestamp(), 100);
 
@@ -38,7 +38,6 @@ fn test_runtime_api() {
     build_runtime().current_txhash(&current_tx_hash);
     assert_eq!(api.get_current_txhash(), current_tx_hash);
 
-    let addr = Address::zero();
     assert_eq!(
         api.sha256(&[0; 20]).to_hex_string(),
         "906fd3cbc4401b7ffac44063f02c2693c332e653c3f2b5db00d3b87eb2c947de"
