@@ -1,8 +1,8 @@
 #![feature(proc_macro_hygiene)]
 #![no_std]
 extern crate ontio_std as ostd;
-use ostd::abi::{Sink, Source,VmValueParser};
-use ostd::contract::{neo};
+use ostd::abi::{Sink, Source, VmValueParser};
+use ostd::contract::neo;
 use ostd::prelude::*;
 use ostd::runtime;
 use ostd::types::{u128_from_neo_bytes, U128};
@@ -96,7 +96,7 @@ pub fn invoke() {
 #[allow(dead_code)]
 fn get_tc<'a>(source: &mut Source<'a>) -> TestContext<'a> {
     let map = BTreeMap::new();
-    let _admin:Address = source.read().unwrap();
+    let _admin: Address = source.read().unwrap();
     let _n = source.read_varuint().unwrap_or(0);
 
     TestContext { map }

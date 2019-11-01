@@ -35,12 +35,7 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
 
     database::put(from, frmbal - amount);
     database::put(to, tobal + amount);
-    EventBuilder::new()
-    .string("Transfer")
-    .address(from)
-    .address(to)
-    .number(amount)
-    .notify();
+    EventBuilder::new().string("Transfer").address(from).address(to).number(amount).notify();
     notify::transfer(from, to, amount);
     notify::transfer_name(from, to, amount);
     notify::transfer_test(from, to, amount);
