@@ -3,6 +3,10 @@ name = "ontio-bump-alloc"
 version = "0.1.0"
 authors = ["laizy <aochyi@126.com>"]
 edition = "2018"
+license = "Apache-2.0/MIT"
+homepage = "https://github.com/ontio/ontology-wasm-cdt-rust"
+repository = "https://github.com/ontio/ontology-wasm-cdt-rust"
+description = "bump memory allocation for ontology wasm engine"
 
 [dependencies]
 cfg-if = { version = "0.1", default-features = false }

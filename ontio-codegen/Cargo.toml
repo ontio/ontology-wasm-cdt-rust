@@ -3,6 +3,10 @@ name = "ontio-codegen"
 version = "0.1.0"
 authors = ["laizy <aochyi@126.com>"]
 edition = "2018"
+license = "Apache-2.0/MIT"
+homepage = "https://github.com/ontio/ontology-wasm-cdt-rust"
+repository = "https://github.com/ontio/ontology-wasm-cdt-rust"
+description = "codegen for ontio-std"
 
 [lib]
 proc-macro = true
@@ -17,7 +21,3 @@ heck = {version = "0.3.1",default-features = false}
 
 [dev-dependencies]
 ontio-std  = {path="../ontio-std"}
-
-[features]
-mock = ["ontio-std/mock"]
-
