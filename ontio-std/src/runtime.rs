@@ -36,7 +36,7 @@ mod env {
             author_len: u32, email_ptr: *const u8, email_len: u32, desc_ptr: *const u8,
             desc_len: u32, new_addr_ptr: *mut u8,
         ) -> u32;
-        pub fn ontio_contract_delete() -> !;
+        pub fn ontio_contract_destroy() -> !;
     }
 }
 
@@ -187,7 +187,7 @@ pub fn contract_migrate(
 ///delete the contract
 pub fn contract_delete() -> ! {
     unsafe {
-        env::ontio_contract_delete();
+        env::ontio_contract_destroy();
     }
 }
 ///Save key-value as a key-value pair

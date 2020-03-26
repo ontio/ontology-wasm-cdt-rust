@@ -3,6 +3,10 @@ name = "ontio-derive-codec"
 version = "0.1.0"
 authors = ["Lucas <sishsh@163.com>"]
 edition = "2018"
+license = "Apache-2.0/MIT"
+homepage = "https://github.com/ontio/ontology-wasm-cdt-rust"
+repository = "https://github.com/ontio/ontology-wasm-cdt-rust"
+description = "codec derive macro for ontio-std"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
