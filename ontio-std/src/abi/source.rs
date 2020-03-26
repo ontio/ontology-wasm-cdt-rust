@@ -82,12 +82,12 @@ impl<'a> Source<'a> {
         T::decode(self)
     }
 
-    pub(crate) fn read_address(&mut self) -> Result<&'a Address, Error> {
+    pub fn read_address(&mut self) -> Result<&'a Address, Error> {
         let buf = self.next_bytes(20)?;
         Ok(unsafe { &*(buf.as_ptr() as *const Address) })
     }
 
-    pub(crate) fn read_h256(&mut self) -> Result<&'a H256, Error> {
+    pub fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;
         Ok(unsafe { &*(buf.as_ptr() as *const H256) })
     }
