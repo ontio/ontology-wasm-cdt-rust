@@ -21,3 +21,6 @@ heck = {version = "0.3.1",default-features = false}
 
 [dev-dependencies]
 ontio-std  = {path="../ontio-std"}
+
+[features]
+mock = ["ontio-std/mock"]
