@@ -67,6 +67,13 @@ impl RuntimeHandle {
         self.inner.borrow_mut().witness = addr.into_iter().map(|a| a.as_ref().clone()).collect();
         self
     }
+
+    pub fn on_contract_call(
+        &self, func: impl Fn(&Address, &[u8]) -> Option<Vec<u8>> + 'static,
+    ) -> &Self {
+        self.inner.borrow_mut().call_contract = Some(Box::new(func));
+        self
+    }
 }
 
 pub fn build_runtime() -> RuntimeHandle {
@@ -77,4 +84,15 @@ pub fn build_runtime() -> RuntimeHandle {
 
     let handle = RuntimeHandle { inner: inner };
     handle
+}
+
+#[test]
+fn test_call_contract() {
+    assert_eq!(crate::runtime::call_contract(&Address::repeat_byte(1), &[1, 2]), Some(vec![]));
+
+    build_runtime().on_contract_call(|_addr, _data| -> Option<Vec<u8>> { Some(vec![1, 2, 3]) });
+    assert_eq!(
+        crate::runtime::call_contract(&Address::repeat_byte(1), &[1, 2]),
+        Some(vec![1, 2, 3])
+    );
 }

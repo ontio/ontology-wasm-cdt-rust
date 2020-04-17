@@ -23,6 +23,16 @@ pub(crate) struct RuntimeInner {
     pub(crate) tx_hash: H256,
     pub(crate) witness: Vec<Address>,
     pub(crate) notify: Vec<Vec<u8>>,
+    pub(crate) call_contract: Option<Box<dyn Fn(&Address, &[u8]) -> Option<Vec<u8>>>>,
+    pub(crate) call_output: Vec<u8>,
+}
+
+impl RuntimeInner {
+    fn call_contract(&mut self, addr: &Address, data: &[u8]) {
+        if let Some(call) = &self.call_contract {
+            self.call_output = (call)(addr, data).unwrap_or_default();
+        }
+    }
 }
 
 impl Runtime {
@@ -73,10 +83,23 @@ impl Runtime {
     fn notify(&self, msg: &[u8]) {
         self.inner.borrow_mut().notify.push(msg.to_vec());
     }
+
     fn sha256(&self, data: &[u8]) -> H256 {
         let mut hasher = sha2::Sha256::new();
         hasher.input(data);
         H256::from_slice(hasher.result().as_slice())
+    }
+
+    fn call_contract(&self, addr: &Address, data: &[u8]) {
+        self.inner.borrow_mut().call_contract(addr, data);
+    }
+
+    fn get_call_output(&self) -> Vec<u8> {
+        self.inner.borrow().call_output.clone()
+    }
+
+    fn call_output_length(&self) -> u32 {
+        self.inner.borrow().call_output.len() as u32
     }
 }
 
@@ -197,5 +220,29 @@ mod env {
             let hash = r.borrow().sha256(msg);
             ptr::copy(hash.as_ptr(), h256, 32);
         });
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ontio_call_contract(
+        addr: *const u8, input_ptr: *const u8, input_len: u32,
+    ) {
+        let addr = Address::from_slice(slice::from_raw_parts(addr, 20));
+        let input = slice::from_raw_parts(input_ptr, input_len as usize);
+        RUNTIME.with(|r| {
+            r.borrow().call_contract(&addr, input);
+        });
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ontio_call_output_length() -> u32 {
+        RUNTIME.with(|r| r.borrow().call_output_length())
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ontio_get_call_output(dest: *mut u8) {
+        RUNTIME.with(|r| {
+            let res = r.borrow().get_call_output();
+            ptr::copy(res.as_ptr(), dest, res.len());
+        })
     }
 }

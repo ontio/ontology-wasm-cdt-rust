@@ -173,7 +173,7 @@ fn test_to_neo_bytes() {
         (90123123981293054321, "71e975a9c4a7b5e204"),
     ];
 
-    for (data, exp) in case_data.into_iter() {
+    for (data, exp) in case_data.iter() {
         let res = i128_to_neo_bytes(*data);
         let r = to_hex_string(res.as_slice());
         assert_eq!(r, exp.to_string());
