@@ -40,7 +40,7 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     notify::transfer_name(from, to, amount);
     notify::transfer_test(from, to, amount);
     let h = runtime::sha256("test");
-    notify::event_test(true, b"test", "test", h);
+    notify::event_test(true, b"test", "test", &h);
     true
 }
 
@@ -60,7 +60,7 @@ mod notify {
     pub fn transfer_test(from: &Address, to: &Address, amount: U128) {}
 
     #[event]
-    pub fn event_test(boo: bool, bs: &[u8], ss: &str, h: H256) {}
+    pub fn event_test(boo: bool, bs: &[u8], ss: &str, h: &H256) {}
 }
 
 #[no_mangle]

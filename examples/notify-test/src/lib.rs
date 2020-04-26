@@ -30,8 +30,8 @@ pub fn invoke() {
         }
         b"notify_hash" => {
             let h = runtime::sha256("test");
-            EventBuilder::new().bytearray(h.as_ref()).notify();
-            EventBuilder::new().h256(h).notify();
+            EventBuilder::new().bytearray(h.as_bytes()).notify();
+            EventBuilder::new().h256(&h).notify();
         }
         b"notify_list" => {
             EventBuilder::new()

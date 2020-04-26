@@ -104,7 +104,7 @@ impl EventBuilder {
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::runtime;
     ///   let hash = runtime::sha256("test");
-    ///   EventBuilder::new().h256(hash).notify();
+    ///   EventBuilder::new().h256(&hash).notify();
     ///```
     pub fn h256(mut self, hash: &H256) -> Self {
         self.common.h256(hash);
