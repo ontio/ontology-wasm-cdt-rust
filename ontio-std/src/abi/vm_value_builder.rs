@@ -1,7 +1,7 @@
 use super::Error;
 use super::{
     Source, VmValueBuilderCommon, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
-    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_STRING,
+    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_LIST, TYPE_STRING,
 };
 use crate::prelude::*;
 
