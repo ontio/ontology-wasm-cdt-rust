@@ -96,7 +96,7 @@ impl<'a> Source<'a> {
         let l = self.read_byte()?;
         let val = self.read_varuint()?;
         let l_new = varuint_encode_size(val);
-        assert_eq!(l, l_new);
+        assert_eq!(l as usize, l_new);
         Ok(val)
     }
 
