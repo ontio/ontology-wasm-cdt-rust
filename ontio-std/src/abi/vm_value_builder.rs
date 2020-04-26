@@ -47,8 +47,8 @@ impl VmValueBuilder {
         self.common.bool(b);
     }
 
-    pub fn h256(&mut self, hash: H256) {
-        self.common.h256(&hash);
+    pub fn h256(&mut self, hash: &H256) {
+        self.common.h256(hash);
     }
 
     pub fn bytes(self) -> Vec<u8> {

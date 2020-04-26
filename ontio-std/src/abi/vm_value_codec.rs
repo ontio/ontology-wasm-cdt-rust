@@ -26,7 +26,7 @@ impl VmValueEncoder for bool {
 
 impl VmValueEncoder for H256 {
     fn serialize(&self, builder: &mut VmValueBuilder) {
-        builder.h256(self.clone());
+        builder.h256(&self);
     }
 }
 
