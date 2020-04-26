@@ -1,6 +1,6 @@
 use super::Error;
 use super::Sink;
-use super::{Decoder, Encoder};
+use super::{Decoder, Encoder, VmValueBuilder, VmValueDecoder, VmValueEncoder, VmValueParser};
 
 use crate::abi::Source;
 use crate::prelude::*;
@@ -259,6 +259,40 @@ for_each_tuple! {
                 #[allow(non_snake_case)]
                 let ($($item,)*) = self;
                 $(_sink.write($item);)*
+            }
+        }
+    }
+}
+
+//trace_macros!(true);
+for_each_tuple! {
+    ($($item:ident)*) => {
+        impl<'a, $($item: VmValueDecoder<'a>),*> VmValueDecoder<'a> for ($($item,)*) {
+            fn deserialize(_parser: &mut VmValueParser<'a>) -> Result<Self, Error> {
+                let ty = _parser.source.read_byte()?;
+                if ty != crate::abi::event_builder::TYPE_LIST {
+                     return Err(Error::TypeInconsistency);
+                }
+                #[allow(unused_mut)]
+                let mut count = 0u32;
+                $(let _ :$item; count +=1;)*
+                let l = _parser.source.read_u32()?;
+                if l!= count {
+                    return Err(Error::LengthInconsistency);
+                }
+                Ok(($(_parser.read::<$item>()?,)*))
+            }
+        }
+        impl<$($item: VmValueEncoder),*> VmValueEncoder for ($($item,)*) {
+            fn serialize(&self, _builder: &mut VmValueBuilder) {
+                _builder.common.sink.write_byte(crate::abi::event_builder::TYPE_LIST);
+                 #[allow(unused_mut)]
+                let mut count = 0u32;
+                #[allow(non_snake_case)]
+                let ($($item,)*) = self;
+                $(let _ = $item;count +=1;)*
+                _builder.common.sink.write_u32(count);
+                $(_builder.write($item);)*
             }
         }
     }
