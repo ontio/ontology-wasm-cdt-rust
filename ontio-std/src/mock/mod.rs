@@ -1,5 +1,5 @@
+mod contract_mock;
 mod runtime;
-
 use self::runtime::setup_runtime;
 pub use self::runtime::Runtime;
 use self::runtime::RuntimeInner;

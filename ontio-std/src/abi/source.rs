@@ -88,15 +88,16 @@ impl<'a> Source<'a> {
     }
     pub fn read_native_address(&mut self) -> Result<&'a Address, Error> {
         let l = self.read_byte()?;
-        if l != 20 {
-            return Err(Error::IrregularData);
-        }
+        assert_eq!(l, 20);
         self.read_address()
     }
 
     pub fn read_native_varuint(&mut self) -> Result<u64, Error> {
-        let _ = self.read_byte();
-        self.read_varuint()
+        let l = self.read_byte()?;
+        let val = self.read_varuint()?;
+        let l_new = varuint_encode_size(val);
+        assert_eq!(l, l_new);
+        Ok(val)
     }
 
     pub fn read_h256(&mut self) -> Result<&'a H256, Error> {
