@@ -360,8 +360,7 @@ pub mod contract_mock {
                     let to = source.read_native_address().ok().unwrap();
                     let amt: Vec<u8> = source.read().ok().unwrap();
                     let value = u128_from_neo_bytes(amt.as_slice());
-                    return Ok(Command::Transfer { from, to, value });
-                    Err(Error::IrregularData)
+                    Ok(Command::Transfer { from, to, value })
                 }
                 "balance_of" => {
                     let addr = source.read_native_address().ok().unwrap();
@@ -403,9 +402,9 @@ pub mod contract_mock {
                     assert_eq!(address_type, TYPE_ADDRESS);
                     let to: &Address = source.read()?;
                     let int_type = source.read_byte()?;
-                    assert_eq!(integer_type, TYPE_INT);
+                    assert_eq!(int_type, TYPE_INT);
                     let value: U128 = source.read()?;
-                    return Ok(NeoCommand::Transfer { from, to, value });
+                    Ok(NeoCommand::Transfer { from, to, value })
                 }
                 b"balance_of" => {
                     let list_type = source.read_byte()?; //list type
