@@ -1,6 +1,7 @@
 use super::super::prelude::*;
 use crate::abi::event_builder::TYPE_LIST;
-use crate::abi::{Decoder, Error, Source, TYPE_ADDRESS, TYPE_INT, TYPE_STRING};
+use crate::abi::event_builder::{TYPE_ADDRESS, TYPE_INT, TYPE_STRING};
+use crate::abi::{Decoder, Error, Source};
 use crate::types::{u128_from_neo_bytes, Address, U128};
 
 pub enum Command<'a> {
