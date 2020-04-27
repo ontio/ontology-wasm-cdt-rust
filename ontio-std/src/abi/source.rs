@@ -86,6 +86,19 @@ impl<'a> Source<'a> {
         let buf = self.next_bytes(20)?;
         Ok(unsafe { &*(buf.as_ptr() as *const Address) })
     }
+    pub fn read_native_address(&mut self) -> Result<&'a Address, Error> {
+        let l = self.read_byte()?;
+        assert_eq!(l, 20);
+        self.read_address()
+    }
+
+    pub fn read_native_varuint(&mut self) -> Result<u64, Error> {
+        let l = self.read_byte()?;
+        let val = self.read_varuint()?;
+        let l_new = varuint_encode_size(val);
+        assert_eq!(l as usize, l_new);
+        Ok(val)
+    }
 
     pub fn read_h256(&mut self) -> Result<&'a H256, Error> {
         let buf = self.next_bytes(32)?;

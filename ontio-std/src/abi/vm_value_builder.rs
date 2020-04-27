@@ -1,8 +1,9 @@
-use super::Error;
-use super::{
-    Source, VmValueBuilderCommon, VmValueDecoder, VmValueEncoder, TYPE_ADDRESS, TYPE_BOOL,
-    TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_STRING,
+use super::event_builder::{
+    TYPE_ADDRESS, TYPE_BOOL, TYPE_BYTEARRAY, TYPE_H256, TYPE_INT, TYPE_STRING,
 };
+use super::Error;
+use super::Source;
+use super::{VmValueBuilderCommon, VmValueDecoder, VmValueEncoder};
 use crate::prelude::*;
 
 pub struct VmValueBuilder {
