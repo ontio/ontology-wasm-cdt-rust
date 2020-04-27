@@ -10,6 +10,7 @@ use crate::prelude::*;
 pub(crate) mod event_builder;
 pub use event_builder::EventBuilder;
 pub(crate) use event_builder::VmValueBuilderCommon;
+pub(crate) use event_builder::{TYPE_ADDRESS, TYPE_INT, TYPE_STRING};
 pub use vm_value_builder::{VmValueBuilder, VmValueParser};
 pub use vm_value_codec::VmValueDecoder;
 pub use vm_value_codec::VmValueEncoder;
