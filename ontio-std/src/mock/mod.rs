@@ -1,4 +1,5 @@
-mod contract_mock;
+pub mod contract_mock;
+pub use contract_mock::{Command, NeoCommand};
 mod runtime;
 use self::runtime::setup_runtime;
 pub use self::runtime::Runtime;
@@ -69,7 +70,7 @@ impl RuntimeHandle {
     }
 
     pub fn on_contract_call(
-        &self, func: impl Fn(&Address, &[u8]) -> Option<Vec<u8>> + 'static,
+        &self, func: impl FnMut(&Address, &[u8]) -> Option<Vec<u8>> + 'static,
     ) -> &Self {
         self.inner.borrow_mut().call_contract = Some(Box::new(func));
         self
