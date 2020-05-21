@@ -23,13 +23,13 @@ pub(crate) struct RuntimeInner {
     pub(crate) tx_hash: H256,
     pub(crate) witness: Vec<Address>,
     pub(crate) notify: Vec<Vec<u8>>,
-    pub(crate) call_contract: Option<Box<dyn Fn(&Address, &[u8]) -> Option<Vec<u8>>>>,
+    pub(crate) call_contract: Option<Box<dyn FnMut(&Address, &[u8]) -> Option<Vec<u8>>>>,
     pub(crate) call_output: Vec<u8>,
 }
 
 impl RuntimeInner {
     fn call_contract(&mut self, addr: &Address, data: &[u8]) {
-        if let Some(call) = &self.call_contract {
+        if let Some(call) = &mut self.call_contract {
             self.call_output = (call)(addr, data).unwrap_or_default();
         }
     }
