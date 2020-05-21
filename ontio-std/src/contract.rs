@@ -29,7 +29,7 @@ pub mod ontid {
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
         if let Some(data) = res {
-            if data.as_slice() == &[1u8] {
+            if data == vec![1u8] {
                 return true;
             }
         }
