@@ -13,7 +13,6 @@ pub fn derive_encoder(item: TokenStream) -> TokenStream {
     let name = &ast.ident; //struct name
     let expanded: proc_macro2::TokenStream = match ast.data {
         Data::Enum(DataEnum { ref variants, .. }) => {
-            println!("{:?}, ", ast.data);
             let get_selfs: Vec<_> = variants
                 .iter()
                 .map(|variant| {
