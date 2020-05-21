@@ -44,6 +44,17 @@ impl<'a, T: Decoder<'a>> Decoder<'a> for Vec<T> {
     }
 }
 
+impl<'a, T: Decoder<'a>> Decoder<'a> for Option<T> {
+    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+        let is_val: bool = source.read()?;
+        if is_val {
+            Ok(Some(source.read()?))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
 impl<'a> Decoder<'a> for &'a str {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
         let buf = source.read_bytes()?;
@@ -174,6 +185,17 @@ where
         sink.write_varuint(self.len() as u64);
         for item in *self {
             sink.write(item);
+        }
+    }
+}
+
+impl<T: Encoder> Encoder for Option<T> {
+    fn encode(&self, sink: &mut Sink) {
+        if let Some(val) = self {
+            sink.write(true);
+            sink.write(val);
+        } else {
+            sink.write(false);
         }
     }
 }
