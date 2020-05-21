@@ -10,6 +10,17 @@ pub mod neo {
         crate::runtime::call_contract(contract_address, &builder.bytes())
     }
 }
+pub mod wasm {
+    use crate::abi::Sink;
+    use crate::prelude::*;
+    pub fn call_contract<T: crate::abi::Encoder>(
+        contract_address: &Address, param: T,
+    ) -> Option<Vec<u8>> {
+        let mut sink = Sink::new(16);
+        sink.write(param);
+        crate::runtime::call_contract(contract_address, sink.bytes())
+    }
+}
 
 ///Used when a transaction contains transfers between multiple addresses.
 pub struct TransferParam {
