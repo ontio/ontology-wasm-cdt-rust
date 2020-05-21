@@ -10,6 +10,33 @@ pub mod neo {
         crate::runtime::call_contract(contract_address, &builder.bytes())
     }
 }
+
+pub mod ontid {
+    use super::super::types::u128_to_neo_bytes;
+    use crate::abi::Sink;
+    use crate::macros::base58;
+    use crate::prelude::*;
+    use crate::runtime;
+    const VERSION: u8 = 0;
+    const ONTID_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6Ubvho7BUwN");
+    pub fn verify_controller(ont_id: &[u8], index: U128) -> bool {
+        let mut sink = Sink::new(16);
+        sink.write(ont_id);
+        sink.write(u128_to_neo_bytes(index));
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("verifyController");
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+        if let Some(data) = res {
+            if data == vec![1u8] {
+                return true;
+            }
+        }
+        false
+    }
+}
+
 pub mod wasm {
     use crate::abi::Sink;
     use crate::prelude::*;

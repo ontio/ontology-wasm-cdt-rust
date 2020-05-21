@@ -12,7 +12,8 @@ members = [
     "examples/red-envlope",
     "examples/call-neovm",
     "examples/invoke-native-test",
-    "examples/notify-test"
+    "examples/notify-test",
+    "examples/call_native"
 ]
 
 [profile.release]
