@@ -13,7 +13,7 @@ pub mod neo {
 
 pub mod ontid {
     use super::super::types::u128_to_neo_bytes;
-    use crate::abi::{EventBuilder, Sink, Source};
+    use crate::abi::Sink;
     use crate::macros::base58;
     use crate::prelude::*;
     use crate::runtime;
