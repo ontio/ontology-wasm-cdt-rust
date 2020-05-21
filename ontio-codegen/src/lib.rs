@@ -59,6 +59,18 @@ pub fn base58(item: TokenStream) -> TokenStream {
 
 #[cfg(test)]
 mod tests {
+    use ontio_std::abi::{Decoder, Encoder};
+    #[derive(Encoder, Decoder)]
+    struct Oep4 {
+        from: u32,
+        to: u32,
+        amt: u32,
+    }
+
+    #[derive(Encoder, Decoder)]
+    enum Token {
+        Oep4(Oep4),
+    }
 
     use ontio_std::prelude::*;
     #[ontio_std::macros::contract]
