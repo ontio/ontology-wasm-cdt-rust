@@ -21,10 +21,10 @@ pub mod ontid {
     const ONTID_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6Ubvho7BUwN");
 
     pub fn verify_signature(ont_id: &[u8], index: U128) -> bool {
-        verify_controller_sig_inner("verifySignature", ont_id, index)
+        verify_sig_inner("verifySignature", ont_id, index)
     }
 
-    fn verify_controller_sig_inner(method: &str, ont_id: &[u8], index: U128) -> bool {
+    fn verify_sig_inner(method: &str, ont_id: &[u8], index: U128) -> bool {
         let mut sink = Sink::new(32);
         sink.write(ont_id);
         sink.write(u128_to_neo_bytes(index));
