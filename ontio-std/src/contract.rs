@@ -19,9 +19,7 @@ pub mod ontid {
     use crate::runtime;
     const VERSION: u8 = 0;
     const ONTID_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6Ubvho7BUwN");
-    pub fn verify_controller(ont_id: &[u8], index: U128) -> bool {
-        verify_controller_sig_inner("verifyController", ont_id, index)
-    }
+
     pub fn verify_signature(ont_id: &[u8], index: U128) -> bool {
         verify_controller_sig_inner("verifySignature", ont_id, index)
     }
