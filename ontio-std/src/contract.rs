@@ -20,16 +20,23 @@ pub mod ontid {
     const VERSION: u8 = 0;
     const ONTID_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6Ubvho7BUwN");
     pub fn verify_controller(ont_id: &[u8], index: U128) -> bool {
-        let mut sink = Sink::new(16);
+        verify_controller_sig_inner("verifyController", ont_id, index)
+    }
+    pub fn verify_signature(ont_id: &[u8], index: U128) -> bool {
+        verify_controller_sig_inner("verifySignature", ont_id, index)
+    }
+
+    fn verify_controller_sig_inner(method: &str, ont_id: &[u8], index: U128) -> bool {
+        let mut sink = Sink::new(32);
         sink.write(ont_id);
         sink.write(u128_to_neo_bytes(index));
         let mut sink_param = Sink::new(64);
         sink_param.write(VERSION);
-        sink_param.write("verifyController");
+        sink_param.write(method);
         sink_param.write(sink.bytes());
         let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
         if let Some(data) = res {
-            if data == vec![1u8] {
+            if data[0] == 1u8 {
                 return true;
             }
         }
