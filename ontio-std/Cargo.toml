@@ -1,6 +1,6 @@
 [package]
 name = "ontio-std"
-version = "0.1.0"
+version = "0.3.0"
 authors = ["laizy <aochyi@126.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
@@ -14,8 +14,8 @@ ontio-bump-alloc = {version = "0.1", path = "../ontio-bump-alloc", optional = tr
 fixed-hash = { version = "0.4", default-features = false }
 cfg-if = { version = "0.1", default-features = false }
 byteorder = { version = "1", default-features= false, features = ["i128"] }
-ontio-codegen = { version = "0.1",  path = "../ontio-codegen"}
-ontio-derive-codec = { version = "0.1", path = "../ontio-derive-codec"}
+ontio-codegen = { version = "0.2",  path = "../ontio-codegen"}
+ontio-derive-codec = { version = "0.2", path = "../ontio-derive-codec"}
 sha2 = {version="0.8", optional=true}
 
 [dev-dependencies]
