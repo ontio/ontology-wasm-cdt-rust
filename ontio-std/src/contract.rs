@@ -13,12 +13,139 @@ pub mod neo {
 
 pub mod ontid {
     use super::super::types::u128_to_neo_bytes;
-    use crate::abi::Sink;
+    use crate::abi::{Decoder, Encoder, Error, Sink, Source};
     use crate::macros::base58;
     use crate::prelude::*;
     use crate::runtime;
+
     const VERSION: u8 = 0;
     const ONTID_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6Ubvho7BUwN");
+
+    pub struct DDOAttribute {
+        key: Vec<u8>,
+        value: Vec<u8>,
+        value_type: Vec<u8>,
+    }
+    impl Encoder for DDOAttribute {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write(self.key.as_slice());
+            sink.write(self.value.as_slice());
+            sink.write(self.value_type.as_slice());
+        }
+    }
+    impl<'a> Decoder<'a> for DDOAttribute {
+        fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+            let key: &[u8] = source.read().unwrap();
+            let value: &[u8] = source.read().unwrap();
+            let value_type: &[u8] = source.read().unwrap();
+            Ok(DDOAttribute {
+                key: key.to_vec(),
+                value: value.to_vec(),
+                value_type: value_type.to_vec(),
+            })
+        }
+    }
+
+    pub struct Signer {
+        id: Vec<u8>,
+        index: u32,
+    }
+    impl Encoder for Signer {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write(self.id.as_slice());
+            sink.write(self.index);
+        }
+    }
+
+    impl<'a> Decoder<'a> for Signer {
+        fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+            let id: &[u8] = source.read().unwrap();
+            let index: u32 = source.read().unwrap();
+            Ok(Signer { id: id.to_vec(), index })
+        }
+    }
+
+    pub struct Group {
+        pub members: Vec<Vec<u8>>,
+        pub threshold: u32,
+    }
+
+    impl Encoder for Group {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write(self.members.as_slice());
+            sink.write(self.threshold);
+        }
+    }
+
+    impl<'a> Decoder<'a> for Group {
+        fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+            let members: Vec<Vec<u8>> = source.read().unwrap();
+            let threshold: u32 = source.read().unwrap();
+            Ok(Group { members, threshold })
+        }
+    }
+
+    fn serialize_group(group: &Group) -> Vec<u8> {
+        let mut sink = Sink::new(64);
+        sink.write_var_bytes(u128_to_neo_bytes(group.members.len() as u128).as_slice());
+        for mem in group.members.iter() {
+            sink.write_var_bytes(mem);
+        }
+        sink.write_var_bytes(u128_to_neo_bytes(group.threshold as u128).as_slice());
+        sink.bytes().to_vec()
+    }
+
+    fn serialize_signers(signers: &[Signer]) -> Vec<u8> {
+        let mut sink = Sink::new(64);
+        sink.write_var_bytes(u128_to_neo_bytes(signers.len() as u128).as_slice());
+        for signer in signers.iter() {
+            sink.write_var_bytes(signer.id.as_slice());
+            sink.write_var_bytes(u128_to_neo_bytes(signer.index as u128).as_slice());
+        }
+        sink.bytes().to_vec()
+    }
+
+    pub fn reg_id_with_controller(ont_id: &[u8], group: &Group, signers: &[Signer]) -> bool {
+        let mut sink = Sink::new(32);
+        sink.write(ont_id);
+        sink.write(serialize_group(group));
+        sink.write(serialize_signers(signers));
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("regIDWithController");
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+        if let Some(data) = res {
+            if data[0] == 1u8 {
+                return true;
+            }
+        }
+        false
+    }
+    pub fn add_attributes_by_controller(
+        ont_id: &[u8], attributes: &[DDOAttribute], signers: &[Signer],
+    ) -> bool {
+        let mut sink = Sink::new(32);
+        sink.write(ont_id);
+        sink.write_native_varuint(attributes.len() as u64);
+        for attr in attributes.iter() {
+            sink.write(attr.key.as_slice());
+            sink.write(attr.value_type.as_slice());
+            sink.write(attr.value.as_slice());
+        }
+        sink.write(serialize_signers(signers));
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("addAttributesByController");
+        sink_param.write(sink.bytes());
+        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+        if let Some(data) = res {
+            if data[0] == 1u8 {
+                return true;
+            }
+        }
+        false
+    }
 
     pub fn verify_signature(ont_id: &[u8], index: U128) -> bool {
         verify_sig_inner("verifySignature", ont_id, index)
