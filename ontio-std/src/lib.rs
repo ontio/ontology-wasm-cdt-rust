@@ -82,6 +82,8 @@ pub mod database;
 pub mod runtime;
 ///The types module provides common data types such as address, U128, hash, etc.
 pub mod types;
+
+pub mod utils;
 ///Macro module provides common macro functions, such as base58! To convert base58 encoded address to address type
 pub mod macros {
     pub use ontio_codegen::base58;
