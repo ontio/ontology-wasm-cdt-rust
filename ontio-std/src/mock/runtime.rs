@@ -85,9 +85,8 @@ impl Runtime {
     }
 
     fn sha256(&self, data: &[u8]) -> H256 {
-        let mut hasher = sha2::Sha256::new();
-        hasher.input(data);
-        H256::from_slice(hasher.result().as_slice())
+        let hash = sha2::Sha256::new().chain(data).finalize();
+        H256::from_slice(hash.as_slice())
     }
 
     fn call_contract(&self, addr: &Address, data: &[u8]) {
@@ -239,10 +238,7 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ontio_get_call_output(dest: *mut u8) {
-        RUNTIME.with(|r| {
-            let res = r.borrow().get_call_output();
-            ptr::copy(res.as_ptr(), dest, res.len());
-        })
+    pub fn ontio_panic(ptr: *const u8, len: u32) -> ! {
+        panic!("ontio panic");
     }
 }

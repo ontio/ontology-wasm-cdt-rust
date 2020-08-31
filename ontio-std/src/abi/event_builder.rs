@@ -1,7 +1,6 @@
 use super::Sink;
 use crate::prelude::*;
 use crate::runtime;
-use byteorder::{ByteOrder, LittleEndian};
 
 pub(crate) const TYPE_BYTEARRAY: u8 = 0x00;
 pub(crate) const TYPE_STRING: u8 = 0x01;
@@ -114,7 +113,7 @@ impl EventBuilder {
     pub fn notify(self) {
         let num_entry = self.common.num_entry;
         let mut buf = self.common.sink.into();
-        LittleEndian::write_u32(&mut buf[5..9], num_entry);
+        buf[5..9].copy_from_slice(&num_entry.to_le_bytes());
         runtime::notify(&buf);
     }
 }
