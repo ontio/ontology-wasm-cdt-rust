@@ -8,7 +8,7 @@ use cmp::PartialEq;
 const INDEX_SIZE: u32 = 64;
 
 pub struct ListStore<T: Encoder> {
-    key: String,
+    key: Vec<u8>,
     need_flush: Vec<u32>, //index,store all index which slice need update
     size: u32,
     next_key_id: u32,
@@ -53,7 +53,7 @@ impl<T> ListStore<T>
 where
     for<'a> T: Decoder<'a> + Encoder,
 {
-    fn init(key: String, source: &mut Source) -> Result<Self, Error> {
+    fn init(key: Vec<u8>, source: &mut Source) -> Result<Self, Error> {
         let next_key_id = source.read().unwrap();
         let index_size: Vec<(u32, u32)> = source.read().unwrap();
         let total = index_size.iter().map(|(_key, size)| size).sum();
@@ -67,18 +67,18 @@ where
         })
     }
 
-    pub(crate) fn new(key: String) -> ListStore<T> {
+    pub(crate) fn new(key: Vec<u8>) -> ListStore<T> {
         let need_flush: Vec<u32> = Vec::default();
         let index_size: Vec<(u32, u32)> = Vec::new();
         let cache: BTreeMap<u32, Vec<T>> = BTreeMap::new();
         ListStore { key, need_flush, size: 0, next_key_id: 0, index_size, cache }
     }
-    pub fn open(key: String) -> ListStore<T> {
-        match database::get::<_, Vec<u8>>(&key) {
-            None => ListStore::new(key),
+    pub fn open(key: &[u8]) -> ListStore<T> {
+        match database::get::<_, Vec<u8>>(key) {
+            None => ListStore::new(key.to_vec()),
             Some(data) => {
                 let mut source = Source::new(&data);
-                ListStore::init(key, &mut source).unwrap()
+                ListStore::init(key.to_vec(), &mut source).unwrap()
             }
         }
     }
@@ -119,7 +119,8 @@ where
                 x.remove((index - start) as usize)
             } else {
                 //read data from database
-                let key = format!("{}{}", self.key, bulk.0);
+                let key = gen_key(self.key.as_slice(), bulk.0);
+
                 let data: Vec<u8> = database::get(key).unwrap();
                 let mut source = Source::new(&data);
                 let l = source.read_u32().unwrap();
@@ -158,10 +159,10 @@ where
             //update the last index_count and the last key->data
             let mut last_index_count = self.index_size.last_mut().unwrap();
             //if data not in cache
-            let keyn = format!("{}{}", self.key, last_index_count.0);
+            let keyn: Vec<u8> = gen_key(self.key.as_slice(), last_index_count.0);
             self.cache.entry(last_index_count.0).or_insert_with(|| {
                 //read data from database
-                let last_node_vec_data: Vec<u8> = database::get(keyn).unwrap();
+                let last_node_vec_data: Vec<u8> = database::get(keyn.as_slice()).unwrap();
                 let mut source = Source::new(&last_node_vec_data);
                 let last_length = source.read_u32().unwrap();
                 let mut last_node_vec: Vec<T> = Vec::new();
@@ -218,8 +219,8 @@ where
                 temp.insert((index - start) as usize, payload);
             } else {
                 //read data from db
-                let key = format!("{}{}", self.key, bulk.0);
-                match database::get::<_, Vec<u8>>(&key) {
+                let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
+                match database::get::<_, Vec<u8>>(key.as_slice()) {
                     Some(data) => {
                         let mut source = Source::new(&data);
                         let l = source.read_u32().unwrap();
@@ -241,8 +242,8 @@ where
     pub fn clear(&mut self) {
         let index_size = self.index_size.to_vec();
         for bulk in index_size {
-            let key = format!("{}{}", self.key, bulk.0);
-            database::delete(&key);
+            let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
+            database::delete(key.as_slice());
         }
         self.need_flush.clear();
         self.next_key_id = 0;
@@ -272,8 +273,8 @@ where
         let start = end - bulk.1;
         //if data not in cache, read data from database
         if self.cache.get(&bulk.0).is_none() {
-            let key = format!("{}{}", self.key, bulk.0);
-            let data: Vec<u8> = database::get(key).unwrap();
+            let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
+            let data: Vec<u8> = database::get(key.as_slice()).unwrap();
             let mut source = Source::new(&data);
             let l = source.read_u32().unwrap();
             let mut temp: Vec<T> = Vec::new();
@@ -298,8 +299,8 @@ impl<T: Encoder> ListStore<T> {
                 for i in v {
                     i.encode(&mut sink);
                 }
-                let key = format!("{}{}", self.key, k);
-                database::put(&key, sink.bytes());
+                let key: Vec<u8> = gen_key(self.key.as_slice(), k);
+                database::put(key.as_slice(), sink.bytes());
             }
             let mut sink = Sink::new(16);
             self.encode(&mut sink);
@@ -341,9 +342,13 @@ where
     }
 }
 
+pub fn gen_key(pre: &[u8], post: u32) -> Vec<u8> {
+    [pre, post.to_le_bytes().as_ref()].concat()
+}
+
 #[test]
 fn test_insert() {
-    let mut list: ListStore<String> = ListStore::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new(b"key".to_vec());
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -361,7 +366,7 @@ fn test_insert() {
 
 #[test]
 fn list_node() {
-    let mut list: ListStore<String> = ListStore::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new(b"key".to_vec());
     list.push("value".to_string());
     list.push("sss".to_string());
     //    list.append(123);
@@ -370,7 +375,7 @@ fn list_node() {
         assert_eq!(x, "sss")
     }
     list.flush();
-    let mut list2: ListStore<String> = ListStore::open("key".to_string());
+    let mut list2: ListStore<String> = ListStore::open(b"key");
     assert_eq!(list2.size, 2);
 
     list2.remove(1);
@@ -378,13 +383,13 @@ fn list_node() {
     assert_eq!(list2.need_flush.len(), 1);
     list2.flush();
 
-    let list3: ListStore<String> = ListStore::open("key".to_string());
+    let list3: ListStore<String> = ListStore::open(b"key");
     assert_eq!(list3.size, 1);
 }
 
 #[test]
 fn test_iter() {
-    let mut list: ListStore<String> = ListStore::new("key".to_string());
+    let mut list: ListStore<String> = ListStore::new(b"key".to_vec());
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -406,7 +411,7 @@ fn test_iter() {
 
 #[test]
 fn clear() {
-    let mut list: ListStore<String> = ListStore::open("key".to_string());
+    let mut list: ListStore<String> = ListStore::open(b"key");
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
@@ -418,7 +423,7 @@ fn clear() {
 #[test]
 fn mock_test() {
     for _n in 0..1000 {
-        let mut list: ListStore<u64> = ListStore::new("key".to_string());
+        let mut list: ListStore<u64> = ListStore::new(b"key".to_vec());
         let mut array = Vec::new();
         for _i in 0..100 {
             match rand::random::<u8>() {
