@@ -12,7 +12,7 @@ pub(crate) const TYPE_H256: u8 = 0x05;
 pub(crate) const TYPE_LIST: u8 = 0x10;
 
 ///Entity used to push events in a contract.
-
+#[must_use = "this `EventBuilder` should call notify to take effect"]
 pub struct EventBuilder {
     common: VmValueBuilderCommon,
 }
@@ -167,3 +167,13 @@ impl VmValueBuilderCommon {
         self.num_entry += 1;
     }
 }
+
+// compile-fails
+
+/// ```compile_fail
+/// #[deny(unused_must_use)]
+/// {
+///     EventBuilder::new().bool(true);
+/// }
+/// ```
+fn _event_builder_must_use() {}
