@@ -119,7 +119,8 @@ where
                 x.remove((index - start) as usize)
             } else {
                 //read data from database
-                let key = [self.key.as_slice(), bulk.0.to_string().as_bytes()].concat();
+                let key = gen_key(self.key.as_slice(), bulk.0);
+
                 let data: Vec<u8> = database::get(key).unwrap();
                 let mut source = Source::new(&data);
                 let l = source.read_u32().unwrap();
@@ -158,8 +159,7 @@ where
             //update the last index_count and the last key->data
             let mut last_index_count = self.index_size.last_mut().unwrap();
             //if data not in cache
-            let keyn: Vec<u8> =
-                [self.key.as_slice(), last_index_count.0.to_string().as_bytes()].concat();
+            let keyn: Vec<u8> = gen_key(self.key.as_slice(), last_index_count.0);
             self.cache.entry(last_index_count.0).or_insert_with(|| {
                 //read data from database
                 let last_node_vec_data: Vec<u8> = database::get(keyn.as_slice()).unwrap();
@@ -219,7 +219,7 @@ where
                 temp.insert((index - start) as usize, payload);
             } else {
                 //read data from db
-                let key: Vec<u8> = [self.key.as_slice(), bulk.0.to_string().as_bytes()].concat();
+                let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
                 match database::get::<_, Vec<u8>>(key.as_slice()) {
                     Some(data) => {
                         let mut source = Source::new(&data);
@@ -242,7 +242,7 @@ where
     pub fn clear(&mut self) {
         let index_size = self.index_size.to_vec();
         for bulk in index_size {
-            let key: Vec<u8> = [self.key.as_slice(), bulk.0.to_string().as_bytes()].concat();
+            let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
             database::delete(key.as_slice());
         }
         self.need_flush.clear();
@@ -273,7 +273,7 @@ where
         let start = end - bulk.1;
         //if data not in cache, read data from database
         if self.cache.get(&bulk.0).is_none() {
-            let key: Vec<u8> = [self.key.as_slice(), bulk.0.to_string().as_bytes()].concat();
+            let key: Vec<u8> = gen_key(self.key.as_slice(), bulk.0);
             let data: Vec<u8> = database::get(key.as_slice()).unwrap();
             let mut source = Source::new(&data);
             let l = source.read_u32().unwrap();
@@ -299,7 +299,7 @@ impl<T: Encoder> ListStore<T> {
                 for i in v {
                     i.encode(&mut sink);
                 }
-                let key: Vec<u8> = [self.key.as_slice(), k.to_string().as_bytes()].concat();
+                let key: Vec<u8> = gen_key(self.key.as_slice(), k);
                 database::put(key.as_slice(), sink.bytes());
             }
             let mut sink = Sink::new(16);
@@ -340,6 +340,10 @@ where
         self.cursor += 1;
         temp
     }
+}
+
+pub fn gen_key(pre: &[u8], post: u32) -> Vec<u8> {
+    [pre, post.to_le_bytes().as_ref()].concat()
 }
 
 #[test]
