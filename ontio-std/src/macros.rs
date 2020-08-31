@@ -59,4 +59,3 @@ mod tests {
     #[test]
     fn event() {}
 }
-

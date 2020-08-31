@@ -238,7 +238,55 @@ mod env {
     }
 
     #[no_mangle]
-    pub fn ontio_panic(ptr: *const u8, len: u32) -> ! {
+    pub fn ontio_panic(_ptr: *const u8, _len: u32) -> ! {
         panic!("ontio panic");
+    }
+
+    #[no_mangle]
+    pub fn ontio_get_call_output(dst: *mut u8) {
+        let output = RUNTIME.with(|r| r.borrow().get_call_output());
+        unsafe {
+            std::ptr::copy(output.as_ptr(), dst, output.len());
+        }
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_create(
+        code_ptr: *const u8, code_len: u32, need_storage: u32, name_ptr: *const u8, name_len: u32,
+        ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+        email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+        new_addr_ptr: *mut u8,
+    ) -> u32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_destroy() -> ! {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_migrate(
+        code: *const u8, code_len: u32, vm_type: u32, name_ptr: *const u8, name_len: u32,
+        ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+        email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+        new_address_ptr: *mut u8,
+    ) -> i32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_input_length() -> u32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_get_input(dst: *mut u8) {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_return(ptr: *const u8, len: u32) -> ! {
+        unimplemented!()
     }
 }
