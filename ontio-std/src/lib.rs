@@ -48,8 +48,8 @@ cfg_if::cfg_if! {
         /// Overrides the default oom
         #[lang = "oom"]
         #[no_mangle]
-        pub extern fn oom(_: core::alloc::Layout) -> ! {
-            unsafe { core::intrinsics::abort() }
+        pub fn oom(_: core::alloc::Layout) -> ! {
+            core::intrinsics::abort()
         }
     }
 

@@ -32,7 +32,7 @@ impl VmValueEncoder for H256 {
 
 impl VmValueEncoder for U128 {
     fn serialize(&self, builder: &mut VmValueBuilder) {
-        builder.number(self.clone());
+        builder.number(*self);
     }
 }
 

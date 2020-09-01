@@ -1,6 +1,6 @@
 use crate::{MyToken, MyTokenInstance};
 use ontio_std::mock::build_runtime;
-use ontio_std::types::{Address, U128};
+use ontio_std::types::Address;
 
 #[test]
 fn get_total_supply() {
