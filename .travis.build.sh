@@ -17,7 +17,7 @@ cd ontio-std
 cargo test --features=mock
 
 cd ../ontio-codegen
-cargo test --features=mock
+cargo test 
 cd $root_dir
 
 for dir in ./examples/* ; do

@@ -85,9 +85,8 @@ impl Runtime {
     }
 
     fn sha256(&self, data: &[u8]) -> H256 {
-        let mut hasher = sha2::Sha256::new();
-        hasher.input(data);
-        H256::from_slice(hasher.result().as_slice())
+        let hash = sha2::Sha256::new().chain(data).finalize();
+        H256::from_slice(hash.as_slice())
     }
 
     fn call_contract(&self, addr: &Address, data: &[u8]) {
@@ -239,10 +238,55 @@ mod env {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ontio_get_call_output(dest: *mut u8) {
-        RUNTIME.with(|r| {
-            let res = r.borrow().get_call_output();
-            ptr::copy(res.as_ptr(), dest, res.len());
-        })
+    pub fn ontio_panic(_ptr: *const u8, _len: u32) -> ! {
+        panic!("ontio panic");
+    }
+
+    #[no_mangle]
+    pub fn ontio_get_call_output(dst: *mut u8) {
+        let output = RUNTIME.with(|r| r.borrow().get_call_output());
+        unsafe {
+            std::ptr::copy(output.as_ptr(), dst, output.len());
+        }
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_create(
+        code_ptr: *const u8, code_len: u32, need_storage: u32, name_ptr: *const u8, name_len: u32,
+        ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+        email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+        new_addr_ptr: *mut u8,
+    ) -> u32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_destroy() -> ! {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_contract_migrate(
+        code: *const u8, code_len: u32, vm_type: u32, name_ptr: *const u8, name_len: u32,
+        ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+        email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+        new_address_ptr: *mut u8,
+    ) -> i32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_input_length() -> u32 {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_get_input(dst: *mut u8) {
+        unimplemented!()
+    }
+
+    #[no_mangle]
+    pub fn ontio_return(ptr: *const u8, len: u32) -> ! {
+        unimplemented!()
     }
 }
