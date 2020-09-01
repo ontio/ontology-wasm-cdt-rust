@@ -17,7 +17,7 @@ pub trait ApiTest {
     fn self_address(&self) -> Address;
     fn caller_address(&self) -> Address;
     fn entry_address(&self) -> Address;
-    fn contract_debug(&self, content: &str) -> ();
+    fn contract_debug(&self, content: &str) -> bool;
     //    fn contract_delete(&self) -> ();
     fn check_witness(&self, addr: &Address) -> bool;
     fn get_current_blockhash(&self) -> H256;
@@ -63,8 +63,9 @@ impl ApiTest for ApiTestInstance {
     fn entry_address(&self) -> Address {
         runtime::entry_address()
     }
-    fn contract_debug(&self, content: &str) {
+    fn contract_debug(&self, content: &str) -> bool {
         console::debug(content);
+        true
     }
     //    fn contract_delete(&self) -> () {
     //        runtime::contract_delete();
