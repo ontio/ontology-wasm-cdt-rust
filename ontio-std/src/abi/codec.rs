@@ -221,7 +221,7 @@ impl<T: Encoder> Encoder for &T {
 
 impl<T: Encoder> Encoder for &mut T {
     fn encode(&self, sink: &mut Sink) {
-        (*self as &T ).encode(sink)
+        (*self as &T).encode(sink)
     }
 }
 
