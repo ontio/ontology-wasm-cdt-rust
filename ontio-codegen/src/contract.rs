@@ -229,19 +229,14 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
         .map(|field| match field {
             ContractField::Event(ref event) => {
                 let event_sig = &event.method_sig;
-                let event_body = match &event.default {
-                    //                    Some(body) => quote! { #body },
-                    //                    None => {
-                    //disable default implementation
-                    _ => {
-                        let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
-                        let args_name = event.params.iter().map(|&(ref pat, _)| quote! { #pat });
-                        quote! { {
-                            let mut sink = ontio_std::abi::Sink::new(16);
-                            #(sink.write::<#args_type>(#args_name);)*
-                            ontio_std::runtime::notify(&sink.into());
-                        } }
-                    }
+                let event_body = {
+                    let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
+                    let args_name = event.params.iter().map(|&(ref pat, _)| quote! { #pat });
+                    quote! { {
+                        let mut sink = ontio_std::abi::Sink::new(16);
+                        #(sink.write::<#args_type>(#args_name);)*
+                        ontio_std::runtime::notify(&sink.into());
+                    } }
                 };
                 quote! {
                     #[allow(non_snake_case)]
