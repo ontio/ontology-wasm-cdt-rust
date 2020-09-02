@@ -227,9 +227,7 @@ mod env {
     ) -> u32 {
         let addr = Address::from_slice(slice::from_raw_parts(addr, 20));
         let input = slice::from_raw_parts(input_ptr, input_len as usize);
-        RUNTIME.with(|r| {
-            r.borrow().call_contract(&addr, input)
-        })
+        RUNTIME.with(|r| r.borrow().call_contract(&addr, input))
     }
 
     #[no_mangle]

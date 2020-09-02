@@ -90,8 +90,5 @@ pub fn build_runtime() -> RuntimeHandle {
 #[test]
 fn test_call_contract() {
     build_runtime().on_contract_call(|_addr, _data| -> Vec<u8> { vec![1, 2, 3] });
-    assert_eq!(
-        crate::runtime::call_contract(&Address::repeat_byte(1), &[1, 2]),
-        vec![1, 2, 3]
-    );
+    assert_eq!(crate::runtime::call_contract(&Address::repeat_byte(1), &[1, 2]), vec![1, 2, 3]);
 }
