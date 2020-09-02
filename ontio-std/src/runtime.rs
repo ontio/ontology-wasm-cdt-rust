@@ -13,7 +13,8 @@ mod env {
         pub fn ontio_notify(ptr: *const u8, len: u32);
         pub fn ontio_input_length() -> u32;
         pub fn ontio_get_input(dst: *mut u8);
-        pub fn ontio_call_contract(addr: *const u8, input_ptr: *const u8, input_len: u32) -> i32;
+        pub fn ontio_call_contract(addr: *const u8, input_ptr: *const u8, input_len: u32) -> u32;
+        #[allow(unused)]
         pub fn ontio_call_output_length() -> u32;
         pub fn ontio_get_call_output(dst: *mut u8);
         pub fn ontio_current_blockhash(blockhash: *const u8) -> u32;
@@ -57,15 +58,10 @@ mod env {
 /// sink.write(("balance_of".to_string(), &addr));
 /// let res = runtime::call_contract(&addr, sink.bytes());
 /// ```
-pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
+pub fn call_contract(addr: &Address, input: &[u8]) -> Vec<u8> {
     let addr: &[u8] = addr.as_ref();
-    let res =
+    let size =
         unsafe { env::ontio_call_contract(addr.as_ptr(), input.as_ptr(), input.len() as u32) };
-    if res < 0 {
-        return None;
-    }
-    let size = unsafe { env::ontio_call_output_length() };
-
     let mut output = vec![0u8; size as usize];
     if size != 0 {
         let value = &mut output[..];
@@ -74,7 +70,7 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Option<Vec<u8>> {
         }
     }
 
-    Some(output)
+    output
 }
 
 /// Create a new contract based on the parameters passed in

@@ -4,7 +4,7 @@ pub mod neo {
     use crate::prelude::*;
     pub fn call_contract<T: crate::abi::VmValueEncoder>(
         contract_address: &Address, param: T,
-    ) -> Option<Vec<u8>> {
+    ) -> Vec<u8> {
         let mut builder = crate::abi::VmValueBuilder::new();
         param.serialize(&mut builder);
         crate::runtime::call_contract(contract_address, &builder.bytes())
@@ -114,14 +114,11 @@ pub mod ontid {
         sink_param.write(VERSION);
         sink_param.write("regIDWithController");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
-        if let Some(data) = res {
-            if data[0] == 1u8 {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
+
     pub fn add_attributes_by_controller(
         ont_id: &[u8], attributes: &[DDOAttribute], signers: &[Signer],
     ) -> bool {
@@ -138,13 +135,9 @@ pub mod ontid {
         sink_param.write(VERSION);
         sink_param.write("addAttributesByController");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
-        if let Some(data) = res {
-            if data[0] == 1u8 {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
 
     pub fn verify_signature(ont_id: &[u8], index: U128) -> bool {
@@ -159,22 +152,16 @@ pub mod ontid {
         sink_param.write(VERSION);
         sink_param.write(method);
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
-        if let Some(data) = res {
-            if data[0] == 1u8 {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(&ONTID_CONTRACT_ADDRESS, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
 }
 
 pub mod wasm {
     use crate::abi::Sink;
     use crate::prelude::*;
-    pub fn call_contract<T: crate::abi::Encoder>(
-        contract_address: &Address, param: T,
-    ) -> Option<Vec<u8>> {
+    pub fn call_contract<T: crate::abi::Encoder>(contract_address: &Address, param: T) -> Vec<u8> {
         let mut sink = Sink::new(16);
         sink.write(param);
         crate::runtime::call_contract(contract_address, sink.bytes())
@@ -419,13 +406,9 @@ pub(crate) mod util {
         sink_param.write(VERSION);
         sink_param.write("transfer");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(contract_address, sink_param.bytes());
-        if let Some(data) = res {
-            if !data.is_empty() {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(contract_address, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
 
     pub(crate) fn approve_inner(
@@ -439,13 +422,9 @@ pub(crate) mod util {
         sink_param.write(VERSION);
         sink_param.write("approve");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(contract_address, sink_param.bytes());
-        if let Some(data) = res {
-            if !data.is_empty() {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(contract_address, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
 
     pub(crate) fn transfer_from_inner(
@@ -460,13 +439,9 @@ pub(crate) mod util {
         sink_param.write(VERSION);
         sink_param.write("transferFrom");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(contract_address, sink_param.bytes());
-        if let Some(data) = res {
-            if !data.is_empty() {
-                return true;
-            }
-        }
-        false
+        let output = runtime::call_contract(contract_address, sink_param.bytes());
+
+        !output.is_empty() && output[0] == 1u8
     }
 
     pub(crate) fn allowance_inner(
@@ -479,11 +454,9 @@ pub(crate) mod util {
         sink_param.write(VERSION);
         sink_param.write("allowance");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(contract_address, sink_param.bytes());
-        if let Some(data) = res {
-            if !data.is_empty() {
-                return u128_from_neo_bytes(&data);
-            }
+        let output = runtime::call_contract(contract_address, sink_param.bytes());
+        if !output.is_empty() {
+            return u128_from_neo_bytes(&output);
         }
         0
     }
@@ -495,11 +468,9 @@ pub(crate) mod util {
         sink_param.write(VERSION);
         sink_param.write("balanceOf");
         sink_param.write(sink.bytes());
-        let res = runtime::call_contract(contract_address, sink_param.bytes());
-        if let Some(data) = res {
-            if !data.is_empty() {
-                return u128_from_neo_bytes(&data);
-            }
+        let output = runtime::call_contract(contract_address, sink_param.bytes());
+        if !output.is_empty() {
+            return u128_from_neo_bytes(&output);
         }
         0
     }

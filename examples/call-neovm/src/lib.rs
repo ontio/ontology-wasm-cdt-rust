@@ -40,52 +40,34 @@ pub fn invoke() {
         }
 
         b"init" => {
-            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("init", ()));
-            match res {
-                Some(res2) => {
-                    let mut parser = VmValueParser::new(res2.as_slice());
-                    let r = parser.bool();
-                    sink.write(r.unwrap_or(false));
-                }
-                _ => sink.write(false),
-            }
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, "init");
+            let mut parser = VmValueParser::new(res.as_slice());
+            let r = parser.bool();
+            sink.write(r.unwrap_or(false));
         }
         b"name" => {
-            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("name", ()));
-            match res {
-                Some(res2) => {
-                    let mut parser = VmValueParser::new(res2.as_slice());
-                    let r = parser.bytearray();
-                    sink.write(r.unwrap_or(b""));
-                }
-                _ => sink.write(""),
-            }
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, "name");
+            let mut parser = VmValueParser::new(res.as_slice());
+            let r = parser.bytearray();
+            sink.write(r.unwrap_or(b""));
         }
         b"balanceOf" => {
             let addr: Address = source.read().unwrap();
-            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("balanceOf", (addr,)));
-            if let Some(res2) = res {
-                let mut parser = VmValueParser::new(&res2);
-                let r = parser.bytearray().unwrap_or(b"0");
-                sink.write(u128_from_neo_bytes(r));
-            } else {
-                sink.write(0 as u128);
-            }
+            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("balanceOf", addr));
+            let mut parser = VmValueParser::new(&res);
+            let r = parser.bytearray().unwrap_or(b"0");
+            sink.write(u128_from_neo_bytes(r));
         }
         b"transfer" => {
             let from_addr: Address = source.read().unwrap();
             let to_addr: Address = source.read().unwrap();
             let amount: U128 = source.read().unwrap();
 
-            let res =
-                neo::call_contract(&NEO_CONTRACT_ADDR, ("transfer", (from_addr, to_addr, amount)));
-            if let Some(data) = res {
-                let mut parser = VmValueParser::new(&data);
-                let boo = parser.bool().unwrap_or(false);
-                sink.write(boo);
-            } else {
-                sink.write(false);
-            }
+            let data =
+                neo::call_contract(&NEO_CONTRACT_ADDR, ("transfer", from_addr, to_addr, amount));
+            let mut parser = VmValueParser::new(&data);
+            let boo = parser.bool().unwrap_or(false);
+            sink.write(boo);
         }
         b"testcase" => sink.write(testcase()),
         _ => panic!("unsupported action!"),

@@ -23,15 +23,15 @@ pub(crate) struct RuntimeInner {
     pub(crate) tx_hash: H256,
     pub(crate) witness: Vec<Address>,
     pub(crate) notify: Vec<Vec<u8>>,
-    pub(crate) call_contract: Option<Box<dyn FnMut(&Address, &[u8]) -> Option<Vec<u8>>>>,
+    pub(crate) call_contract: Option<Box<dyn FnMut(&Address, &[u8]) -> Vec<u8>>>,
     pub(crate) call_output: Vec<u8>,
 }
 
 impl RuntimeInner {
-    fn call_contract(&mut self, addr: &Address, data: &[u8]) {
-        if let Some(call) = &mut self.call_contract {
-            self.call_output = (call)(addr, data).unwrap_or_default();
-        }
+    fn call_contract(&mut self, addr: &Address, data: &[u8]) -> u32 {
+        let call = self.call_contract.as_mut().expect("call contract callback is not set");
+        self.call_output = (call)(addr, data);
+        self.call_output.len() as u32
     }
 }
 
@@ -89,8 +89,8 @@ impl Runtime {
         H256::from_slice(hash.as_slice())
     }
 
-    fn call_contract(&self, addr: &Address, data: &[u8]) {
-        self.inner.borrow_mut().call_contract(addr, data);
+    fn call_contract(&self, addr: &Address, data: &[u8]) -> u32 {
+        self.inner.borrow_mut().call_contract(addr, data)
     }
 
     fn get_call_output(&self) -> Vec<u8> {
@@ -224,12 +224,10 @@ mod env {
     #[no_mangle]
     pub unsafe extern "C" fn ontio_call_contract(
         addr: *const u8, input_ptr: *const u8, input_len: u32,
-    ) {
+    ) -> u32 {
         let addr = Address::from_slice(slice::from_raw_parts(addr, 20));
         let input = slice::from_raw_parts(input_ptr, input_len as usize);
-        RUNTIME.with(|r| {
-            r.borrow().call_contract(&addr, input);
-        });
+        RUNTIME.with(|r| r.borrow().call_contract(&addr, input))
     }
 
     #[no_mangle]
