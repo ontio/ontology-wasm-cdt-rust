@@ -90,7 +90,7 @@ impl ApiTest for ApiTestInstance {
         let mut sink = Sink::new(16);
         sink.write("name".to_string());
         console::debug(&format!("{:?}", contract));
-        let res = runtime::call_contract(contract, sink.bytes()).unwrap();
+        let res = runtime::call_contract(contract, sink.bytes());
         let s = str::from_utf8(res.as_slice()).unwrap();
         console::debug(s);
         let mut source = Source::new(&res);
@@ -100,11 +100,8 @@ impl ApiTest for ApiTestInstance {
         let mut sink = Sink::new(16);
         sink.write(("balance_of".to_string(), addr));
         let res = runtime::call_contract(contract, sink.bytes());
-        res.map(|res| {
-            let mut source = Source::new(&res);
-            source.read().unwrap()
-        })
-        .unwrap_or(0)
+        let mut source = Source::new(&res);
+        source.read().unwrap()
     }
 
     fn call_wasm_transfer(
@@ -113,7 +110,7 @@ impl ApiTest for ApiTestInstance {
         let mut sink = Sink::new(16);
         sink.write(("transfer".to_string(), from, to, amount));
         let res = runtime::call_contract(contract, sink.bytes());
-        res.is_some()
+        !res.is_empty()
     }
 
     fn call_neovm_transfer(
@@ -128,15 +125,11 @@ impl ApiTest for ApiTestInstance {
         sink.write("transfer".to_string());
         sink.write(103u8);
         sink.write(contract);
-        let res = runtime::call_contract(contract, sink.bytes());
-        if let Some(data) = res {
-            runtime::notify(b"true");
-            let s = str::from_utf8(data.as_slice()).unwrap();
-            console::debug(s);
-            true
-        } else {
-            false
-        }
+        let data = runtime::call_contract(contract, sink.bytes());
+        runtime::notify(b"true");
+        let s = str::from_utf8(data.as_slice()).unwrap();
+        console::debug(s);
+        true
     }
     fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U128) -> bool {
         ont::transfer(&from, &to, amount)

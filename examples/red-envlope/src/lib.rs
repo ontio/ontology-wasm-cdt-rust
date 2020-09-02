@@ -63,7 +63,7 @@ fn create_red_envlope(owner: Address, pack_count: u128, amount: u128, token_addr
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, owner, amount));
         let res = runtime::call_contract(&token_addr, sink.bytes());
-        if res.is_none() {
+        if res.is_empty() {
             return false;
         }
     }
@@ -150,7 +150,7 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, account, claim_amount));
         let res = runtime::call_contract(&est.token_addr, sink.bytes());
-        if res.is_none() {
+        if res.is_empty() {
             return false;
         }
     }
