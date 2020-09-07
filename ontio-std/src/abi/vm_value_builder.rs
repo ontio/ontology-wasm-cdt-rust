@@ -4,7 +4,9 @@ use super::event_builder::{
 use super::Error;
 use super::Source;
 use super::{VmValueBuilderCommon, VmValueDecoder, VmValueEncoder};
+use crate::abi::event_builder::TYPE_LIST;
 use crate::prelude::*;
+use fixed_hash::static_assertions::_core::ops::{Deref, DerefMut};
 
 pub struct VmValueBuilder {
     pub(crate) common: VmValueBuilderCommon,
@@ -16,11 +18,40 @@ impl Default for VmValueBuilder {
     }
 }
 
+pub struct NestedVmValueBuilder<'a> {
+    origin: &'a mut VmValueBuilder,
+    current: VmValueBuilderCommon,
+}
+
+impl<'a> NestedVmValueBuilder<'_> {
+    pub fn finish(self) {
+        let mut buf = self.current.sink.into();
+        buf[1..5].copy_from_slice(&self.current.num_entry.to_le_bytes());
+        self.origin.common.sink.write_bytes(&buf);
+    }
+}
+
+impl<'a> Deref for NestedVmValueBuilder<'a> {
+    type Target = VmValueBuilderCommon;
+
+    fn deref(&self) -> &Self::Target {
+        &self.current
+    }
+}
+
+impl<'a> DerefMut for NestedVmValueBuilder<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.current
+    }
+}
+
 impl VmValueBuilder {
     pub fn new() -> Self {
         let common = VmValueBuilderCommon::new();
         let mut builder = VmValueBuilder { common };
-        builder.common.sink.write_byte(0u8);
+        builder.common.sink.write_byte(0u8); // verison
+        builder.common.sink.write_byte(TYPE_LIST); // list type
+        builder.common.sink.write_u32(builder.common.num_entry); // occupy length
         builder
     }
 
@@ -44,6 +75,14 @@ impl VmValueBuilder {
         self.common.number(amount);
     }
 
+    pub fn list(&mut self) -> NestedVmValueBuilder {
+        let mut nested = VmValueBuilderCommon::new();
+        nested.sink.write_byte(TYPE_LIST); // list type
+        nested.sink.write_u32(0); // occupy length
+
+        NestedVmValueBuilder { origin: self, current: nested }
+    }
+
     pub fn bool(&mut self, b: bool) {
         self.common.bool(b);
     }
@@ -53,7 +92,10 @@ impl VmValueBuilder {
     }
 
     pub fn bytes(self) -> Vec<u8> {
-        self.common.sink.into()
+        let num_entry = self.common.num_entry;
+        let mut buf = self.common.sink.into();
+        buf[2..6].copy_from_slice(&num_entry.to_le_bytes());
+        buf
     }
 }
 
