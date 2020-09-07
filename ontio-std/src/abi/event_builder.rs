@@ -118,9 +118,9 @@ impl EventBuilder {
     }
 }
 
-pub(crate) struct VmValueBuilderCommon {
+pub struct VmValueBuilderCommon {
     pub(crate) sink: Sink,
-    num_entry: u32,
+    pub(crate) num_entry: u32,
 }
 
 impl VmValueBuilderCommon {
@@ -128,6 +128,7 @@ impl VmValueBuilderCommon {
         let sink = Sink::new(12);
         Self { sink, num_entry: 0u32 }
     }
+
     pub fn string(&mut self, method: &str) {
         self.sink.write_byte(TYPE_STRING);
         self.sink.write_u32(method.len() as u32);

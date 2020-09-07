@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene)]
 #![no_std]
 extern crate ontio_std as ostd;
-use ostd::abi::{Sink, Source, VmValueParser};
+use ostd::abi::{Sink, Source, VmValueBuilder, VmValueParser};
 use ostd::contract::neo;
 use ostd::prelude::*;
 use ostd::runtime;
@@ -53,7 +53,13 @@ pub fn invoke() {
         }
         b"balanceOf" => {
             let addr: Address = source.read().unwrap();
-            let res = neo::call_contract(&NEO_CONTRACT_ADDR, ("balanceOf", addr));
+            let mut builder = VmValueBuilder::new();
+            builder.string("balanceOf");
+            let mut nested = builder.list();
+            nested.address(&addr);
+            nested.finish();
+
+            let res = runtime::call_contract(&NEO_CONTRACT_ADDR, &builder.bytes());
             let mut parser = VmValueParser::new(&res);
             let r = parser.bytearray().unwrap_or(b"0");
             sink.write(u128_from_neo_bytes(r));
