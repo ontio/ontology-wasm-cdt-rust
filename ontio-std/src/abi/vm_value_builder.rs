@@ -155,7 +155,7 @@ impl<'a> VmValueParser<'a> {
         match ty {
             TYPE_BOOL => self.source.read_bool(),
             TYPE_INT => Ok(self.source.read_u128()? != 0),
-            _ => Err(Error::TypeInconsistency)
+            _ => Err(Error::TypeInconsistency),
         }
     }
 
@@ -167,7 +167,6 @@ impl<'a> VmValueParser<'a> {
         self.source.read_h256()
     }
 }
-
 
 #[cfg(test)]
 mod tests {
