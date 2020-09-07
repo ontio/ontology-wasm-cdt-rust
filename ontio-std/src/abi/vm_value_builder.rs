@@ -151,17 +151,11 @@ impl<'a> VmValueParser<'a> {
 
     pub fn bool(&mut self) -> Result<bool, Error> {
         let ty = self.source.read_byte()?;
-        if ty == TYPE_BOOL {
-            return self.source.read_bool();
-        } else if ty == TYPE_INT {
-            let res = self.source.read_u128()?;
-            if res != 0 {
-                return Ok(true);
-            } else {
-                return Ok(false);
-            }
+        match ty {
+            TYPE_BOOL => self.source.read_bool(),
+            TYPE_INT => Ok(!self.source.read_u128()?.is_zero()),
+            _ => Err(Error::TypeInconsistency)
         }
-        Err(Error::TypeInconsistency)
     }
 
     pub fn h256(&mut self) -> Result<&'a H256, Error> {
