@@ -79,6 +79,7 @@ impl VmValueBuilder {
         let mut nested = VmValueBuilderCommon::new();
         nested.sink.write_byte(TYPE_LIST); // list type
         nested.sink.write_u32(0); // occupy length
+        self.common.num_entry += 1;
 
         NestedVmValueBuilder { origin: self, current: nested }
     }
@@ -153,7 +154,7 @@ impl<'a> VmValueParser<'a> {
         let ty = self.source.read_byte()?;
         match ty {
             TYPE_BOOL => self.source.read_bool(),
-            TYPE_INT => Ok(!self.source.read_u128()?.is_zero()),
+            TYPE_INT => Ok(self.source.read_u128()? != 0),
             _ => Err(Error::TypeInconsistency)
         }
     }
@@ -164,5 +165,37 @@ impl<'a> VmValueParser<'a> {
             return Err(Error::TypeInconsistency);
         }
         self.source.read_h256()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::abi::Sink;
+
+    #[test]
+    fn test_builder() {
+        let mut builder = VmValueBuilder::new();
+        let addr = Address::default();
+        builder.string("balanceOf");
+        let mut nested = builder.list();
+        nested.address(&addr);
+        nested.finish();
+
+        let mut sink = Sink::new(10);
+        sink.write_byte(0); //version
+        sink.write_byte(TYPE_LIST); // type
+        sink.write_u32(2); // two param
+        sink.write_byte(TYPE_STRING); // first param
+        let param = "balanceOf";
+        sink.write_u32(param.len() as u32);
+        sink.write_bytes(param.as_bytes());
+
+        sink.write_byte(TYPE_LIST); // second param
+        sink.write_u32(1);
+        sink.write_byte(TYPE_ADDRESS); // first param
+        sink.write(&addr);
+        assert_eq!(builder.bytes(), sink.into());
     }
 }
