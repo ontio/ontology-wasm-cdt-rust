@@ -6,7 +6,7 @@ use super::Source;
 use super::{VmValueBuilderCommon, VmValueDecoder, VmValueEncoder};
 use crate::abi::event_builder::TYPE_LIST;
 use crate::prelude::*;
-use fixed_hash::static_assertions::_core::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut};
 
 pub struct VmValueBuilder {
     pub(crate) common: VmValueBuilderCommon,
