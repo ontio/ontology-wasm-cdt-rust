@@ -6,14 +6,14 @@ use super::abi::{Decoder, Encoder, Sink, Source};
 use super::prelude::*;
 use super::runtime;
 
+#[track_caller]
 pub fn get<K: AsRef<[u8]>, T>(key: K) -> Option<T>
 where
     for<'a> T: Decoder<'a> + 'static,
 {
-    runtime::storage_read(key.as_ref()).map(|val: Vec<u8>| {
-        let mut source = Source::new(&val);
-        source.read().unwrap()
-    })
+    let val = runtime::storage_read(key.as_ref())?;
+    let mut source = Source::new(&val);
+    Some(source.read().unwrap())
 }
 
 pub fn put<K: AsRef<[u8]>, T: Encoder>(key: K, val: T) {
