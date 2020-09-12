@@ -35,7 +35,6 @@ impl Sink {
     ///   let addr = Address::repeat_byte(1u8);
     ///   sink.write(addr);
     ///   sink.write("123");
-    ///   sink.write(123 as U128);
     ///```
     pub fn write<T: Encoder>(&mut self, val: T) {
         val.encode(self)

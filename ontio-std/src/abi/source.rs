@@ -71,12 +71,12 @@ impl<'a> Source<'a> {
     /// # use ontio_std::types::U128;
     ///   let mut sink = Sink::new(0);
     ///   sink.write("123");
-    ///   sink.write(123 as U128);
+    ///   sink.write(U128::new(123));
     ///   let mut source = Source::new(sink.bytes());
     ///   let res:&str= source.read().unwrap();
     ///   let res2 :U128 = source.read().unwrap();
     ///   assert_eq!(res as &str, "123");
-    ///   assert_eq!(res2, 123 as U128);
+    ///   assert_eq!(res2, U128::new(123));
     /// ```
     ///
     pub fn read<T: Decoder<'a>>(&mut self) -> Result<T, Error> {
@@ -159,11 +159,11 @@ impl<'a> Source<'a> {
     ///   let mut sink = Sink::new(0);
     ///   let addr = Address::repeat_byte(1);
     ///   sink.write(addr);
-    ///   sink.write(123 as U128);
+    ///   sink.write(U128::new(123));
     ///   let mut source = Source::new(sink.bytes());
     ///   source.skip(20);//the length of addr is 20
     ///   let res = source.read_u128().unwrap_or_default();
-    ///   assert_eq!(res, 123 as U128);
+    ///   assert_eq!(res, U128::new(123));
     /// ```
     ///
     #[allow(unused)]
@@ -183,12 +183,12 @@ impl<'a> Source<'a> {
     /// # use ontio_std::types::{U128,Address};
     ///   let mut sink = Sink::new(0);
     ///   let addr = Address::repeat_byte(1);
-    ///   sink.write(123 as U128);
+    ///   sink.write(U128::new(123));
     ///   let mut source = Source::new(sink.bytes());
     ///   source.read_byte();//Read a byte of data here
     ///   source.backup(1);//Back one byte
     ///   let res = source.read_u128().unwrap_or_default();
-    ///   assert_eq!(res, 123 as U128);
+    ///   assert_eq!(res, U128::new(123));
     /// ```
     ///
     #[allow(unused)]
@@ -251,10 +251,10 @@ impl<'a> Source<'a> {
     /// # use ontio_std::types::{U128,Address};
     ///   let mut sink = Sink::new(0);
     ///   let addr = Address::repeat_byte(1);
-    ///   sink.write(123 as U128);
+    ///   sink.write(U128::new(123));
     ///   let mut source = Source::new(sink.bytes());
     ///   let res = source.read_u128().unwrap_or_default();
-    ///   assert_eq!(res, 123 as U128);
+    ///   assert_eq!(res, U128::new(123));
     /// ```
     ///
     pub fn read_u128(&mut self) -> Result<U128, Error> {

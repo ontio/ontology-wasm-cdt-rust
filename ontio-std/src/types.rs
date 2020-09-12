@@ -174,12 +174,13 @@ fn test_to_neo_bytes() {
     ];
 
     for (data, exp) in case_data.iter() {
-        let res = i128_to_neo_bytes(*data);
+        let d = I128::new(*data);
+        let res = i128_to_neo_bytes(d);
         let r = to_hex_string(res.as_slice());
         assert_eq!(r, exp.to_string());
 
         let u = u128_from_neo_bytes(&res);
-        assert_eq!(u, *data as u128);
+        assert_eq!(u, d.to_u128());
     }
 }
 
@@ -187,17 +188,19 @@ fn test_to_neo_bytes() {
 fn test_from_neo_bytes() {
     for _i in 0..100000 {
         let v: i128 = rand::random();
-        let bs = u128_to_neo_bytes(v as U128);
+        let v = I128::new(v).to_u128();
+        let bs = u128_to_neo_bytes(v);
 
         let u = u128_from_neo_bytes(&bs);
-        assert_eq!(v as U128, u);
+        assert_eq!(v , u);
     }
 
     for _i in 0..100000 {
         let v: u128 = rand::random();
+        let v = U128::new(v);
         let bs = u128_to_neo_bytes(v);
 
         let u = u128_from_neo_bytes(&bs);
-        assert_eq!(v as U128, u);
+        assert_eq!(v, u);
     }
 }

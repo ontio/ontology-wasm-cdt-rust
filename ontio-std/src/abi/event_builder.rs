@@ -78,7 +78,7 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
-    ///   EventBuilder::new().number(123 as U128).notify();
+    ///   EventBuilder::new().number(U128::new(123)).notify();
     ///```
     pub fn number(mut self, amount: U128) -> Self {
         self.common.number(amount);
@@ -90,7 +90,7 @@ impl EventBuilder {
     ///```no_run
     /// # use ontio_std::abi::EventBuilder;
     /// # use ontio_std::types::U128;
-    ///   EventBuilder::new().number(123 as U128).notify();
+    ///   EventBuilder::new().bool(true).notify();
     ///```
     pub fn bool(mut self, b: bool) -> Self {
         self.common.bool(b);
