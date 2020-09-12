@@ -142,7 +142,7 @@ impl<'a> VmValueParser<'a> {
         self.source.read_address()
     }
 
-    pub fn number(&mut self) -> Result<u128, Error> {
+    pub fn number(&mut self) -> Result<U128, Error> {
         let ty = self.source.read_byte()?;
         if ty != TYPE_INT {
             return Err(Error::TypeInconsistency);
@@ -154,7 +154,7 @@ impl<'a> VmValueParser<'a> {
         let ty = self.source.read_byte()?;
         match ty {
             TYPE_BOOL => self.source.read_bool(),
-            TYPE_INT => Ok(self.source.read_u128()? != 0),
+            TYPE_INT => Ok(self.source.read_u128()?.raw() != 0),
             _ => Err(Error::TypeInconsistency),
         }
     }

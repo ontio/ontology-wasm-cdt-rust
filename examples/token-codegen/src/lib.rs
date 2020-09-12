@@ -10,7 +10,7 @@ use ostd::{database, runtime};
 const _ADDR_EMPTY: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
 const KEY_TOTAL_SUPPLY: &str = "total_supply";
-const TOTAL_SUPPLY: U128 = 100_000_000_000;
+const TOTAL_SUPPLY: U128 = U128::new(100_000_000_000);
 const KEY_BALANCE: &str = "b";
 const KEY_APPROVE: &str = "a";
 
@@ -49,7 +49,7 @@ impl MyToken for MyTokenInstance {
     }
 
     fn balance_of(&self, owner: &Address) -> U128 {
-        database::get(&utils::gen_balance_key(owner)).unwrap_or(0)
+        database::get(&utils::gen_balance_key(owner)).unwrap_or_default()
     }
 
     fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool {
@@ -58,7 +58,7 @@ impl MyToken for MyTokenInstance {
         }
         let mut frmbal = self.balance_of(from);
         let mut tobal = self.balance_of(to);
-        if amount == 0 || frmbal < amount {
+        if amount.is_zero() || frmbal < amount {
             false
         } else {
             frmbal -= amount;
@@ -116,8 +116,9 @@ impl MyToken for MyTokenInstance {
         true
     }
     fn allowance(&mut self, approves: &Address, receiver: &Address) -> U128 {
-        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or(0)
+        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or_default()
     }
+
     fn total_supply(&self) -> U128 {
         database::get(KEY_TOTAL_SUPPLY).unwrap()
     }

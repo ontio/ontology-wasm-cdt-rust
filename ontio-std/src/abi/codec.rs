@@ -105,15 +105,15 @@ impl<'a> Decoder<'a> for H256 {
     }
 }
 
-impl<'a> Decoder<'a> for u128 {
+impl<'a> Decoder<'a> for U128 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
         source.read_u128()
     }
 }
 
-impl<'a> Decoder<'a> for i128 {
+impl<'a> Decoder<'a> for I128 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-        Ok(source.read_u128()? as i128)
+        Ok(source.read_u128()?.to_i128())
     }
 }
 
@@ -135,13 +135,13 @@ impl Encoder for u32 {
     }
 }
 
-impl Encoder for u128 {
+impl Encoder for U128 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(&self.to_le_bytes())
     }
 }
 
-impl Encoder for i128 {
+impl Encoder for I128 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(&self.to_le_bytes())
     }

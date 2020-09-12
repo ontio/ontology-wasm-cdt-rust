@@ -87,20 +87,20 @@ pub mod ontid {
 
     fn serialize_group(group: &Group) -> Vec<u8> {
         let mut sink = Sink::new(64);
-        sink.write_var_bytes(u128_to_neo_bytes(group.members.len() as u128).as_slice());
+        sink.write_var_bytes(u128_to_neo_bytes(U128::new(group.members.len() as u128)).as_slice());
         for mem in group.members.iter() {
             sink.write_var_bytes(mem);
         }
-        sink.write_var_bytes(u128_to_neo_bytes(group.threshold as u128).as_slice());
+        sink.write_var_bytes(u128_to_neo_bytes(U128::new(group.threshold as u128)).as_slice());
         sink.bytes().to_vec()
     }
 
     fn serialize_signers(signers: &[Signer]) -> Vec<u8> {
         let mut sink = Sink::new(64);
-        sink.write_var_bytes(u128_to_neo_bytes(signers.len() as u128).as_slice());
+        sink.write_var_bytes(u128_to_neo_bytes(U128::new(signers.len() as u128)).as_slice());
         for signer in signers.iter() {
             sink.write_var_bytes(signer.id.as_slice());
-            sink.write_var_bytes(u128_to_neo_bytes(signer.index as u128).as_slice());
+            sink.write_var_bytes(u128_to_neo_bytes(U128::new(signer.index as u128)).as_slice());
         }
         sink.bytes().to_vec()
     }
@@ -458,7 +458,7 @@ pub(crate) mod util {
         if !output.is_empty() {
             return u128_from_neo_bytes(&output);
         }
-        0
+        U128::new(0)
     }
 
     pub(crate) fn balance_of_inner(contract_address: &Address, address: &Address) -> U128 {
@@ -472,6 +472,6 @@ pub(crate) mod util {
         if !output.is_empty() {
             return u128_from_neo_bytes(&output);
         }
-        0
+        U128::new(0)
     }
 }

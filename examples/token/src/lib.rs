@@ -10,7 +10,7 @@ use ostd::{database, runtime};
 const KEY_TOTAL_SUPPLY: &str = "total_supply";
 const NAME: &str = "wasm_token";
 const SYMBOL: &str = "WTK";
-const TOTAL_SUPPLY: U128 = 100_000_000_000;
+const TOTAL_SUPPLY: U128 = U128::new(100_000_000_000);
 
 const ADMIN: Address = base58!("AQf4Mzu1YJrhz9f3aRkkwSm9n3qhXGSh4p");
 
@@ -21,14 +21,14 @@ fn initialize() -> bool {
 }
 
 fn balance_of(owner: &Address) -> U128 {
-    database::get(owner).unwrap_or(0)
+    database::get(owner).unwrap_or_default()
 }
 
 fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     assert!(runtime::check_witness(from));
 
     let frmbal = balance_of(from);
-    if amount == 0 || frmbal < amount {
+    if amount.is_zero() || frmbal < amount {
         return false;
     }
     database::put(from, frmbal - amount);

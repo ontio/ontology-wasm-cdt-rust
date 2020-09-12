@@ -79,12 +79,12 @@ impl Sink {
         self.write_bytes(&buf)
     }
 
-    pub(crate) fn write_u128(&mut self, val: u128) {
+    pub(crate) fn write_u128(&mut self, val: U128) {
         self.write_bytes(&val.to_le_bytes())
     }
 
     #[allow(unused)]
-    pub(crate) fn write_i128(&mut self, val: i128) {
+    pub(crate) fn write_i128(&mut self, val: I128) {
         self.write_bytes(&val.to_le_bytes())
     }
 

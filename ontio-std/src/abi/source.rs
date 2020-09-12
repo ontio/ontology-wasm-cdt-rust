@@ -2,6 +2,7 @@ use super::Decoder;
 use super::Error;
 use byteorder::{ByteOrder, LittleEndian};
 
+use crate::prelude::U128;
 use crate::types::{Address, H256};
 
 pub(crate) fn varuint_encode_size(val: u64) -> usize {
@@ -256,8 +257,8 @@ impl<'a> Source<'a> {
     ///   assert_eq!(res, 123 as U128);
     /// ```
     ///
-    pub fn read_u128(&mut self) -> Result<u128, Error> {
-        Ok(LittleEndian::read_u128(self.next_bytes(16)?))
+    pub fn read_u128(&mut self) -> Result<U128, Error> {
+        Ok(U128::new(LittleEndian::read_u128(self.next_bytes(16)?)))
     }
     pub fn read_varuint(&mut self) -> Result<u64, Error> {
         match self.read_byte()? {

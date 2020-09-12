@@ -70,9 +70,9 @@ fn to_hex_string(data: &[u8]) -> String {
 ///
 pub type Address = H160;
 
-/// Byte array of length 16
-pub type U128 = u128;
-pub type I128 = i128;
+mod num;
+pub use num::I128;
+pub use num::U128;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {
@@ -96,8 +96,8 @@ pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
 }
 #[doc(hidden)]
 pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
-    if data >= 0 {
-        return u128_to_neo_bytes(data as u128);
+    if data.raw() >= 0 {
+        return u128_to_neo_bytes(data.to_u128());
     }
     let temp = data.to_le_bytes();
     if let Some(pos) = temp.iter().rev().position(|v| *v != 255) {
@@ -116,17 +116,17 @@ pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
 #[doc(hidden)]
 pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
     if buf.is_empty() {
-        return 0;
+        return U128::new(0);
     }
     let neg = buf[buf.len() - 1] >= 0x80;
     let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
 
     let mut result = [0u8; 16];
     if (buf.len() > 16 && neg) || (buf.len() > 17 && !neg) {
-        return default;
+        return U128::new(default);
     }
     if buf.len() == 17 && buf[16] != 0 {
-        return default;
+        return U128::new(default);
     }
 
     let copy = cmp::min(buf.len(), 16);
