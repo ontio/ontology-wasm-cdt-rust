@@ -28,12 +28,11 @@ fn transfer(from: &Address, to: &Address, amount: U128) -> bool {
     assert!(runtime::check_witness(from));
 
     let frmbal = balance_of(from);
-    let tobal = balance_of(to);
     if amount == 0 || frmbal < amount {
         return false;
     }
-
     database::put(from, frmbal - amount);
+    let tobal = balance_of(to);
     database::put(to, tobal + amount);
     EventBuilder::new().string("Transfer").address(from).address(to).number(amount).notify();
     notify::transfer(from, to, amount);
