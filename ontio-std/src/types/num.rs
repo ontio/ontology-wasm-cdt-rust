@@ -1,4 +1,5 @@
 use core::fmt::{Debug, Display, Formatter, Result};
+use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
 #[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
@@ -50,6 +51,12 @@ impl U128 {
 
     pub const fn to_i128(self) -> I128 {
         I128(self.0 as i128)
+    }
+}
+
+impl Sum for U128 {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(U128::new(0), Add::add)
     }
 }
 
