@@ -192,7 +192,7 @@ fn test_from_neo_bytes() {
         let bs = u128_to_neo_bytes(v);
 
         let u = u128_from_neo_bytes(&bs);
-        assert_eq!(v , u);
+        assert_eq!(v, u);
     }
 
     for _i in 0..100000 {

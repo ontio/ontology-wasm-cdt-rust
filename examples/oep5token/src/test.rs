@@ -1,6 +1,6 @@
 use crate::{Oep5Token, Oep5TokenInstance};
 use ontio_std::mock::build_runtime;
-use ontio_std::types::{U128, Address};
+use ontio_std::types::{Address, U128};
 
 #[test]
 fn initialize() {
@@ -25,7 +25,7 @@ fn transfer() {
     let mut token = Oep5TokenInstance;
     let owner = Address::zero();
     assert_eq!(token.initialize(&owner), true);
-    assert_eq!(token.total_supply(), 2);
+    assert_eq!(token.total_supply(), U128::new(2));
     let token_id = token.query_token_id_by_index(U128::new(1));
     assert_eq!(token.owner_of(token_id.clone()), owner.clone());
     let alice = Address::repeat_byte(1);
