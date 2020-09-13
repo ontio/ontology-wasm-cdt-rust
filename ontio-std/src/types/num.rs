@@ -84,16 +84,6 @@ impl Add<U128> for U128 {
     }
 }
 
-impl<'a> Add<&'a U128> for U128 {
-    type Output = U128;
-
-    #[track_caller]
-    fn add(self, rhs: &'a U128) -> Self::Output {
-        U128(self.0.checked_add(rhs.0).unwrap())
-    }
-}
-
-
 impl Add<u128> for U128 {
     type Output = U128;
 
