@@ -60,8 +60,9 @@ fn transfer_multi() {
     build_runtime().witness(&[owner, alice]);
     let mut token = MyTokenInstance;
     assert!(token.initialize(owner));
-    let states = [(owner.clone(), alice.clone(), 1), (owner.clone(), bob.clone(), 2)];
+    let states =
+        [(owner.clone(), alice.clone(), U128::new(1)), (owner.clone(), bob.clone(), U128::new(2))];
     assert_eq!(token.transfer_multi(&states), true);
-    assert_eq!(token.balance_of(&alice), 1);
-    assert_eq!(token.balance_of(&bob), 2);
+    assert_eq!(token.balance_of(&alice), U128::new(1));
+    assert_eq!(token.balance_of(&bob), U128::new(2));
 }
