@@ -18,7 +18,7 @@ fn transfer_no_witness() {
     let owner = &Address::random();
     let b = &Address::random();
     assert!(token.initialize(owner));
-    assert_eq!(token.transfer(owner, b, 123), false);
+    assert_eq!(token.transfer(owner, b, U128::new(123)), false);
 }
 
 #[test]
@@ -29,11 +29,11 @@ fn transfer() {
     let mut token = MyTokenInstance;
     assert!(token.initialize(owner));
 
-    assert_eq!(token.transfer(owner, b, 123), true);
-    assert_eq!(token.balance_of(b), 123);
+    assert_eq!(token.transfer(owner, b, U128::new(123)), true);
+    assert_eq!(token.balance_of(b), U128::new(123));
 
     let total = token.total_supply();
-    assert_eq!(token.balance_of(owner), total - 123);
+    assert_eq!(token.balance_of(owner), total - U128::new(123));
 }
 
 #[test]
@@ -44,12 +44,12 @@ fn approve() {
     let handle = build_runtime();
     handle.witness(&[owner]);
     assert!(token.initialize(owner));
-    assert!(token.approve(owner, alice, 100));
-    assert_eq!(token.allowance(owner, alice), 100);
-    assert!(!token.transfer_from(alice, owner, 100));
+    assert!(token.approve(owner, alice, U128::new(100)));
+    assert_eq!(token.allowance(owner, alice), U128::new(100));
+    assert!(!token.transfer_from(alice, owner, U128::new(100)));
     handle.witness(&[alice]);
-    assert!(token.transfer_from(alice, owner, 100));
-    assert_eq!(token.allowance(owner, alice), 0);
+    assert!(token.transfer_from(alice, owner, U128::new(100)));
+    assert_eq!(token.allowance(owner, alice), U128::new(0));
 }
 
 #[test]

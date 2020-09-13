@@ -1,6 +1,6 @@
 use crate::{Oep8Token, Oep8TokenInstance};
 use ontio_std::mock::build_runtime;
-use ontio_std::types::{U128, Address};
+use ontio_std::types::{Address, U128};
 
 #[test]
 fn init() {
@@ -46,8 +46,10 @@ fn transfer() {
     assert_eq!(token.balance_of(&owner, token_id_1.clone()), U128::new(100000 - 10));
     assert_eq!(token.balance_of(&alice, token_id_1.clone()), U128::new(10));
     let bob = Address::random();
-    let states =
-        [(owner.clone(), alice, U128::new(1000), token_id_1.clone()), (owner, bob, U128::new(1000), token_id_1.clone())];
+    let states = [
+        (owner.clone(), alice, U128::new(1000), token_id_1.clone()),
+        (owner, bob, U128::new(1000), token_id_1.clone()),
+    ];
     assert!(token.transfer_multi(&states));
     assert_eq!(token.balance_of(&bob, token_id_1.clone()), U128::new(1000));
 }
