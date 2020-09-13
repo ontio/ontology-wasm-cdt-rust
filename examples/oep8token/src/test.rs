@@ -1,6 +1,6 @@
 use crate::{Oep8Token, Oep8TokenInstance};
 use ontio_std::mock::build_runtime;
-use ontio_std::types::Address;
+use ontio_std::types::{U128, Address};
 
 #[test]
 fn init() {
