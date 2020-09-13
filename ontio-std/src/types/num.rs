@@ -60,6 +60,22 @@ impl Sum for U128 {
     }
 }
 
+impl Sum<&U128> for U128 {
+    fn sum<I: Iterator<Item = &Self>>(iter: I) -> Self {
+        iter.fold(U128::new(0), Add::add)
+    }
+}
+
+impl Add<&U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn add(self, rhs: &U128) -> Self::Output {
+        U128(self.0.checked_add(rhs.0).unwrap())
+    }
+}
+
+
 impl Add<U128> for U128 {
     type Output = U128;
 
