@@ -84,6 +84,16 @@ impl Add<U128> for U128 {
     }
 }
 
+impl<'a> Add<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn add(self, rhs: &'a U128) -> Self::Output {
+        U128(self.0.checked_add(rhs.0).unwrap())
+    }
+}
+
+
 impl Add<u128> for U128 {
     type Output = U128;
 
@@ -111,11 +121,29 @@ impl Sub<U128> for U128 {
     }
 }
 
+impl<'a> Sub<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn sub(self, rhs: &'a U128) -> Self::Output {
+        U128(self.0.checked_sub(rhs.0).unwrap())
+    }
+}
+
 impl Mul<U128> for U128 {
     type Output = U128;
 
     #[track_caller]
     fn mul(self, rhs: U128) -> Self::Output {
+        U128(self.0.checked_mul(rhs.0).unwrap())
+    }
+}
+
+impl<'a> Mul<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn mul(self, rhs: &'a U128) -> Self::Output {
         U128(self.0.checked_mul(rhs.0).unwrap())
     }
 }
@@ -129,11 +157,29 @@ impl Mul<u128> for U128 {
     }
 }
 
+impl<'a> Mul<&'a u128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn mul(self, rhs: &'a u128) -> Self::Output {
+        U128(self.0.checked_mul(*rhs).unwrap())
+    }
+}
+
 impl Div<U128> for U128 {
     type Output = U128;
 
     #[track_caller]
     fn div(self, rhs: U128) -> Self::Output {
+        U128(self.0.checked_div(rhs.0).unwrap())
+    }
+}
+
+impl<'a> Div<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn div(self, rhs: &'a U128) -> Self::Output {
         U128(self.0.checked_div(rhs.0).unwrap())
     }
 }
