@@ -15,6 +15,11 @@ pub struct RuntimeHandle {
 }
 
 impl RuntimeHandle {
+    pub fn storage_put_raw<K: AsRef<[u8]>, V: AsRef<[u8]>>(&self, key: K, val: V) -> &Self {
+        self.inner.borrow_mut().storage.insert(key.as_ref().to_vec(), val.as_ref().to_vec());
+        self
+    }
+
     pub fn storage_put<K: AsRef<[u8]>, T: Encoder>(&self, key: K, val: T) -> &Self {
         let mut sink = Sink::new(12);
         sink.write(val);

@@ -6,6 +6,7 @@ extern crate ontio_std as ostd;
 use ostd::abi::Dispatcher;
 use ostd::prelude::*;
 use ostd::{database, runtime};
+use ostd::types::U128;
 
 const _ADDR_EMPTY: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 
