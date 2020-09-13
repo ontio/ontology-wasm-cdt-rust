@@ -60,11 +60,11 @@ fn approve() {
     build_runtime().witness(&[owner, alice]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
-    assert!(token.approve(&owner, &alice, 10, token_id_1.clone()));
-    assert_eq!(token.allowance(&owner, &alice, token_id_1.clone()), 10);
-    assert!(token.transfer_from(&alice, &owner, &alice, 10, token_id_1.clone()));
-    assert_eq!(token.allowance(&owner, &alice, token_id_1.clone()), 0);
-    assert_eq!(token.balance_of(&alice, token_id_1.clone()), 10);
+    assert!(token.approve(&owner, &alice, U128::new(10), token_id_1.clone()));
+    assert_eq!(token.allowance(&owner, &alice, token_id_1.clone()), U128::new(10));
+    assert!(token.transfer_from(&alice, &owner, &alice, U128::new(10), token_id_1.clone()));
+    assert_eq!(token.allowance(&owner, &alice, token_id_1.clone()), U128::new(0));
+    assert_eq!(token.balance_of(&alice, token_id_1.clone()), U128::new(10));
 }
 
 #[test]
@@ -75,9 +75,9 @@ fn approve_multi() {
     build_runtime().witness(&[owner, alice]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
-    let states = [(owner, alice, 10000, token_id_1.clone())];
+    let states = [(owner, alice, U128::new(10000), token_id_1.clone())];
     assert!(token.approve_multi(&states));
-    let transfer_from_state = [(alice, owner, alice, 100, token_id_1.clone())];
+    let transfer_from_state = [(alice, owner, alice, U128::new(100), token_id_1.clone())];
     assert!(token.transfer_from_multi(&transfer_from_state));
-    assert_eq!(token.balance_of(&alice, token_id_1.clone()), 100);
+    assert_eq!(token.balance_of(&alice, token_id_1.clone()), U128::new(100));
 }
