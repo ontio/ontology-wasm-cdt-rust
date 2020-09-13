@@ -2,10 +2,10 @@ use core::fmt::{Debug, Display, Formatter, Result};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default, Ord)]
 pub struct U128(u128);
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Ord, Default)]
 pub struct I128(i128);
 
 impl I128 {
