@@ -72,7 +72,7 @@ impl Oep8Token for Oep8TokenInstance {
         assert!(runtime::check_witness(from));
         let balance_key = utils::concat(token_id.clone(), BALANCE);
         let from_key = utils::concat(&balance_key, from);
-        let from_balance = database::get(&from_key).unwrap_or(0);
+        let from_balance = database::get(&from_key).unwrap_or_default();
         if amount > from_balance {
             return false;
         }
@@ -82,8 +82,8 @@ impl Oep8Token for Oep8TokenInstance {
             database::put(from_key, from_balance - amount)
         }
         let to_key = utils::concat(&balance_key, to);
-        let to_balance = database::get(&to_key).unwrap_or(0);
-        database::put(&to_key, to_balance + amount);
+        let to_balance: U128 = database::get(&to_key).unwrap_or_default();
+        database::put(&to_key, amount + to_balance);
         self.Transfer(&from, &to, amount, token_id);
         true
     }
@@ -108,7 +108,7 @@ impl Oep8Token for Oep8TokenInstance {
         assert_eq!(self.check_token_id(token_id.clone()), true);
         let owner_balance = self.balance_of(owner, token_id.clone());
         assert_eq!(owner_balance >= amount, true);
-        assert_eq!(amount > 0, true);
+        assert_eq!(amount.raw() > 0, true);
         let approve_key = utils::concat(token_id.clone(), (APPROVE, owner, spender));
         database::put(&approve_key, amount);
         self.Approve(owner, spender, amount, token_id);
@@ -116,12 +116,12 @@ impl Oep8Token for Oep8TokenInstance {
     }
     fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U128 {
         let approve_key = utils::concat(token_id, (APPROVE, owner, spender));
-        database::get(&approve_key).unwrap_or(0)
+        database::get(&approve_key).unwrap_or_default()
     }
     fn transfer_from(
         &mut self, spender: &Address, from: &Address, to: &Address, amount: U128, token_id: String,
     ) -> bool {
-        assert!(amount > 0);
+        assert!(amount.raw() > 0);
         assert_eq!(runtime::check_witness(spender), true);
         let approval = self.allowance(from, spender, token_id.clone());
         assert!(amount <= approval);
@@ -172,11 +172,11 @@ impl Oep8Token for Oep8TokenInstance {
             "TokenNameFifth",
         ];
         let token_symbol_list = ["TNF", "TNS", "TNH", "TNO", "TNI"];
-        let token_supply_list = [100_000, 200_000, 300_000, 400_000, 500_000];
+        let token_supply_list = [100_000u128, 200_000, 300_000, 400_000, 500_000];
         for index in 0..5 {
             let token_name = token_name_list[index];
             let token_symbol = token_symbol_list[index];
-            let token_total_supply = token_supply_list[index];
+            let token_total_supply = U128::new(token_supply_list[index]);
             let token_id = format!("{}", index + 1);
             database::put(&utils::concat(token_id.clone(), NAME), token_name);
             database::put(&utils::concat(token_id.clone(), SYMBOL), token_symbol);

@@ -20,20 +20,20 @@ const CLAIM_PREFIX: &str = "CLAIM_PREFIX_";
 #[derive(Encoder, Decoder)]
 struct ReceiveRecord {
     account: Address,
-    amount: u128,
+    amount: U128,
 }
 
 #[derive(Encoder, Decoder)]
 struct EnvlopeStruct {
     token_addr: Address,
-    total_amount: u128,
-    total_package_count: u128,
-    remain_amount: u128,
-    remain_package_count: u128,
+    total_amount: U128,
+    total_package_count: U128,
+    remain_amount: U128,
+    remain_package_count: U128,
     records: Vec<ReceiveRecord>,
 }
 
-fn create_red_envlope(owner: Address, pack_count: u128, amount: u128, token_addr: Address) -> bool {
+fn create_red_envlope(owner: Address, pack_count: U128, amount: U128, token_addr: Address) -> bool {
     if !runtime::check_witness(&owner) {
         return false;
     }
@@ -110,27 +110,27 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
         return false;
     }
     let mut est = es.unwrap();
-    if est.remain_amount == 0 {
+    if est.remain_amount.is_zero() {
         return false;
     }
-    if est.remain_package_count == 0 {
+    if est.remain_package_count.is_zero() {
         return false;
     }
-    let mut record = ReceiveRecord { account: *account, amount: 0 };
-    let mut claim_amount = 0;
-    if est.remain_package_count == 1 {
+    let mut record = ReceiveRecord { account: *account, amount: U128::new(0) };
+    let mut claim_amount = U128::new(0);
+    if est.remain_package_count == U128::new(1) {
         claim_amount = est.remain_amount;
         record.amount = claim_amount;
     } else {
         let random = runtime::current_blockhash();
         let mut part = [0u8; 16];
         part.copy_from_slice(&random.as_bytes()[..8]);
-        let random_num = U128::from_le_bytes(part) as u64;
+        let random_num = u128::from_le_bytes(part) as u64;
         let percent = random_num % 100 + 1;
-        let mut claim_amount = est.remain_amount * percent as u128 / 100;
+        let mut claim_amount = est.remain_amount * (percent as u128) / 100;
 
-        if claim_amount == 0 {
-            claim_amount = 1;
+        if claim_amount.is_zero() {
+            claim_amount = U128::new(1);
         } else if is_ont_address(&est.token_addr)
             && est.remain_amount - claim_amount < est.remain_package_count - 1
         {

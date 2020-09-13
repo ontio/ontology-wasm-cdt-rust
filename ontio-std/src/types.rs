@@ -70,9 +70,9 @@ fn to_hex_string(data: &[u8]) -> String {
 ///
 pub type Address = H160;
 
-/// Byte array of length 16
-pub type U128 = u128;
-pub type I128 = i128;
+mod num;
+pub use num::I128;
+pub use num::U128;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {
@@ -96,8 +96,8 @@ pub fn u128_to_neo_bytes(data: U128) -> Vec<u8> {
 }
 #[doc(hidden)]
 pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
-    if data >= 0 {
-        return u128_to_neo_bytes(data as u128);
+    if data.raw() >= 0 {
+        return u128_to_neo_bytes(data.to_u128());
     }
     let temp = data.to_le_bytes();
     if let Some(pos) = temp.iter().rev().position(|v| *v != 255) {
@@ -116,17 +116,17 @@ pub fn i128_to_neo_bytes(data: I128) -> Vec<u8> {
 #[doc(hidden)]
 pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
     if buf.is_empty() {
-        return 0;
+        return U128::new(0);
     }
     let neg = buf[buf.len() - 1] >= 0x80;
     let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
 
     let mut result = [0u8; 16];
     if (buf.len() > 16 && neg) || (buf.len() > 17 && !neg) {
-        return default;
+        return U128::new(default);
     }
     if buf.len() == 17 && buf[16] != 0 {
-        return default;
+        return U128::new(default);
     }
 
     let copy = cmp::min(buf.len(), 16);
@@ -174,12 +174,13 @@ fn test_to_neo_bytes() {
     ];
 
     for (data, exp) in case_data.iter() {
-        let res = i128_to_neo_bytes(*data);
+        let d = I128::new(*data);
+        let res = i128_to_neo_bytes(d);
         let r = to_hex_string(res.as_slice());
         assert_eq!(r, exp.to_string());
 
         let u = u128_from_neo_bytes(&res);
-        assert_eq!(u, *data as u128);
+        assert_eq!(u, d.to_u128());
     }
 }
 
@@ -187,17 +188,19 @@ fn test_to_neo_bytes() {
 fn test_from_neo_bytes() {
     for _i in 0..100000 {
         let v: i128 = rand::random();
-        let bs = u128_to_neo_bytes(v as U128);
+        let v = I128::new(v).to_u128();
+        let bs = u128_to_neo_bytes(v);
 
         let u = u128_from_neo_bytes(&bs);
-        assert_eq!(v as U128, u);
+        assert_eq!(v, u);
     }
 
     for _i in 0..100000 {
         let v: u128 = rand::random();
+        let v = U128::new(v);
         let bs = u128_to_neo_bytes(v);
 
         let u = u128_from_neo_bytes(&bs);
-        assert_eq!(v as U128, u);
+        assert_eq!(v, u);
     }
 }

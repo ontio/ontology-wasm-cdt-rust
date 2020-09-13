@@ -23,7 +23,7 @@ pub fn invoke() {
             EventBuilder::new().address(&_ADDR).notify();
         }
         b"notify_number" => {
-            EventBuilder::new().number(128 as U128).notify();
+            EventBuilder::new().number(U128::new(128)).notify();
         }
         b"notify_bool" => {
             EventBuilder::new().bool(true).notify();
@@ -38,7 +38,7 @@ pub fn invoke() {
                 .string("my name is lucas")
                 .bool(false)
                 .address(&_ADDR)
-                .number(128 as U128)
+                .number(U128::new(128))
                 .notify();
         }
         _ => panic!("unsupported action!"),
