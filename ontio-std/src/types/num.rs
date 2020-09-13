@@ -2,10 +2,10 @@ use core::fmt::{Debug, Display, Formatter, Result};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default, Ord)]
 pub struct U128(u128);
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Ord, Default)]
 pub struct I128(i128);
 
 impl I128 {
@@ -111,11 +111,29 @@ impl Sub<U128> for U128 {
     }
 }
 
+impl<'a> Sub<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn sub(self, rhs: &'a U128) -> Self::Output {
+        U128(self.0.checked_sub(rhs.0).unwrap())
+    }
+}
+
 impl Mul<U128> for U128 {
     type Output = U128;
 
     #[track_caller]
     fn mul(self, rhs: U128) -> Self::Output {
+        U128(self.0.checked_mul(rhs.0).unwrap())
+    }
+}
+
+impl<'a> Mul<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn mul(self, rhs: &'a U128) -> Self::Output {
         U128(self.0.checked_mul(rhs.0).unwrap())
     }
 }
@@ -129,11 +147,29 @@ impl Mul<u128> for U128 {
     }
 }
 
+impl<'a> Mul<&'a u128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn mul(self, rhs: &'a u128) -> Self::Output {
+        U128(self.0.checked_mul(*rhs).unwrap())
+    }
+}
+
 impl Div<U128> for U128 {
     type Output = U128;
 
     #[track_caller]
     fn div(self, rhs: U128) -> Self::Output {
+        U128(self.0.checked_div(rhs.0).unwrap())
+    }
+}
+
+impl<'a> Div<&'a U128> for U128 {
+    type Output = U128;
+
+    #[track_caller]
+    fn div(self, rhs: &'a U128) -> Self::Output {
         U128(self.0.checked_div(rhs.0).unwrap())
     }
 }
