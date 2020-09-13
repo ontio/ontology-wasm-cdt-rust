@@ -13,17 +13,17 @@ fn init() {
     let token_id_3 = format!("{}", 3);
     let token_id_4 = format!("{}", 4);
     let token_id_5 = format!("{}", 5);
-    assert_eq!(token.balance_of(&owner, token_id_1.clone()), 100000);
-    assert_eq!(token.balance_of(&owner, token_id_2.clone()), 200000);
-    assert_eq!(token.balance_of(&owner, token_id_3.clone()), 300000);
-    assert_eq!(token.balance_of(&owner, token_id_4.clone()), 400000);
-    assert_eq!(token.balance_of(&owner, token_id_5.clone()), 500000);
+    assert_eq!(token.balance_of(&owner, token_id_1.clone()), U128::new(100000));
+    assert_eq!(token.balance_of(&owner, token_id_2.clone()), U128::new(200000));
+    assert_eq!(token.balance_of(&owner, token_id_3.clone()), U128::new(300000));
+    assert_eq!(token.balance_of(&owner, token_id_4.clone()), U128::new(400000));
+    assert_eq!(token.balance_of(&owner, token_id_5.clone()), U128::new(500000));
 
-    assert_eq!(token.total_supply(token_id_1.clone()), 100000);
-    assert_eq!(token.total_supply(token_id_2.clone()), 200000);
-    assert_eq!(token.total_supply(token_id_3.clone()), 300000);
-    assert_eq!(token.total_supply(token_id_4.clone()), 400000);
-    assert_eq!(token.total_supply(token_id_5.clone()), 500000);
+    assert_eq!(token.total_supply(token_id_1.clone()), U128::new(100000));
+    assert_eq!(token.total_supply(token_id_2.clone()), U128::new(200000));
+    assert_eq!(token.total_supply(token_id_3.clone()), U128::new(300000));
+    assert_eq!(token.total_supply(token_id_4.clone()), U128::new(400000));
+    assert_eq!(token.total_supply(token_id_5.clone()), U128::new(500000));
 
     assert_eq!(token.name(token_id_1.clone()), "TokenNameFirst");
     assert_eq!(token.name(token_id_2.clone()), "TokenNameSecond");
@@ -42,14 +42,14 @@ fn transfer() {
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     let alice = Address::random();
-    assert!(token.transfer(&owner, &alice, 10, token_id_1.clone()));
-    assert_eq!(token.balance_of(&owner, token_id_1.clone()), 100000 - 10);
-    assert_eq!(token.balance_of(&alice, token_id_1.clone()), 10);
+    assert!(token.transfer(&owner, &alice, U128::new(10), token_id_1.clone()));
+    assert_eq!(token.balance_of(&owner, token_id_1.clone()), U128::new(100000 - 10));
+    assert_eq!(token.balance_of(&alice, token_id_1.clone()), U128::new(10));
     let bob = Address::random();
     let states =
-        [(owner.clone(), alice, 1000, token_id_1.clone()), (owner, bob, 1000, token_id_1.clone())];
+        [(owner.clone(), alice, U128::new(1000), token_id_1.clone()), (owner, bob, U128::new(1000), token_id_1.clone())];
     assert!(token.transfer_multi(&states));
-    assert_eq!(token.balance_of(&bob, token_id_1.clone()), 1000);
+    assert_eq!(token.balance_of(&bob, token_id_1.clone()), U128::new(1000));
 }
 
 #[test]
