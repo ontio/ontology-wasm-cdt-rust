@@ -1,6 +1,5 @@
-use core::fmt::{Debug, Display, Result};
+use core::fmt::{Debug, Display, Formatter, Result};
 use core::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
-use fixed_hash::static_assertions::_core::fmt::Formatter;
 
 #[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Default)]
 pub struct U128(u128);
@@ -16,15 +15,15 @@ impl I128 {
         U128(self.0 as u128)
     }
 
-    pub fn from_le_bytes(bs: [u8; 16]) -> Self {
+    pub const fn from_le_bytes(bs: [u8; 16]) -> Self {
         I128(i128::from_le_bytes(bs))
     }
 
-    pub fn to_le_bytes(self) -> [u8; 16] {
+    pub const fn to_le_bytes(self) -> [u8; 16] {
         self.0.to_le_bytes()
     }
 
-    pub fn raw(self) -> i128 {
+    pub const fn raw(self) -> i128 {
         self.0
     }
 }
@@ -33,23 +32,23 @@ impl U128 {
     pub const fn new(val: u128) -> Self {
         U128(val)
     }
-    pub fn from_le_bytes(bs: [u8; 16]) -> Self {
+    pub const fn from_le_bytes(bs: [u8; 16]) -> Self {
         U128(u128::from_le_bytes(bs))
     }
 
-    pub fn is_zero(self) -> bool {
+    pub const fn is_zero(self) -> bool {
         self.0 == 0
     }
 
-    pub fn to_le_bytes(self) -> [u8; 16] {
+    pub const fn to_le_bytes(self) -> [u8; 16] {
         self.0.to_le_bytes()
     }
 
-    pub fn raw(self) -> u128 {
+    pub const fn raw(self) -> u128 {
         self.0
     }
 
-    pub fn to_i128(self) -> I128 {
+    pub const fn to_i128(self) -> I128 {
         I128(self.0 as i128)
     }
 }
