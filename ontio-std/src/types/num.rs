@@ -236,7 +236,7 @@ impl Debug for U128 {
 }
 
 mod u256 {
-    #[allow(clippy::ptr-offset-with-cast, clippy::assign-op-pattern)]
+    #[allow(clippy::ptr_offset_with_cast, clippy::assign_op_pattern)]
     uint::construct_uint! {
         pub struct U256(4);
     }
