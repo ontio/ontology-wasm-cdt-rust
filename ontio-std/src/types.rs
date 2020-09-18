@@ -70,7 +70,7 @@ fn to_hex_string(data: &[u8]) -> String {
 ///
 pub type Address = H160;
 
-pub mod num;
+mod num;
 pub use num::I128;
 pub use num::U128;
 pub use num::U256;
