@@ -1,3 +1,5 @@
+#![allow(clippy::ptr_offset_with_cast, clippy::assign_op_pattern)]
+
 use core::fmt::{Debug, Display, Formatter, Result};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
@@ -236,7 +238,6 @@ impl Debug for U128 {
 }
 
 mod u256 {
-    #[allow(clippy::ptr_offset_with_cast, clippy::assign_op_pattern)]
     uint::construct_uint! {
         pub struct U256(4);
     }
