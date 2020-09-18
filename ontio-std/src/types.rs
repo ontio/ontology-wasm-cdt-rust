@@ -73,6 +73,7 @@ pub type Address = H160;
 mod num;
 pub use num::I128;
 pub use num::U128;
+pub use num::U256;
 
 impl Address {
     pub fn to_hex_string(&self) -> String {
