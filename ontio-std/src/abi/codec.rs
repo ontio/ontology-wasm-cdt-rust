@@ -117,12 +117,6 @@ impl<'a> Decoder<'a> for I128 {
     }
 }
 
-impl<'a> Decoder<'a> for U256 {
-    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-        source.read_u256()
-    }
-}
-
 impl Encoder for u8 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_byte(*self)
@@ -142,12 +136,6 @@ impl Encoder for u32 {
 }
 
 impl Encoder for U128 {
-    fn encode(&self, sink: &mut Sink) {
-        sink.write_bytes(&self.to_le_bytes())
-    }
-}
-
-impl Encoder for U256 {
     fn encode(&self, sink: &mut Sink) {
         sink.write_bytes(&self.to_le_bytes())
     }
