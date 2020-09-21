@@ -492,3 +492,53 @@ impl SubAssign<U256> for U256 {
         self.0 = self.0.checked_sub(rhs.0).unwrap();
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::types::U256;
+
+    #[test]
+    fn smoke() {
+        for _ in 0..100000 {
+            let b = u128::max_value();
+            let (a, c):(u128, u128) = rand::random();
+            let sum = U256::from(a) + U256::from(b);
+            let b2 = sum - a;
+            assert_eq!(b2.as_u128().raw(), b);
+
+            let a = U256::from(a);
+            let mul = a * U256::from(c);
+            let c2 = mul / a;
+            assert_eq!(c2.as_u128().raw(), c);
+        }
+    }
+
+    #[test]
+    fn small_value() {
+        for _ in 0..10000 {
+            let a: u64 = rand::random();
+            let b: u64 = rand::random();
+            let a = a as u128;
+            let b = b as u128;
+
+            let sum = U256::from(a ) * U256::from(b );
+
+            assert_eq!(sum.as_u128().raw(), a * b, "{} {}", a,b);
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_as_u128_overflow() {
+        let val = U256::from(u128::max_value()) + 1000;
+        let _ = val.as_u128();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_u256_overflow() {
+        let val = U256::MAX;
+        let _ = val.as_u128();
+    }
+}
