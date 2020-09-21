@@ -91,7 +91,11 @@ impl Add<u128> for U128 {
 
     #[track_caller]
     fn add(self, rhs: u128) -> Self::Output {
-        U128(self.0.checked_add(rhs).unwrap_or_else(|| panic!("add overflow {} {}", self.0, rhs)))
+        if let Some(res) = self.0.checked_add(rhs) {
+            return U128(res);
+        }
+
+        panic!("add overflow {} {}", self.0, rhs)
     }
 }
 
@@ -100,7 +104,11 @@ impl Sub<u128> for U128 {
 
     #[track_caller]
     fn sub(self, rhs: u128) -> Self::Output {
-        U128(self.0.checked_sub(rhs).unwrap_or_else(|| panic!("sub overflow {} {} ", self.0, rhs)))
+        if let Some(res) = self.0.checked_sub(rhs) {
+            return U128(res);
+        }
+
+        panic!("sub overflow {} {} ", self.0, rhs)
     }
 }
 
@@ -109,11 +117,10 @@ impl Sub<U128> for U128 {
 
     #[track_caller]
     fn sub(self, rhs: U128) -> Self::Output {
-        U128(
-            self.0
-                .checked_sub(rhs.0)
-                .unwrap_or_else(|| panic!("sub overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_sub(rhs.0) {
+            return U128(res);
+        }
+        panic!("sub overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -122,11 +129,10 @@ impl<'a> Sub<&'a U128> for U128 {
 
     #[track_caller]
     fn sub(self, rhs: &'a U128) -> Self::Output {
-        U128(
-            self.0
-                .checked_sub(rhs.0)
-                .unwrap_or_else(|| panic!("sub overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_sub(rhs.0) {
+            return U128(res);
+        }
+        panic!("sub overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -135,11 +141,10 @@ impl Mul<U128> for U128 {
 
     #[track_caller]
     fn mul(self, rhs: U128) -> Self::Output {
-        U128(
-            self.0
-                .checked_mul(rhs.0)
-                .unwrap_or_else(|| panic!("mul overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_mul(rhs.0) {
+            return U128(res);
+        }
+        panic!("mul overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -157,7 +162,10 @@ impl Mul<u128> for U128 {
 
     #[track_caller]
     fn mul(self, rhs: u128) -> Self::Output {
-        U128(self.0.checked_mul(rhs).unwrap_or_else(|| panic!("mul overflow {} {}", self.0, rhs)))
+        if let Some(res) = self.0.checked_mul(rhs) {
+            return U128(res);
+        }
+        panic!("mul overflow {} {}", self.0, rhs)
     }
 }
 
@@ -252,6 +260,16 @@ impl U256 {
     pub fn as_u128(&self) -> U128 {
         U128(self.0.as_u128())
     }
+
+    pub fn from_little_endian(slice: &[u8]) -> Self {
+        U256(u256::U256::from_little_endian(slice))
+    }
+
+    pub fn to_le_bytes(self) -> [u8; 32] {
+        let mut buf = [0; 32];
+        self.0.to_little_endian(&mut buf);
+        buf
+    }
 }
 
 impl From<u128> for U256 {
@@ -295,11 +313,10 @@ impl Add<u128> for U256 {
 
     #[track_caller]
     fn add(self, rhs: u128) -> Self::Output {
-        U256(
-            self.0
-                .checked_add(From::from(rhs))
-                .unwrap_or_else(|| panic!("add overflow {} {}", self.0, rhs)),
-        )
+        if let Some(res) = self.0.checked_add(From::from(rhs)) {
+            return U256(res);
+        }
+        panic!("add overflow {} {}", self.0, rhs)
     }
 }
 
@@ -308,11 +325,10 @@ impl Add<U256> for U256 {
 
     #[track_caller]
     fn add(self, rhs: U256) -> Self::Output {
-        U256(
-            self.0
-                .checked_add(rhs.0)
-                .unwrap_or_else(|| panic!("add overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_add(rhs.0) {
+            return U256(res);
+        }
+        panic!("add overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -321,11 +337,10 @@ impl<'a> Add<&'a U256> for U256 {
 
     #[track_caller]
     fn add(self, rhs: &'a U256) -> Self::Output {
-        U256(
-            self.0
-                .checked_add(rhs.0)
-                .unwrap_or_else(|| panic!("add overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_add(rhs.0) {
+            return U256(res);
+        }
+        panic!("add overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -334,11 +349,10 @@ impl Sub<u128> for U256 {
 
     #[track_caller]
     fn sub(self, rhs: u128) -> Self::Output {
-        U256(
-            self.0
-                .checked_sub(From::from(rhs))
-                .unwrap_or_else(|| panic!("sub overflow {} {} ", self.0, rhs)),
-        )
+        if let Some(res) = self.0.checked_sub(From::from(rhs)) {
+            return U256(res);
+        }
+        panic!("sub overflow {} {} ", self.0, rhs)
     }
 }
 
@@ -347,11 +361,10 @@ impl Sub<U128> for U256 {
 
     #[track_caller]
     fn sub(self, rhs: U128) -> Self::Output {
-        U256(
-            self.0
-                .checked_sub(From::from(rhs.0))
-                .unwrap_or_else(|| panic!("sub overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_sub(From::from(rhs.0)) {
+            return U256(res);
+        }
+        panic!("sub overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -360,11 +373,10 @@ impl<'a> Sub<&'a U128> for U256 {
 
     #[track_caller]
     fn sub(self, rhs: &'a U128) -> Self::Output {
-        U256(
-            self.0
-                .checked_sub(From::from(rhs.0))
-                .unwrap_or_else(|| panic!("sub overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_sub(From::from(rhs.0)) {
+            return U256(res);
+        }
+        panic!("sub overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -373,11 +385,10 @@ impl Sub<U256> for U256 {
 
     #[track_caller]
     fn sub(self, rhs: U256) -> Self::Output {
-        U256(
-            self.0
-                .checked_sub(rhs.0)
-                .unwrap_or_else(|| panic!("sub overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_sub(rhs.0) {
+            return U256(res);
+        }
+        panic!("sub overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -386,11 +397,10 @@ impl Mul<U128> for U256 {
 
     #[track_caller]
     fn mul(self, rhs: U128) -> Self::Output {
-        U256(
-            self.0
-                .checked_mul(From::from(rhs.0))
-                .unwrap_or_else(|| panic!("mul overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_mul(From::from(rhs.0)) {
+            return U256(res);
+        }
+        panic!("mul overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -408,11 +418,10 @@ impl Mul<u128> for U256 {
 
     #[track_caller]
     fn mul(self, rhs: u128) -> Self::Output {
-        U256(
-            self.0
-                .checked_mul(From::from(rhs))
-                .unwrap_or_else(|| panic!("mul overflow {} {}", self.0, rhs)),
-        )
+        if let Some(res) = self.0.checked_mul(From::from(rhs)) {
+            return U256(res);
+        }
+        panic!("mul overflow {} {}", self.0, rhs)
     }
 }
 
@@ -430,11 +439,11 @@ impl Mul<U256> for U256 {
 
     #[track_caller]
     fn mul(self, rhs: U256) -> Self::Output {
-        U256(
-            self.0
-                .checked_mul(rhs.0)
-                .unwrap_or_else(|| panic!("mul overflow {} {}", self.0, rhs.0)),
-        )
+        if let Some(res) = self.0.checked_mul(rhs.0) {
+            return U256(res);
+        }
+
+        panic!("mul overflow {} {}", self.0, rhs.0)
     }
 }
 
@@ -493,7 +502,6 @@ impl SubAssign<U256> for U256 {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::types::U256;
@@ -502,7 +510,7 @@ mod tests {
     fn smoke() {
         for _ in 0..100000 {
             let b = u128::max_value();
-            let (a, c):(u128, u128) = rand::random();
+            let (a, c): (u128, u128) = rand::random();
             let sum = U256::from(a) + U256::from(b);
             let b2 = sum - a;
             assert_eq!(b2.as_u128().raw(), b);
@@ -522,9 +530,9 @@ mod tests {
             let a = a as u128;
             let b = b as u128;
 
-            let sum = U256::from(a ) * U256::from(b );
+            let sum = U256::from(a) * U256::from(b);
 
-            assert_eq!(sum.as_u128().raw(), a * b, "{} {}", a,b);
+            assert_eq!(sum.as_u128().raw(), a * b, "{} {}", a, b);
         }
     }
 
