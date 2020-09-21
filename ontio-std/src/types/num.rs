@@ -257,6 +257,13 @@ pub struct U256(u256::U256);
 impl U256 {
     pub const MAX: U256 = U256(u256::U256::MAX);
 
+    pub const fn new(value: u128) -> Self {
+        let mut ret = [0; 4];
+        ret[0] = value as u64;
+        ret[1] = (value >> 64) as u64;
+        U256(u256::U256(ret))
+    }
+
     pub fn as_u128(&self) -> U128 {
         U128(self.0.as_u128())
     }
