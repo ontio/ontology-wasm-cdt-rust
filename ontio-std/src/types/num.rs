@@ -278,6 +278,12 @@ impl Display for U256 {
     }
 }
 
+impl Debug for U256 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
 impl From<u128> for U256 {
     fn from(val: u128) -> Self {
         Self(From::from(val))
