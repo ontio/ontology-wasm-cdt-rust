@@ -56,7 +56,7 @@ impl Sink {
         self.write_bytes(data);
     }
 
-    pub(crate) fn write_bytes(&mut self, data: &[u8]) {
+    pub fn write_bytes(&mut self, data: &[u8]) {
         self.buf.extend_from_slice(data)
     }
 
