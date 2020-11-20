@@ -171,7 +171,7 @@ impl VmValueBuilderCommon {
 // compile-fails
 
 /// ```compile_fail
-/// #[deny(unused_must_use)]
+/// #![deny(unused_must_use)]
 /// {
 ///     EventBuilder::new().bool(true);
 /// }
