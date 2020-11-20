@@ -4,7 +4,7 @@ use super::{Decoder, Encoder, VmValueBuilder, VmValueDecoder, VmValueEncoder, Vm
 
 use crate::abi::Source;
 use crate::prelude::*;
-use crate::types::{Address, H256, U256};
+use crate::types::{Address, H256};
 
 impl<'a> Decoder<'a> for u8 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
