@@ -297,6 +297,12 @@ impl From<u128> for U256 {
     }
 }
 
+impl From<U128> for U256 {
+    fn from(val: U128) -> Self {
+        From::from(val.raw())
+    }
+}
+
 impl Sum for U256 {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(U256::default(), Add::add)
@@ -481,6 +487,15 @@ impl<'a> Div<&'a U128> for U256 {
     #[track_caller]
     fn div(self, rhs: &'a U128) -> Self::Output {
         U256(self.0.checked_div(From::from(rhs.0)).unwrap())
+    }
+}
+
+impl Div<u128> for U256 {
+    type Output = U256;
+
+    #[track_caller]
+    fn div(self, rhs: u128) -> Self::Output {
+        U256(self.0.checked_div(From::from(rhs)).unwrap())
     }
 }
 
