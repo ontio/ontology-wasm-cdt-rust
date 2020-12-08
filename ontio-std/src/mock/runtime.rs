@@ -250,10 +250,10 @@ mod env {
 
     #[no_mangle]
     pub fn ontio_contract_create(
-        _code_ptr: *const u8, _code_len: u32, _need_storage: u32, _name_ptr: *const u8,
-        _name_len: u32, _ver_ptr: *const u8, _ver_len: u32, _author_ptr: *const u8,
-        _author_len: u32, _email_ptr: *const u8, _email_len: u32, _desc_ptr: *const u8,
-        _desc_len: u32, _new_addr_ptr: *mut u8,
+        _code_ptr: *const u8, _code_len: u32, _vm_type: u32, _name_ptr: *const u8, _name_len: u32,
+        _ver_ptr: *const u8, _ver_len: u32, _author_ptr: *const u8, _author_len: u32,
+        _email_ptr: *const u8, _email_len: u32, _desc_ptr: *const u8, _desc_len: u32,
+        _new_addr_ptr: *mut u8,
     ) -> u32 {
         unimplemented!()
     }
