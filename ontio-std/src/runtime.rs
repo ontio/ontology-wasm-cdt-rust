@@ -32,10 +32,10 @@ mod env {
         pub fn ontio_storage_delete(key: *const u8, klen: u32);
         pub fn ontio_sha256(data: *const u8, len: u32, val: *mut u8);
         pub fn ontio_contract_create(
-            code_ptr: *const u8, code_len: u32, need_storage: u32, name_ptr: *const u8,
-            name_len: u32, ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8,
-            author_len: u32, email_ptr: *const u8, email_len: u32, desc_ptr: *const u8,
-            desc_len: u32, new_addr_ptr: *mut u8,
+            code_ptr: *const u8, code_len: u32, vm_type: u32, name_ptr: *const u8, name_len: u32,
+            ver_ptr: *const u8, ver_len: u32, author_ptr: *const u8, author_len: u32,
+            email_ptr: *const u8, email_len: u32, desc_ptr: *const u8, desc_len: u32,
+            new_addr_ptr: *mut u8,
         ) -> u32;
         pub fn ontio_contract_destroy() -> !;
     }
@@ -77,7 +77,7 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Vec<u8> {
 ///
 /// code: new contract code
 ///
-/// need_storage:
+/// vm_type: 1 for neovm, 3 for wasmvm
 ///
 /// name: contract name
 ///
@@ -97,19 +97,19 @@ pub fn call_contract(addr: &Address, input: &[u8]) -> Vec<u8> {
 /// # use ontio_std::runtime;
 ///   let input = runtime::input();
 ///   let mut source = Source::new(&input);
-///   let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
-///   let res = runtime::contract_create(code, need_storage, name, ver, author, email, desc);
+///   let (code, vm_type, name, ver, author, email, desc) = source.read().unwrap();
+///   let res = runtime::contract_create(code, vm_type, name, ver, author, email, desc);
 /// ```
 ///
 pub fn contract_create(
-    code: &[u8], need_storage: u32, name: &str, ver: &str, author: &str, email: &str, desc: &str,
+    code: &[u8], vm_type: u32, name: &str, ver: &str, author: &str, email: &str, desc: &str,
 ) -> Address {
     let mut addr: Address = Address::zero();
     unsafe {
         env::ontio_contract_create(
             code.as_ptr(),
             code.len() as u32,
-            need_storage,
+            vm_type,
             name.as_ptr(),
             name.len() as u32,
             ver.as_ptr(),
@@ -131,7 +131,7 @@ pub fn contract_create(
 ///
 /// code: new contract code
 ///
-/// need_storage:
+/// vm_type: 1 for neovm, 3 for wasmvm
 ///
 /// name: contract name
 ///
@@ -151,8 +151,8 @@ pub fn contract_create(
 /// # use ontio_std::runtime;
 /// let input = runtime::input();
 /// let mut source = Source::new(&input);
-/// let (code, need_storage, name, ver, author, email, desc) = source.read().unwrap();
-/// let res = runtime::contract_migrate(code, need_storage, name, ver, author, email, desc);
+/// let (code, vm_type, name, ver, author, email, desc) = source.read().unwrap();
+/// let res = runtime::contract_migrate(code, vm_type, name, ver, author, email, desc);
 /// ```
 ///
 pub fn contract_migrate(
