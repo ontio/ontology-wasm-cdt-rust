@@ -2,6 +2,7 @@
 #![feature(proc_macro_hygiene)]
 extern crate ontio_std as ostd;
 use ostd::abi::{Sink, Source};
+use ostd::contract::governance::un_authorize_for_peer;
 use ostd::contract::{governance, ont};
 use ostd::prelude::*;
 use ostd::runtime;
@@ -40,6 +41,10 @@ pub fn invoke() {
             let (user, amt, peer_pub_key) = source.read().unwrap();
             let peer_pub_key: String = peer_pub_key;
             sink.write(authorize_for_peer(user, amt, &peer_pub_key))
+        }
+        "un_authorize_for_peer" => {
+            let (user, amt, peer_pub_key) = source.read().unwrap();
+            sink.write(un_authorize_for_peer(user, amt, &peer_pub_key))
         }
         "withdraw" => {
             let (user, amt, peer_pub_key) = source.read().unwrap();
