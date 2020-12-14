@@ -21,6 +21,7 @@ uint = {version = "0.8.5", default-features=false}
 
 [dev-dependencies]
 rand = "0.7.0"
+etcommon-hexutil = { version = "0.2.4", default-features = false }
 
 [features]
 std = []

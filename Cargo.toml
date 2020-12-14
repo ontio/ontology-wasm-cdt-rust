@@ -14,7 +14,8 @@ members = [
     "examples/invoke-native-test",
     "examples/notify-test",
     "examples/call_native",
-    "examples/oracle"
+    "examples/oracle",
+    "examples/gov"
 ]
 
 [profile.release]
