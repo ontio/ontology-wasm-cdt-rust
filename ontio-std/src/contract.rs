@@ -12,12 +12,12 @@ pub mod governance {
 
     pub struct AuthorizeForPeerParam<'a> {
         addr: &'a Address,
-        peer_pubkey_list: &'a [&'a String],
+        peer_pubkey_list: &'a [&'a str],
         pos_list: &'a [u32],
     }
 
     impl<'a> AuthorizeForPeerParam<'a> {
-        pub fn new(addr: &'a Address, pos_list: &'a [u32], peer_pub_key: &'a [&String]) -> Self {
+        pub fn new(addr: &'a Address, pos_list: &'a [u32], peer_pub_key: &'a [&str]) -> Self {
             AuthorizeForPeerParam { addr, peer_pubkey_list: peer_pub_key, pos_list }
         }
     }
@@ -26,8 +26,8 @@ pub mod governance {
         fn encode(&self, sink: &mut Sink) {
             sink.write_var_bytes(&self.addr.as_bytes());
             sink.write_native_varuint(self.peer_pubkey_list.len() as u64);
-            for pk in self.peer_pubkey_list.iter() {
-                sink.write(pk.as_str());
+            for &pk in self.peer_pubkey_list.iter() {
+                sink.write(pk);
             }
             sink.write_native_varuint(self.pos_list.len() as u64);
             for pos in self.pos_list.iter() {
@@ -36,7 +36,7 @@ pub mod governance {
         }
     }
 
-    pub fn authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &String) -> bool {
+    pub fn authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
         let mut sink = Sink::new(64);
         let pos_list = vec![amt.raw() as u32];
         let peer_pub_key = &[peer_pub_key];
@@ -54,9 +54,7 @@ pub mod governance {
     }
 
     //Authorize for a node by depositing ONT in this governance contract, used by contracts
-    pub fn authorize_for_peer_transfer_from(
-        addr: &Address, amt: U128, peer_pub_key: &String,
-    ) -> bool {
+    pub fn authorize_for_peer_transfer_from(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
         let mut sink = Sink::new(64);
         let pos_list = &[amt.raw() as u32];
         let peer_pub_key = &[peer_pub_key];
@@ -73,7 +71,7 @@ pub mod governance {
     }
 
     //UnAuthorize for a node by redeeming ONT from this governance contract
-    pub fn un_authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &String) -> bool {
+    pub fn un_authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
         let mut sink = Sink::new(64);
         let pos_list = vec![amt.raw() as u32];
         let peer_pub_key = &[peer_pub_key];
@@ -92,7 +90,7 @@ pub mod governance {
 
     struct WithdrawParam<'a> {
         addr: &'a Address,
-        peer_pubkey_list: &'a [String],
+        peer_pubkey_list: &'a [&'a str],
         withdraw_list: &'a [u32],
     }
     impl<'a> Encoder for WithdrawParam<'a> {
@@ -112,11 +110,11 @@ pub mod governance {
     }
 
     //Withdraw unfreezed ONT deposited in this governance contract.
-    pub fn withdraw(addr: &Address, amt: U128, peer_pub_key: &String) -> bool {
+    pub fn withdraw(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
         let mut sink = Sink::new(80);
         sink.write(WithdrawParam {
             addr,
-            peer_pubkey_list: &[peer_pub_key.to_string()],
+            peer_pubkey_list: &[peer_pub_key],
             withdraw_list: &[amt.raw() as u32],
         });
         let mut sink_param = Sink::new(64);
@@ -169,7 +167,7 @@ pub mod governance {
 
         let wp = WithdrawParam {
             addr: &Address::repeat_byte(2),
-            peer_pubkey_list: &["test".to_string()],
+            peer_pubkey_list: &["test"],
             withdraw_list: &[128u32],
         };
         let mut sink = Sink::new(64);

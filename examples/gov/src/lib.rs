@@ -8,16 +8,17 @@ use ostd::prelude::*;
 use ostd::runtime;
 use ostd::runtime::address;
 
-fn authorize_for_peer_transfer_from(user: &Address, amt: U128, peer_pub_key: &String) -> bool {
+fn authorize_for_peer_transfer_from(user: &Address, amt: U128, peer_pub_key: &str) -> bool {
     let this = address();
     ont::transfer(user, &this, amt);
     governance::authorize_for_peer_transfer_from(&this, amt, peer_pub_key)
 }
 
-fn authorize_for_peer(user: &Address, amt: U128, peer_pub_key: &String) -> bool {
+fn authorize_for_peer(user: &Address, amt: U128, peer_pub_key: &str) -> bool {
     governance::authorize_for_peer(user, amt, peer_pub_key)
 }
-fn withdraw(user: &Address, amt: U128, peer_pub_key: &String) -> bool {
+
+fn withdraw(user: &Address, amt: U128, peer_pub_key: &str) -> bool {
     governance::withdraw(user, amt, peer_pub_key)
 }
 
@@ -34,22 +35,19 @@ pub fn invoke() {
     match action {
         "authorize_for_peer_transfer_from" => {
             let (user, amt, peer_pub_key) = source.read().unwrap();
-            let peer_pub_key: String = peer_pub_key;
-            sink.write(authorize_for_peer_transfer_from(user, amt, &peer_pub_key));
+            sink.write(authorize_for_peer_transfer_from(user, amt, peer_pub_key));
         }
         "authorize_for_peer" => {
             let (user, amt, peer_pub_key) = source.read().unwrap();
-            let peer_pub_key: String = peer_pub_key;
-            sink.write(authorize_for_peer(user, amt, &peer_pub_key))
+            sink.write(authorize_for_peer(user, amt, peer_pub_key))
         }
         "un_authorize_for_peer" => {
             let (user, amt, peer_pub_key) = source.read().unwrap();
-            sink.write(un_authorize_for_peer(user, amt, &peer_pub_key))
+            sink.write(un_authorize_for_peer(user, amt, peer_pub_key))
         }
         "withdraw" => {
             let (user, amt, peer_pub_key) = source.read().unwrap();
-            let peer_pub_key: String = peer_pub_key;
-            sink.write(withdraw(user, amt, &peer_pub_key));
+            sink.write(withdraw(user, amt, peer_pub_key));
         }
         "withdraw_ong" => {
             let user = source.read().unwrap();
