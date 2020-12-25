@@ -70,7 +70,7 @@ fn to_hex_string(data: &[u8]) -> String {
 ///
 pub type Address = H160;
 
-mod num;
+pub(crate) mod num;
 pub use num::I128;
 pub use num::U128;
 pub use num::U256;
@@ -120,7 +120,11 @@ pub fn u128_from_neo_bytes(buf: &[u8]) -> U128 {
         return U128::new(0);
     }
     let neg = buf[buf.len() - 1] >= 0x80;
-    let default = if neg { i128::min_value() as u128 } else { i128::max_value() as u128 };
+    let default = if neg {
+        i128::min_value() as u128
+    } else {
+        i128::max_value() as u128
+    };
 
     let mut result = [0u8; 16];
     if (buf.len() > 16 && neg) || (buf.len() > 17 && !neg) {

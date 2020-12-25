@@ -245,7 +245,7 @@ impl Debug for U128 {
     }
 }
 
-mod u256 {
+pub(crate) mod u256 {
     uint::construct_uint! {
         pub struct U256(4);
     }
