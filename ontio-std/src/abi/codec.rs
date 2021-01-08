@@ -225,33 +225,23 @@ impl<T: Encoder> Encoder for &mut T {
     }
 }
 
-macro_rules! impl_abi_codec_fixed_array {
-    () => {};
-    ($num:expr) => {
-        impl<'a> Decoder<'a> for [u8; $num] {
-            fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-                let mut array = [0;$num];
-                source.read_into(&mut array)?;
-                Ok(array)
-            }
+impl<T: Encoder, const N: usize> Encoder for [T; N] {
+    fn encode(&self, sink: &mut Sink) {
+        for val in self {
+            sink.write(val)
         }
-
-        impl Encoder for [u8; $num] {
-            fn encode(&self, sink: &mut Sink) {
-                sink.write_bytes(self)
-            }
-        }
-    } ;
-    ($num:expr, $($tail:expr),*) => {
-        impl_abi_codec_fixed_array!($num);
-        impl_abi_codec_fixed_array!($($tail),*);
-     };
+    }
 }
 
-impl_abi_codec_fixed_array!(
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-    27, 28, 29, 30, 31, 32
-);
+impl<'a, T: Decoder<'a> + Default + Copy, const N: usize> Decoder<'a> for [T; N] {
+    fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
+        let mut array = [Default::default(); N];
+        for val in &mut array {
+            *val = source.read()?;
+        }
+        Ok(array)
+    }
+}
 
 /// reference:
 /// 1. https://github.com/rust-lang/rust/issues/24830
@@ -324,4 +314,14 @@ for_each_tuple! {
             }
         }
     }
+}
+
+#[test]
+fn test_array() {
+    let addrs = [Address::zero(), Address::repeat_byte(1)];
+    let mut sink = Sink::new(10);
+    sink.write(addrs);
+    let buf = sink.into();
+    let addrs2: [Address; 2] = Source::new(buf.as_slice()).read().unwrap();
+    assert_eq!(addrs, addrs2);
 }
