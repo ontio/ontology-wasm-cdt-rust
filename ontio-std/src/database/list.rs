@@ -54,8 +54,8 @@ where
     for<'a> T: Decoder<'a> + Encoder,
 {
     fn init(key: Vec<u8>, source: &mut Source) -> Result<Self, Error> {
-        let next_key_id = source.read().unwrap();
-        let index_size: Vec<(u32, u32)> = source.read().unwrap();
+        let next_key_id = source.read()?;
+        let index_size: Vec<(u32, u32)> = source.read()?;
         let total = index_size.iter().map(|(_key, size)| size).sum();
         Ok(ListStore {
             key,
