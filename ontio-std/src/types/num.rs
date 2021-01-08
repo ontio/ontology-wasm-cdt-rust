@@ -1,4 +1,5 @@
 #![allow(clippy::ptr_offset_with_cast, clippy::assign_op_pattern)]
+#![allow(clippy::manual_range_contains)]
 
 use core::fmt::{Debug, Display, Formatter, Result};
 use core::iter::Sum;

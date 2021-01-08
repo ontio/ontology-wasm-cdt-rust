@@ -7,7 +7,6 @@
 #![feature(exclusive_range_pattern)]
 #![feature(proc_macro_hygiene)]
 #![feature(panic_info_message)]
-#![feature(min_const_generics)]
 
 //#![feature(trace_macros)]
 
