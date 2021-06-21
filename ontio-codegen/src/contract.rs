@@ -134,7 +134,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
                 let args = action.params.iter().map(|&(_, ref ty)| {
-                    let ty :&syn::Type = &ty;
+                    let ty :&syn::Type = ty;
                     match ty {
                         syn::Type::Reference(refer) => {
                             let mutability = refer.mutability.as_ref();
