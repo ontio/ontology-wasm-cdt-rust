@@ -39,7 +39,7 @@ fn test_runtime_api() {
     assert_eq!(api.get_current_txhash(), current_tx_hash);
 
     assert_eq!(
-        api.sha256(&[0; 20]).to_hex_string(),
+        api.sha256(&[0; 20]).hex_string(),
         "906fd3cbc4401b7ffac44063f02c2693c332e653c3f2b5db00d3b87eb2c947de"
     );
 }

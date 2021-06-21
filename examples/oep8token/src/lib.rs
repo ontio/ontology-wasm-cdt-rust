@@ -68,7 +68,7 @@ impl Oep8Token for Oep8TokenInstance {
         database::get(&utils::concat(token_id, (BALANCE, address))).unwrap_or_default()
     }
     fn transfer(&mut self, from: &Address, to: &Address, amount: U128, token_id: String) -> bool {
-        assert_eq!(self.check_token_id(token_id.clone()), true);
+        assert!(self.check_token_id(token_id.clone()));
         assert!(runtime::check_witness(from));
         let balance_key = utils::concat(token_id.clone(), BALANCE);
         let from_key = utils::concat(&balance_key, from);
@@ -104,11 +104,11 @@ impl Oep8Token for Oep8TokenInstance {
     fn approve(
         &mut self, owner: &Address, spender: &Address, amount: U128, token_id: String,
     ) -> bool {
-        assert_eq!(runtime::check_witness(owner), true);
-        assert_eq!(self.check_token_id(token_id.clone()), true);
+        assert!(runtime::check_witness(owner));
+        assert!(self.check_token_id(token_id.clone()));
         let owner_balance = self.balance_of(owner, token_id.clone());
-        assert_eq!(owner_balance >= amount, true);
-        assert_eq!(amount.raw() > 0, true);
+        assert!(owner_balance >= amount);
+        assert!(amount.raw() > 0);
         let approve_key = utils::concat(token_id.clone(), (APPROVE, owner, spender));
         database::put(&approve_key, amount);
         self.Approve(owner, spender, amount, token_id);
@@ -122,7 +122,7 @@ impl Oep8Token for Oep8TokenInstance {
         &mut self, spender: &Address, from: &Address, to: &Address, amount: U128, token_id: String,
     ) -> bool {
         assert!(amount.raw() > 0);
-        assert_eq!(runtime::check_witness(spender), true);
+        assert!(runtime::check_witness(spender));
         let approval = self.allowance(from, spender, token_id.clone());
         assert!(amount <= approval);
         let fromval = self.balance_of(from, token_id.clone());

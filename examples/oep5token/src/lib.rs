@@ -122,7 +122,7 @@ impl Oep5Token for Oep5TokenInstance {
         total_supply += 1;
         database::put(KEY_TOTAL_SUPPLY, &total_supply);
         let tmp = utils::concat(owner, &total_supply);
-        let token_id = runtime::sha256(&tmp).to_hex_string();
+        let token_id = runtime::sha256(&tmp).hex_string();
         let token = (token_id.clone(), name, url, token_type);
         database::put(&utils::concat(PREFIX_INDEX, &total_supply), &token_id);
         database::put(&utils::concat(PREFIX_OWNER, &token_id), owner);
