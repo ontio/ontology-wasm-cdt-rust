@@ -248,7 +248,7 @@ pub mod ont {
     ///     ont::balance_of(addr);
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
-        super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, &address)
+        super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, address)
     }
     ///This method is used in conjunction with the approve method to query the number of approve
     /// # Example
@@ -339,7 +339,7 @@ pub mod ong {
     ///     ong::balance_of(addr);
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
-        super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, &address)
+        super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, address)
     }
     ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
     /// # Example

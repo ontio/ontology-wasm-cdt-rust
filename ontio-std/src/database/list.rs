@@ -148,8 +148,7 @@ where
         //if null list
         if self.index_size.is_empty() {
             //update cache
-            let mut temp: Vec<T> = Vec::new();
-            temp.push(payload);
+            let mut temp = vec![payload];
             self.cache.insert(0, temp);
             //update index_count
             self.index_size.push((0, 1));
@@ -176,8 +175,7 @@ where
                 //if the slice is filled
                 let l = last_node_vec.len() as u32;
                 if l >= INDEX_SIZE {
-                    let mut temp: Vec<T> = Vec::new();
-                    temp.push(payload);
+                    let mut temp = vec![payload];
                     //cache add new k->v
                     self.cache.insert(self.next_key_id, temp);
                     self.index_size.push((self.next_key_id, 1));

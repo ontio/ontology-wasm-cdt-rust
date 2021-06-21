@@ -26,7 +26,7 @@ impl VmValueEncoder for bool {
 
 impl VmValueEncoder for H256 {
     fn serialize(&self, builder: &mut VmValueBuilder) {
-        builder.h256(&self);
+        builder.h256(self);
     }
 }
 
@@ -38,7 +38,7 @@ impl VmValueEncoder for U128 {
 
 impl VmValueEncoder for Address {
     fn serialize(&self, builder: &mut VmValueBuilder) {
-        builder.address(&self);
+        builder.address(self);
     }
 }
 
