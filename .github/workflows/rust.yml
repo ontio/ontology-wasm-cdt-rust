@@ -18,8 +18,12 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
-          toolchain: nightly
+          toolchain: nightly-2020-12-31
     - run: rustup default nightly
+    - run: rustup component add rustfmt
+    - run: rustup target add wasm32-unknown-unknown
+    - name: Cargo Fmt
+      run: cargo fmt --all -- --check
     - name: Run tests
-      run: bash ./build.sh
+      run: bash ./.travis.build.sh
 
