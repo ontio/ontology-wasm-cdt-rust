@@ -34,7 +34,7 @@ impl AsRef<H256> for H256 {
 }
 
 impl H256 {
-    pub fn to_hex_string(&self) -> String {
+    pub fn hex_string(&self) -> String {
         to_hex_string_reverse(&self.0)
     }
 }
@@ -76,7 +76,7 @@ pub use num::U128;
 pub use num::U256;
 
 impl Address {
-    pub fn to_hex_string(&self) -> String {
+    pub fn hex_string(&self) -> String {
         to_hex_string_reverse(&self.0)
     }
 }

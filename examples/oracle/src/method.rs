@@ -10,7 +10,7 @@ use crate::storage::*;
  * @param admin The address of the Oracle
  */
 pub fn initialize(admin: &Address) -> bool {
-    assert!(check_witness(&admin), "check witness failed");
+    assert!(check_witness(admin), "check witness failed");
     assert!(!is_init(), "already init");
     put_admin(admin);
     init();

@@ -1,0 +1,29 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly-2021-05-25
+    - run: rustup default nightly
+    - run: rustup component add rustfmt
+    - run: rustup target add wasm32-unknown-unknown
+    - name: Cargo Fmt
+      run: cargo fmt --all -- --check
+    - name: Run tests
+      run: bash ./.travis.build.sh
+

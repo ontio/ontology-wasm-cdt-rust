@@ -86,10 +86,10 @@ fn query_envlope(hash: &str) -> String {
     if let Some(r) = res {
         let mut records: Vec<String> = Vec::new();
         for x in r.records.iter() {
-            records.push(format!("account: {}, amount: {}", x.account.to_hex_string(), x.amount));
+            records.push(format!("account: {}, amount: {}", x.account.hex_string(), x.amount));
         }
         return format!("token_addr:{}, total_amount: {}, total_package_count: {}, remain_amount: {}, remain_package_count: {},\
-        records:[{:?}]", r.token_addr.to_hex_string(), r.total_amount,r.total_package_count,r.remain_amount,r.remain_package_count,records);
+        records:[{:?}]", r.token_addr.hex_string(), r.total_amount, r.total_package_count, r.remain_amount, r.remain_package_count, records);
     }
 
     "".to_string()
@@ -143,9 +143,9 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     est.records.push(record);
     let self_addr = runtime::address();
     if is_ont_address(&est.token_addr) {
-        return ont::transfer(&self_addr, &account, claim_amount);
+        return ont::transfer(&self_addr, account, claim_amount);
     } else if is_ong_address(&est.token_addr) {
-        return ong::transfer(&self_addr, &account, claim_amount);
+        return ong::transfer(&self_addr, account, claim_amount);
     } else {
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, account, claim_amount));
