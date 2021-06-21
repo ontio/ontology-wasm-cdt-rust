@@ -143,9 +143,9 @@ fn claim_envlope(account: &Address, hash: &str) -> bool {
     est.records.push(record);
     let self_addr = runtime::address();
     if is_ont_address(&est.token_addr) {
-        return ont::transfer(&self_addr, &account, claim_amount);
+        return ont::transfer(&self_addr, account, claim_amount);
     } else if is_ong_address(&est.token_addr) {
-        return ong::transfer(&self_addr, &account, claim_amount);
+        return ong::transfer(&self_addr, account, claim_amount);
     } else {
         let mut sink = Sink::new(16);
         sink.write(("transfer", self_addr, account, claim_amount));

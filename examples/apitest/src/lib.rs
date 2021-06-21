@@ -132,7 +132,7 @@ impl ApiTest for ApiTestInstance {
         true
     }
     fn call_ont_transfer(&self, from: &Address, to: &Address, amount: U128) -> bool {
-        ont::transfer(&from, &to, amount)
+        ont::transfer(from, to, amount)
     }
     fn call_ont_approve(&self, from: &Address, to: &Address, amount: U128) -> bool {
         ont::approve(from, to, amount)
