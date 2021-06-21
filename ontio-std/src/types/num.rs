@@ -282,7 +282,13 @@ impl U256 {
         U256(u256::U256::from_big_endian(slice))
     }
 
-    pub fn to_le_bytes(self) -> [u8; 32] {
+    pub fn to_be_bytes(&self) -> [u8; 32] {
+        let mut buf = [0; 32];
+        self.0.to_big_endian(&mut buf);
+        buf
+    }
+
+    pub fn to_le_bytes(&self) -> [u8; 32] {
         let mut buf = [0; 32];
         self.0.to_little_endian(&mut buf);
         buf

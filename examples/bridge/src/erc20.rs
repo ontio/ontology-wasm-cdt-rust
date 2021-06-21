@@ -35,7 +35,7 @@ const TRANSFER_FROM_ID: [u8; 4] = [0x23, 0xb8, 0x72, 0xdd];
 const BALANCEOF_ID: [u8; 4] = [0x70, 0xa0, 0x82, 0x31];
 
 fn gen_eth_transfer_data(to: &Address, amount: U128) -> Vec<u8> {
-    [TRANSFER_ID.as_ref(), format_addr(to).as_ref(), format_amount(amount).as_slice()].concat()
+    [TRANSFER_ID.as_ref(), format_addr(to).as_ref(), format_amount(amount).as_ref()].concat()
 }
 
 fn gen_eth_transfer_from_data(from_acct: &Address, to_acct: &Address, amount: U128) -> Vec<u8> {
@@ -43,7 +43,7 @@ fn gen_eth_transfer_from_data(from_acct: &Address, to_acct: &Address, amount: U1
         TRANSFER_FROM_ID.as_ref(),
         format_addr(from_acct).as_ref(),
         format_addr(to_acct).as_ref(),
-        format_amount(amount).as_slice(),
+        format_amount(amount).as_ref(),
     ]
     .concat()
 }
@@ -58,12 +58,8 @@ fn format_addr(addr: &Address) -> [u8; 32] {
     res
 }
 
-fn format_amount(amt: U128) -> Vec<u8> {
-    let bs = amt.to_be_bytes();
-    let mut res = Vec::with_capacity(32);
-    (0..16).into_iter().for_each(|_| res.push(0u8));
-    res.extend_from_slice(bs.as_ref());
-    res
+fn format_amount(amt: U128) -> [u8; 32] {
+    U256::from(amt).to_be_bytes()
 }
 
 #[test]
