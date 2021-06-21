@@ -84,7 +84,7 @@ impl Oep8Token for Oep8TokenInstance {
         let to_key = utils::concat(&balance_key, to);
         let to_balance: U128 = database::get(&to_key).unwrap_or_default();
         database::put(&to_key, amount + to_balance);
-        self.Transfer(&from, &to, amount, token_id);
+        self.Transfer(from, to, amount, token_id);
         true
     }
     fn transfer_multi(&mut self, states: &[(Address, Address, U128, String)]) -> bool {
