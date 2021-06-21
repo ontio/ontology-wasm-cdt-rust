@@ -15,6 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly
+    - run: rustup default nightly
     - name: Run tests
       run: bash ./build.sh
 
