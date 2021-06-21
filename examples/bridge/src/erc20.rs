@@ -45,7 +45,7 @@ fn gen_eth_transfer_from_data(from_acct: &Address, to_acct: &Address, amount: U1
         format_addr(to_acct).as_ref(),
         format_amount(amount).as_slice(),
     ]
-        .concat()
+    .concat()
 }
 
 fn gen_eth_balance_of_data(addr: &Address) -> Vec<u8> {

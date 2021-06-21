@@ -24,7 +24,7 @@ pub mod eth {
     const SYSTEM_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbwC9m2yJG");
 
     pub fn evm_invoke(caller: &Address, target: &Address, input: &[u8]) -> Vec<u8> {
-        let mut sink = Sink::new(64);
+        let mut sink = Sink::new(input.len() + 20 + 20 + 16);
         sink.write(caller.as_bytes());
         sink.write(target.as_bytes());
         sink.write(input);
