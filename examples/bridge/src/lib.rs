@@ -22,7 +22,6 @@ const KEY_ADMIN: &[u8] = b"1";
 const PREFIX_TOKEN_PAIR: &[u8] = b"2";
 const KEY_TOKEN_PAIR_NAME: &[u8] = b"3";
 
-const ZERO_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
 const ADMIN_ADDRESS: Address = base58!("ARGK44mXXZfU6vcdSfFKMzjaabWxyog1qb");
 
 #[derive(Encoder, Decoder, Default)]
@@ -32,7 +31,7 @@ struct TokenPair {
 }
 
 fn initialize(admin: &Address) -> bool {
-    assert_eq!(get_admin(), ZERO_ADDRESS, "has inited");
+    assert!(get_admin().is_zero(), "has inited");
     assert!(check_witness(admin), "check admin signature failed");
     put(KEY_ADMIN, admin);
     true
@@ -58,8 +57,8 @@ fn register_token_pair(
     names.push(token_pair_name.to_vec());
     put(KEY_TOKEN_PAIR_NAME, names);
 
-    assert_ne!(ont_token_addr, &ZERO_ADDRESS);
-    assert_ne!(eth_token_addr, &ZERO_ADDRESS);
+    assert!(!ont_token_addr.is_zero());
+    assert!(!eth_token_addr.is_zero());
 
     database::put(
         pair_key.as_slice(),
@@ -72,7 +71,7 @@ fn get_next_token_id() -> u32 {
     get(KEY_NEXT_TOKEN_ID).unwrap_or_default()
 }
 
-fn un_register_token_pair(token_name: &[u8], ont_acct: &Address, eth_acct: &Address) -> bool {
+fn unregister_token_pair(token_name: &[u8], ont_acct: &Address, eth_acct: &Address) -> bool {
     assert!(check_witness(&get_admin()), "need admin signature");
     let token_pair: Option<TokenPair> = get(gen_key(PREFIX_TOKEN_PAIR, token_name).as_slice());
     if let Some(pair) = token_pair {
@@ -99,7 +98,7 @@ fn migrate(
     let erc20_addr = &get_erc20_token_addr();
     let this = &address();
     let addr = contract_migrate(code, vm_type, name, version, author, email, desc);
-    assert_ne!(addr, ZERO_ADDRESS);
+    assert!(!addr.is_zero());
     let oep4_balance = balance_of_neovm(&oep4_addr, this);
     if !oep4_balance.is_zero() {
         transfer_neovm(&oep4_addr, this, &addr, oep4_balance);
@@ -178,7 +177,7 @@ pub fn invoke() {
             let (token_pair_name, ont_token_addr, eth_token_addr) = source.read().unwrap();
             sink.write(register_token_pair(token_pair_name, ont_token_addr, eth_token_addr))
         }
-        "unRegisterTokenPair" => {
+        "unregisterTokenPair" => {
             let (token_pair_name, ont_token_addr, eth_token_addr) = source.read().unwrap();
             sink.write(un_register_token_pair(token_pair_name, ont_token_addr, eth_token_addr))
         }
