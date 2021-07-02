@@ -180,7 +180,7 @@ fn erc20_to_oep4(
     if let Some(pair) = token_pair {
         let this = &address();
         let before = balance_of_erc20(this, &pair.erc20, this);
-        transfer_from_erc20(this, &pair.erc20, eth_acct, this, amount);
+        transfer_from_erc20(ont_acct, &pair.erc20, eth_acct, this, amount);
         let after = balance_of_erc20(this, &pair.erc20, this);
         assert!(after >= before);
         let delta = after - before;
