@@ -6,7 +6,7 @@ extern crate ontio_std as ostd;
 use crate::erc20::{balance_of_erc20, transfer_erc20, transfer_from_erc20};
 use crate::events::{erc20_to_oep4_event, oep4_to_erc20_event};
 use crate::oep4::{balance_of_neovm, transfer_neovm};
-use ostd::abi::{Sink, Source, Encoder, Decoder};
+use ostd::abi::{Decoder, Encoder, Sink, Source};
 use ostd::database::{get, put};
 use ostd::macros::base58;
 use ostd::prelude::*;
@@ -17,7 +17,6 @@ use std::fs::read;
 mod erc20;
 mod events;
 mod oep4;
-
 
 const KEY_ADMIN: &[u8] = b"1";
 const PREFIX_TOKEN_PAIR: &[u8] = b"2";
@@ -74,6 +73,7 @@ fn get_next_token_id() -> u32 {
 }
 
 fn un_register_token_pair(token_name: &[u8], ont_acct: &Address, eth_acct: &Address) -> bool {
+    assert!(check_witness(&get_admin()), "need admin signature");
     let token_pair: Option<TokenPair> = get(gen_key(PREFIX_TOKEN_PAIR, token_name).as_slice());
     if let Some(pair) = token_pair {
         let this = address();
@@ -89,13 +89,6 @@ fn un_register_token_pair(token_name: &[u8], ont_acct: &Address, eth_acct: &Addr
 
 fn get_token_pair(token_name: &[u8]) -> TokenPair {
     get(gen_key(PREFIX_TOKEN_PAIR, token_name).as_slice()).unwrap_or_default()
-}
-
-fn gen_key<T:Encoder>(prefix: &[u8], post: T) -> Vec<u8> {
-    let mut sink = Sink::new(64);
-    sink.write(prefix);
-    sink.write(post);
-    sink.bytes().to_vec()
 }
 
 fn migrate(
@@ -163,6 +156,13 @@ fn erc20_to_oep4(
     }
 }
 
+fn gen_key<T: Encoder>(prefix: &[u8], post: T) -> Vec<u8> {
+    let mut sink = Sink::new(64);
+    sink.write(prefix);
+    sink.write(post);
+    sink.bytes().to_vec()
+}
+
 #[no_mangle]
 pub fn invoke() {
     let input = runtime::input();
@@ -178,7 +178,11 @@ pub fn invoke() {
             let (token_pair_name, ont_token_addr, eth_token_addr) = source.read().unwrap();
             sink.write(register_token_pair(token_pair_name, ont_token_addr, eth_token_addr))
         }
-        "get_token_pair" => {
+        "unRegisterTokenPair" => {
+            let (token_pair_name, ont_token_addr, eth_token_addr) = source.read().unwrap();
+            sink.write(un_register_token_pair(token_pair_name, ont_token_addr, eth_token_addr))
+        }
+        "getTokenPair" => {
             let token_pair_name = source.read().unwrap();
             sink.write(get_token_pair(token_pair_name));
         }
