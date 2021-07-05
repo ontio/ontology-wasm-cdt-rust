@@ -39,23 +39,25 @@ fn get_admin() -> Address {
     get(KEY_ADMIN).unwrap_or_default()
 }
 
-fn set_pending_admin(new_admin: &Address) {
+fn set_pending_admin(new_admin: &Address) -> bool {
     assert!(check_witness(&get_admin()), "check admin signature failed");
     put(KEY_PENDING_ADMIN, new_admin);
     new_pending_admin_event(new_admin);
+    true
 }
 
 fn get_pending_admin() -> Address {
     get(KEY_PENDING_ADMIN).unwrap_or_default()
 }
 
-fn accept_admin() {
+fn accept_admin() -> bool {
     let pending_admin = get_pending_admin();
     assert!(check_witness(&get_pending_admin()), "check pending admin signature failed");
     let old_admin = get_admin();
     put(KEY_ADMIN, pending_admin);
     delete(KEY_PENDING_ADMIN);
     new_admin_event(&old_admin, &pending_admin);
+    true
 }
 
 fn get_all_token_pair_name() -> Vec<Vec<u8>> {
@@ -78,14 +80,14 @@ fn register_token_pair(token_pair_name: &[u8], oep4_addr: &Address, erc20_addr: 
     assert!(!oep4_addr.is_zero());
     assert!(!erc20_addr.is_zero());
 
-    put(pair_key.as_slice(), TokenPair { erc20: erc20_addr.clone(), oep4: oep4_addr.clone() });
+    put(pair_key.as_slice(), TokenPair { erc20: *erc20_addr, oep4: *oep4_addr });
     true
 }
 
 fn update_pair(
     token_pair_name: &[u8], oep4_addr: &Address, erc20_addr: &Address, eth_acct: &Address,
     ont_acct: &Address,
-) {
+) -> bool {
     assert!(check_witness(&get_admin()), "need admin signature");
     let pair_key = gen_key(PREFIX_TOKEN_PAIR, token_pair_name);
     let token_pair: Option<TokenPair> = get(pair_key);
@@ -102,6 +104,7 @@ fn update_pair(
         let ba = balance_of_erc20(this, &pair.erc20, this);
         transfer_erc20(this, &pair.erc20, eth_acct, ba);
     }
+    true
 }
 
 fn unregister_token_pair(token_pair_name: &[u8], ont_acct: &Address, eth_acct: &Address) -> bool {
