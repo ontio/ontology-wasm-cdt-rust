@@ -12,6 +12,7 @@ use ostd::abi::{Decoder, Encoder, Sink, Source};
 use ostd::database::{delete, get, put};
 use ostd::prelude::*;
 use ostd::runtime::{address, check_witness, contract_migrate, input, ret};
+use ostd::types::U256;
 
 mod erc20;
 mod events;
@@ -22,10 +23,14 @@ const KEY_PENDING_ADMIN: &[u8] = b"2";
 const PREFIX_TOKEN_PAIR: &[u8] = b"3";
 const KEY_TOKEN_PAIR_NAME: &[u8] = b"4";
 
+const COMPUTE_DECIMAL: U256 = U256::new(10u128.pow(18));
+
 #[derive(Encoder, Decoder, Default)]
 struct TokenPair {
     erc20: Address,
+    erc20_decimals: U128,
     oep4: Address,
+    oep4_decimals: U128,
 }
 
 fn initialize(admin: &Address) -> bool {
@@ -64,10 +69,15 @@ fn get_all_token_pair_name() -> Vec<Vec<u8>> {
     get(KEY_TOKEN_PAIR_NAME).unwrap_or_default()
 }
 
-fn register_token_pair(token_pair_name: &[u8], oep4_addr: &Address, erc20_addr: &Address) -> bool {
+fn register_token_pair(
+    token_pair_name: &[u8], oep4_addr: &Address, oep4_decimals: U128, erc20_addr: &Address,
+    erc20_decimals: U128,
+) -> bool {
     assert!(check_witness(&get_admin()), "need admin signature");
-    assert!(!oep4_addr.is_zero());
-    assert!(!erc20_addr.is_zero());
+    assert!(!oep4_addr.is_zero(), "invalid oep4 address");
+    assert!(!oep4_decimals.is_zero(), "invalid oep4 decimals");
+    assert!(!erc20_addr.is_zero(), "invalid erc20 address");
+    assert!(!erc20_decimals.is_zero(), "invalid erc20 decimals");
 
     let pair_key = gen_key(PREFIX_TOKEN_PAIR, token_pair_name);
     let token_pair: Option<TokenPair> = get(pair_key.as_slice());
@@ -77,10 +87,10 @@ fn register_token_pair(token_pair_name: &[u8], oep4_addr: &Address, erc20_addr: 
     names.push(token_pair_name.to_vec());
     put(KEY_TOKEN_PAIR_NAME, names);
 
-    assert!(!oep4_addr.is_zero());
-    assert!(!erc20_addr.is_zero());
-
-    put(pair_key.as_slice(), TokenPair { erc20: *erc20_addr, oep4: *oep4_addr });
+    put(
+        pair_key.as_slice(),
+        TokenPair { erc20: *erc20_addr, erc20_decimals, oep4: *oep4_addr, oep4_decimals },
+    );
     true
 }
 
@@ -164,10 +174,17 @@ fn oep4_to_erc20(
         transfer_neovm(&pair.oep4, ont_acct, this, amount);
         let after = balance_of_neovm(&pair.oep4, this);
         let delta = after - before;
-        if !delta.is_zero() {
-            transfer_erc20(this, &pair.erc20, eth_acct, delta);
-        }
-        oep4_to_erc20_event(ont_acct, eth_acct, amount, delta, &pair.oep4, &pair.erc20);
+        let erc20_amt = if delta.is_zero() {
+            U128::new(0)
+        } else {
+            let erc20_amt_exp = U256::new(delta.raw()) * COMPUTE_DECIMAL
+                / U256::new(10u128.pow(pair.oep4_decimals.raw() as u32));
+            let erc20_amt = erc20_amt_exp * U256::new(10u128.pow(pair.erc20_decimals.raw() as u32))
+                / COMPUTE_DECIMAL;
+            transfer_erc20(this, &pair.erc20, eth_acct, erc20_amt.as_u128());
+            erc20_amt.as_u128()
+        };
+        oep4_to_erc20_event(ont_acct, eth_acct, amount, erc20_amt, &pair.oep4, &pair.erc20);
         true
     } else {
         false
@@ -187,10 +204,17 @@ fn erc20_to_oep4(
         let after = balance_of_erc20(this, &pair.erc20, this);
         assert!(after >= before);
         let delta = after - before;
-        if !delta.is_zero() {
+        let oep4_amt = if delta.is_zero() {
+            U128::new(0)
+        } else {
+            let oep4_amt_exp = U256::new(delta.raw()) * COMPUTE_DECIMAL
+                / U256::new(10u128.pow(pair.erc20_decimals.raw() as u32));
+            let oep4_amt = oep4_amt_exp * U256::new(10u128.pow(pair.oep4_decimals.raw() as u32))
+                / COMPUTE_DECIMAL;
             transfer_neovm(&pair.oep4, this, ont_acct, delta);
-        }
-        erc20_to_oep4_event(eth_acct, ont_acct, amount, delta, &pair.oep4, &pair.erc20);
+            oep4_amt.as_u128()
+        };
+        erc20_to_oep4_event(eth_acct, ont_acct, amount, oep4_amt, &pair.oep4, &pair.erc20);
         true
     } else {
         false
@@ -229,8 +253,15 @@ pub fn invoke() {
             sink.write(accept_admin());
         }
         "registerTokenPair" => {
-            let (token_pair_name, oep4_addr, erc20_addr) = source.read().unwrap();
-            sink.write(register_token_pair(token_pair_name, oep4_addr, erc20_addr))
+            let (token_pair_name, oep4_addr, oep4_decimals, erc20_addr, erc20_decimals) =
+                source.read().unwrap();
+            sink.write(register_token_pair(
+                token_pair_name,
+                oep4_addr,
+                oep4_decimals,
+                erc20_addr,
+                erc20_decimals,
+            ))
         }
         "updateTokenPair" => {
             let (token_pair_name, oep4_addr, erc20_addr, eth_acct, ont_acct) =
