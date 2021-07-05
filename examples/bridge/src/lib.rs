@@ -75,9 +75,7 @@ fn register_token_pair(
 ) -> bool {
     assert!(check_witness(&get_admin()), "need admin signature");
     assert!(!oep4_addr.is_zero(), "invalid oep4 address");
-    assert!(!oep4_decimals.is_zero(), "invalid oep4 decimals");
     assert!(!erc20_addr.is_zero(), "invalid erc20 address");
-    assert!(!erc20_decimals.is_zero(), "invalid erc20 decimals");
 
     let pair_key = gen_key(PREFIX_TOKEN_PAIR, token_pair_name);
     let token_pair: Option<TokenPair> = get(pair_key.as_slice());
@@ -102,16 +100,14 @@ fn update_token_pair(
     let pair_key = gen_key(PREFIX_TOKEN_PAIR, token_pair_name);
     let mut pair: TokenPair = get(pair_key.as_slice()).expect("token pair name has not registered");
     let this = &address();
-    if &pair.oep4 != oep4_addr {
-        assert!(!oep4_decimals.is_zero(), "invalid oep4_decimals");
+    if &pair.oep4 != oep4_addr && !oep4_addr.is_zero() {
         assert!(!ont_acct.is_zero(), "ont acct should not be nil");
         let ba = balance_of_neovm(&pair.oep4, this);
         transfer_neovm(&pair.oep4, this, ont_acct, ba);
         pair.oep4 = *oep4_addr;
         pair.oep4_decimals = oep4_decimals;
     }
-    if &pair.erc20 != erc20_addr {
-        assert!(!erc20_decimals.is_zero(), "invalid erc20_decimals");
+    if &pair.erc20 != erc20_addr && !erc20_addr.is_zero() {
         assert!(!eth_acct.is_zero(), "eth acct should not be nil");
         let ba = balance_of_erc20(this, &pair.erc20, this);
         transfer_erc20(this, &pair.erc20, eth_acct, ba);
