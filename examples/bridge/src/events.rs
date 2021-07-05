@@ -2,11 +2,15 @@ use crate::{Address, U128};
 use ontio_std::abi::EventBuilder;
 
 pub fn new_pending_admin_event(new_pending_admin: &Address) {
-    EventBuilder::new().address(new_pending_admin).notify();
+    EventBuilder::new().string("setPendingAdmin").address(new_pending_admin).notify();
 }
 
 pub fn new_admin_event(old_admin: &Address, new_pending_admin: &Address) {
-    EventBuilder::new().address(old_admin).address(new_pending_admin).notify();
+    EventBuilder::new()
+        .string("acceptAdmin")
+        .address(old_admin)
+        .address(new_pending_admin)
+        .notify();
 }
 
 pub fn oep4_to_erc20_event(
@@ -14,6 +18,7 @@ pub fn oep4_to_erc20_event(
     erc20_addr: &Address,
 ) {
     EventBuilder::new()
+        .string("oep4ToErc20")
         .address(ont_acct)
         .address(eth_acct)
         .number(amount)
@@ -28,6 +33,7 @@ pub fn erc20_to_oep4_event(
     erc20_addr: &Address,
 ) {
     EventBuilder::new()
+        .string("erc20ToOep4")
         .address(eth_acct)
         .address(ont_acct)
         .number(amount)
