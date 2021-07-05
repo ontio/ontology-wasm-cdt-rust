@@ -94,26 +94,31 @@ fn register_token_pair(
     true
 }
 
-fn update_pair(
-    token_pair_name: &[u8], oep4_addr: &Address, erc20_addr: &Address, eth_acct: &Address,
-    ont_acct: &Address,
+fn update_token_pair(
+    token_pair_name: &[u8], oep4_addr: &Address, oep4_decimals: U128, erc20_addr: &Address,
+    erc20_decimals: U128, eth_acct: &Address, ont_acct: &Address,
 ) -> bool {
     assert!(check_witness(&get_admin()), "need admin signature");
     let pair_key = gen_key(PREFIX_TOKEN_PAIR, token_pair_name);
-    let token_pair: Option<TokenPair> = get(pair_key);
-    assert!(!token_pair.is_none(), "token pair name has not registered");
-    let pair = token_pair.unwrap();
+    let mut pair: TokenPair = get(pair_key.as_slice()).expect("token pair name has not registered");
     let this = &address();
     if &pair.oep4 != oep4_addr {
+        assert!(!oep4_decimals.is_zero(), "invalid oep4_decimals");
         assert!(!ont_acct.is_zero(), "ont acct should not be nil");
         let ba = balance_of_neovm(&pair.oep4, this);
         transfer_neovm(&pair.oep4, this, ont_acct, ba);
+        pair.oep4 = *oep4_addr;
+        pair.oep4_decimals = oep4_decimals;
     }
     if &pair.erc20 != erc20_addr {
+        assert!(!erc20_decimals.is_zero(), "invalid erc20_decimals");
         assert!(!eth_acct.is_zero(), "eth acct should not be nil");
         let ba = balance_of_erc20(this, &pair.erc20, this);
         transfer_erc20(this, &pair.erc20, eth_acct, ba);
+        pair.erc20 = *erc20_addr;
+        pair.erc20_decimals = erc20_decimals;
     }
+    put(pair_key.as_slice(), pair);
     true
 }
 
@@ -146,17 +151,19 @@ fn migrate(
     assert!(check_witness(&get_admin()), "check admin signature failed");
     let this = &address();
     let all_token_pair_name = get_all_token_pair_name();
-    let addr = contract_migrate(code, vm_type, name, version, author, email, desc);
-    assert!(!addr.is_zero());
-    all_token_pair_name.iter().for_each(|item| {
-        let pair = get_token_pair(item);
+    let token_pairs: Vec<TokenPair> =
+        all_token_pair_name.iter().map(|name| get_token_pair(name)).collect();
+
+    let new_addr = contract_migrate(code, vm_type, name, version, author, email, desc);
+    assert!(!new_addr.is_zero());
+    token_pairs.iter().for_each(|pair| {
         let oep4_balance = balance_of_neovm(&pair.oep4, this);
         if !oep4_balance.is_zero() {
-            transfer_neovm(&pair.oep4, this, &addr, oep4_balance);
+            transfer_neovm(&pair.oep4, this, &new_addr, oep4_balance);
         }
         let erc20_balance = balance_of_erc20(this, &pair.erc20, this);
         if !erc20_balance.is_zero() {
-            transfer_erc20(this, &pair.erc20, &addr, erc20_balance);
+            transfer_erc20(this, &pair.erc20, &new_addr, erc20_balance);
         }
     });
     true
@@ -264,9 +271,24 @@ pub fn invoke() {
             ))
         }
         "updateTokenPair" => {
-            let (token_pair_name, oep4_addr, erc20_addr, eth_acct, ont_acct) =
-                source.read().unwrap();
-            sink.write(update_pair(token_pair_name, oep4_addr, erc20_addr, eth_acct, ont_acct))
+            let (
+                token_pair_name,
+                oep4_addr,
+                oep4_decimals,
+                erc20_addr,
+                erc20_decimals,
+                eth_acct,
+                ont_acct,
+            ) = source.read().unwrap();
+            sink.write(update_token_pair(
+                token_pair_name,
+                oep4_addr,
+                oep4_decimals,
+                erc20_addr,
+                erc20_decimals,
+                eth_acct,
+                ont_acct,
+            ))
         }
         "unregisterTokenPair" => {
             let (token_pair_name, ont_acct, eth_acct) = source.read().unwrap();
