@@ -302,13 +302,13 @@ pub fn invoke() {
             let vm_type: U128 = vm_type;
             sink.write(migrate(code, vm_type.raw() as u32, name, version, author, email, desc));
         }
+        "erc20ToOep4" => {
+            let (ont_acct, eth_acct, amount, token_pair_name) = source.read().unwrap();
+            sink.write(erc20_to_oep4(ont_acct, eth_acct, amount, token_pair_name));
+        }
         "oep4ToErc20" => {
             let (ont_acct, eth_acct, amount, token_pair_name) = source.read().unwrap();
             sink.write(oep4_to_erc20(ont_acct, eth_acct, amount, token_pair_name));
-        }
-        "erc20ToOep4" => {
-            let (eth_acct, ont_acct, amount, token_pair_name) = source.read().unwrap();
-            sink.write(erc20_to_oep4(ont_acct, eth_acct, amount, token_pair_name));
         }
         _ => panic!("unsupported action!"),
     }
