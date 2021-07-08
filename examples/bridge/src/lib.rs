@@ -179,7 +179,7 @@ fn oep4_to_erc20(
             let decimals_delta = pair.oep4_decimals - pair.erc20_decimals;
             let remainder = amount.raw() % 10u128.pow(decimals_delta);
             if remainder != 0 {
-                amount = amount - U128::new(remainder);
+                amount -= U128::new(remainder);
             }
             decimals_delta
         } else {
@@ -220,7 +220,7 @@ fn erc20_to_oep4(
             let decimals_delta = pair.erc20_decimals - pair.oep4_decimals;
             let remainder = amount.raw() % 10u128.pow(decimals_delta);
             if remainder != 0 {
-                amount = amount - U128::new(remainder);
+                amount -= U128::new(remainder);
             }
             decimals_delta
         } else {
