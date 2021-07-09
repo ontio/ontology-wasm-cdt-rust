@@ -61,7 +61,7 @@ mod tests {
         #[ontio_std::macros::event]
         fn transfer_name(from: &Address) {}
 
-        #[ontio_std::macros::event(name = transfer_test)]
+        #[ontio_std::macros::event(name=transfer_test)]
         fn transfer_name2(from: &Address) {}
     }
 
