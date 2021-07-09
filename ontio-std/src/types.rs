@@ -49,7 +49,7 @@ fn to_hex_string_reverse(data: &[u8]) -> String {
 }
 
 #[allow(unused)]
-fn to_hex_string(data: &[u8]) -> String {
+pub fn to_hex_string(data: &[u8]) -> String {
     use core::fmt::Write;
     let mut s = String::with_capacity(data.len() * 2);
     for v in data {

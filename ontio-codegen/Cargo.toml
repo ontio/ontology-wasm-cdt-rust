@@ -18,4 +18,5 @@ proc-macro2 = "1.0"
 sha2 = { version = "0.9", default-features = false }
 num = { version = "0.3"}
 heck = {version = "0.3.1",default-features = false}
+keccak-hash = "0.8.0"
 

@@ -2,7 +2,9 @@
 #![feature(proc_macro_hygiene)]
 
 extern crate proc_macro;
+
 use heck::MixedCase;
+use keccak_hash::keccak;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Lit};
@@ -54,5 +56,18 @@ pub fn base58(item: TokenStream) -> TokenStream {
     };
     let result = quote! { Address::new([#(#addr),*])};
 
+    result.into()
+}
+
+#[proc_macro]
+pub fn keccak256(item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as Lit);
+    let data = match input {
+        syn::Lit::Str(lit_str) => lit_str.value().as_bytes().to_vec(),
+        syn::Lit::ByteStr(lit_str) => lit_str.value(),
+        _ => panic!("keccak256! only support string literal"),
+    };
+    let res = keccak(data).0;
+    let result = quote! { H256::new([#(#res),*]) };
     result.into()
 }
