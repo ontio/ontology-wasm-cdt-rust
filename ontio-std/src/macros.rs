@@ -7,10 +7,7 @@ pub use ontio_codegen::keccak256;
 mod tests {
     use crate as ontio_std;
     use ontio_std::abi::{Decoder, Encoder};
-<<<<<<< HEAD
     use ontio_std::types::to_hex_string;
-=======
->>>>>>> add keccak256!
 
     #[derive(Encoder, Decoder)]
     struct Oep4 {
