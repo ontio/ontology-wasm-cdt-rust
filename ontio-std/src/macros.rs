@@ -1,11 +1,13 @@
 pub use ontio_codegen::base58;
 pub use ontio_codegen::contract;
 pub use ontio_codegen::event;
+pub use ontio_codegen::keccak256;
 
 #[cfg(test)]
 mod tests {
     use crate as ontio_std;
     use ontio_std::abi::{Decoder, Encoder};
+
     #[derive(Encoder, Decoder)]
     struct Oep4 {
         from: u32,
@@ -19,6 +21,7 @@ mod tests {
     }
 
     use ontio_std::prelude::*;
+
     #[ontio_std::macros::contract]
     trait TestContract {
         fn mut_self(&mut self, owner: Address) -> bool;
@@ -43,16 +46,22 @@ mod tests {
         const _ADDR: Address = ontio_std::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     }
 
+    #[test]
+    fn keccak256_test() {
+        let _data: H256 = ontio_std::macros::keccak256!("transfer(address,uint256)");
+    }
+
     mod notify {
         use crate as ontio_std;
         use ontio_std::types::{Address, U128};
+
         #[ontio_std::macros::event]
         fn transfer(from: &Address, to: &Address, amount: U128) {}
 
         #[ontio_std::macros::event]
         fn transfer_name(from: &Address) {}
 
-        #[ontio_std::macros::event(name=transfer_test)]
+        #[ontio_std::macros::event(name = transfer_test)]
         fn transfer_name2(from: &Address) {}
     }
 
