@@ -7,6 +7,7 @@ pub use ontio_codegen::keccak256;
 mod tests {
     use crate as ontio_std;
     use ontio_std::abi::{Decoder, Encoder};
+    use ontio_std::types::to_hex_string;
 
     #[derive(Encoder, Decoder)]
     struct Oep4 {
@@ -48,7 +49,11 @@ mod tests {
 
     #[test]
     fn keccak256_test() {
-        let _data: H256 = ontio_std::macros::keccak256!("transfer(address,uint256)");
+        let data: H256 = ontio_std::macros::keccak256!("transfer(address,uint256)");
+        assert_eq!(
+            to_hex_string(data.as_bytes()),
+            "a9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b"
+        );
     }
 
     mod notify {
