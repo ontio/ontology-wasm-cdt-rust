@@ -50,6 +50,22 @@ oep4 资产转换成erc20资产
 
 注意： 会校验ont_acct的签名
 
+
+
+* 事件
+
+|参数名|参数描述|
+|:---|:---|
+|oep4ToErc20|方法名|
+|ont_acct|用户的ontology账户地址|
+|eth_acct|用户的ethereum账户地址|
+|amount|要兑换的oep4资产的数量|
+|erc20_amt|兑换到的erc20的数量|
+|oep4_addr|oep4合约地址|
+|erc20_addr|erc20合约地址|
+
+
+
 4. erc20ToOep4
 
 erc20资产兑换成oep4资产
@@ -64,3 +80,16 @@ erc20资产兑换成oep4资产
 |token_pair_name|&[u8]|要兑换的tokenPair对的名字|
 
 注意： 会校验ont_acct的签名
+
+
+* 事件
+
+|参数名|参数描述|
+|:---|:---|
+|erc20ToOep4|方法名|
+|ont_acct|用户的ontology账户地址|
+|eth_acct|用户的ethereum账户地址|
+|amount|要兑换的erc20资产的数量|
+|oep4_amt|兑换到的oep4_amt的数量|
+|oep4_addr|oep4合约地址|
+|erc20_addr|erc20合约地址|
