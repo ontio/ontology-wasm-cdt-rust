@@ -243,7 +243,7 @@ fn erc20_to_oep4(
             transfer_neovm(&pair.oep4, this, ont_acct, oep4_amt);
             oep4_amt
         };
-        erc20_to_oep4_event(ont_acct,eth_acct, amount, oep4_amt, &pair.oep4, &pair.erc20);
+        erc20_to_oep4_event(ont_acct, eth_acct, amount, oep4_amt, &pair.oep4, &pair.erc20);
         true
     } else {
         false
