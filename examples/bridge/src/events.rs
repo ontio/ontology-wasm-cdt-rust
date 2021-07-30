@@ -34,8 +34,8 @@ pub fn erc20_to_oep4_event(
 ) {
     EventBuilder::new()
         .string("erc20ToOep4")
-        .address(eth_acct)
         .address(ont_acct)
+        .address(eth_acct)
         .number(amount)
         .number(oep4_amt)
         .address(oep4_addr)
