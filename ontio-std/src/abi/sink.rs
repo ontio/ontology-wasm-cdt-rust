@@ -51,7 +51,7 @@ impl Sink {
             self.write_byte(0)
         }
     }
-    pub(crate) fn write_var_bytes(&mut self, data: &[u8]) {
+    pub fn write_var_bytes(&mut self, data: &[u8]) {
         self.write_varuint(data.len() as u64);
         self.write_bytes(data);
     }
