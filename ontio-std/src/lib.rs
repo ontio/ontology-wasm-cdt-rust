@@ -1,7 +1,6 @@
 #![feature(lang_items)]
 #![feature(core_intrinsics)]
 #![feature(allocator_api)]
-#![feature(alloc_prelude)]
 #![feature(slice_concat_ext)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(exclusive_range_pattern)]
@@ -61,7 +60,7 @@ pub mod prelude {
     pub use crate::contract::TransferParam;
     pub use crate::types::{Address, H256, I128, U128};
     pub use alloc::boxed::Box;
-    pub use alloc::prelude::*;
+    pub use alloc::borrow::ToOwned;
     pub use alloc::str;
     pub use alloc::string::{self, String, ToString};
     pub use alloc::vec::Vec;
