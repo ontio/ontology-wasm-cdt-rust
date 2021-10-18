@@ -101,10 +101,10 @@ impl ContractAction {
 
 #[derive(Debug)]
 struct ContractEvent {
-    name: syn::Ident,
+    _name: syn::Ident,
     method_sig: syn::Signature,
     params: Vec<(Box<syn::Pat>, Box<syn::Type>)>,
-    default: Option<syn::Block>,
+    _default: Option<syn::Block>,
 }
 
 impl ContractEvent {
@@ -119,10 +119,10 @@ impl ContractEvent {
             })
             .collect();
         ContractEvent {
-            name: method.sig.ident.clone(),
+            _name: method.sig.ident.clone(),
             method_sig: method.sig,
             params,
-            default: method.default,
+            _default: method.default,
         }
     }
 }
