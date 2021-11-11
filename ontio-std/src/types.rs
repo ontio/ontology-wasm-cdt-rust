@@ -34,7 +34,7 @@ impl AsRef<H256> for H256 {
 }
 
 impl H256 {
-    pub fn to_hex_string(&self) -> String {
+    pub fn hex_string(&self) -> String {
         to_hex_string_reverse(&self.0)
     }
 }
@@ -49,7 +49,7 @@ fn to_hex_string_reverse(data: &[u8]) -> String {
 }
 
 #[allow(unused)]
-fn to_hex_string(data: &[u8]) -> String {
+pub fn to_hex_string(data: &[u8]) -> String {
     use core::fmt::Write;
     let mut s = String::with_capacity(data.len() * 2);
     for v in data {
@@ -76,7 +76,7 @@ pub use num::U128;
 pub use num::U256;
 
 impl Address {
-    pub fn to_hex_string(&self) -> String {
+    pub fn hex_string(&self) -> String {
         to_hex_string_reverse(&self.0)
     }
 }

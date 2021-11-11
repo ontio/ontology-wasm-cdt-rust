@@ -183,12 +183,37 @@ pub mod governance {
 
 pub mod neo {
     use crate::prelude::*;
+
     pub fn call_contract<T: crate::abi::VmValueEncoder>(
         contract_address: &Address, param: T,
     ) -> Vec<u8> {
         let mut builder = crate::abi::VmValueBuilder::new();
         param.serialize(&mut builder);
         crate::runtime::call_contract(contract_address, &builder.bytes())
+    }
+}
+
+pub mod eth {
+    use crate::abi::Sink;
+    use crate::macros::base58;
+    use crate::prelude::*;
+    use crate::runtime;
+    use crate::types::Address;
+
+    const EVM_INVOKE_NAME: &str = "evmInvoke";
+    const VERSION: u8 = 0;
+    const SYSTEM_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbwC9m2yJG");
+
+    pub fn evm_invoke(caller: &Address, target: &Address, input: &[u8]) -> Vec<u8> {
+        let mut sink = Sink::new(input.len() + 20 + 20 + 16);
+        sink.write(caller.as_bytes());
+        sink.write(target.as_bytes());
+        sink.write(input);
+        let mut sink_param = Sink::new(sink.bytes().len() + 32);
+        sink_param.write(VERSION);
+        sink_param.write(EVM_INVOKE_NAME);
+        sink_param.write(sink.bytes());
+        runtime::call_contract(&SYSTEM_CONTRACT_ADDRESS, sink_param.bytes())
     }
 }
 
@@ -207,6 +232,7 @@ pub mod ontid {
         value: Vec<u8>,
         value_type: Vec<u8>,
     }
+
     impl Encoder for DDOAttribute {
         fn encode(&self, sink: &mut Sink) {
             sink.write(self.key.as_slice());
@@ -214,6 +240,7 @@ pub mod ontid {
             sink.write(self.value_type.as_slice());
         }
     }
+
     impl<'a> Decoder<'a> for DDOAttribute {
         fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
             let key: &[u8] = source.read().unwrap();
@@ -231,6 +258,7 @@ pub mod ontid {
         id: Vec<u8>,
         index: u32,
     }
+
     impl Encoder for Signer {
         fn encode(&self, sink: &mut Sink) {
             sink.write(self.id.as_slice());
@@ -342,6 +370,7 @@ pub mod ontid {
 pub mod wasm {
     use crate::abi::Sink;
     use crate::prelude::*;
+
     pub fn call_contract<T: crate::abi::Encoder>(contract_address: &Address, param: T) -> Vec<u8> {
         let mut sink = Sink::new(16);
         sink.write(param);
@@ -379,6 +408,7 @@ pub mod ont {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, state.as_ref())
     }
+
     ///transfer_multi method of ont assets,Multiple transfers in one transaction
     /// # Example
     /// ```no_run
@@ -403,6 +433,7 @@ pub mod ont {
     pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
         super::util::transfer_inner(&ONT_CONTRACT_ADDRESS, transfer)
     }
+
     ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
     /// # Example
     /// ```no_run
@@ -417,6 +448,7 @@ pub mod ont {
     pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner(&ONT_CONTRACT_ADDRESS, from, to, amount)
     }
+
     ///Query the balance of ont assets
     /// # Example
     /// ```no_run
@@ -429,8 +461,9 @@ pub mod ont {
     ///     ont::balance_of(addr);
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
-        super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, &address)
+        super::util::balance_of_inner(&ONT_CONTRACT_ADDRESS, address)
     }
+
     ///This method is used in conjunction with the approve method to query the number of approve
     /// # Example
     /// ```no_run
@@ -445,6 +478,7 @@ pub mod ont {
     pub fn allowance(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner(&ONT_CONTRACT_ADDRESS, from, to)
     }
+
     ///Spender transfers a certain amount of ont from from-address to to-address
     /// # Example
     /// ```no_run
@@ -485,6 +519,7 @@ pub mod ong {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, state.as_ref())
     }
+
     ///transfer_multi method of ong assets,Multiple transfers in one transaction
     /// # Example
     /// ```no_run
@@ -508,6 +543,7 @@ pub mod ong {
     pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
         super::util::transfer_inner(&ONG_CONTRACT_ADDRESS, transfer)
     }
+
     ///Query the balance of ong assets
     /// # Example
     /// ```no_run
@@ -520,8 +556,9 @@ pub mod ong {
     ///     ong::balance_of(addr);
     /// ```
     pub fn balance_of(address: &Address) -> U128 {
-        super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, &address)
+        super::util::balance_of_inner(&ONG_CONTRACT_ADDRESS, address)
     }
+
     ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
     /// # Example
     /// ```no_run
@@ -536,6 +573,7 @@ pub mod ong {
     pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner(&ONG_CONTRACT_ADDRESS, from, to, amount)
     }
+
     ///This method is used in conjunction with the approve method to query the number of approve
     /// # Example
     /// ```no_run
@@ -550,6 +588,7 @@ pub mod ong {
     pub fn allowance(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner(&ONG_CONTRACT_ADDRESS, from, to)
     }
+
     ///Spender transfers a certain amount of ong from from-address to to-address
     /// # Example
     /// ```no_run
@@ -572,6 +611,7 @@ pub(crate) mod util {
     use super::super::types::{u128_from_neo_bytes, u128_to_neo_bytes, Address, U128};
 
     const VERSION: u8 = 0;
+
     pub(crate) fn transfer_inner(
         contract_address: &Address, transfer: &[super::TransferParam],
     ) -> bool {

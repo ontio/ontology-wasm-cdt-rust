@@ -1,4 +1,5 @@
 #![allow(clippy::ptr_offset_with_cast, clippy::assign_op_pattern)]
+#![allow(clippy::manual_range_contains)]
 
 use core::fmt::{Debug, Display, Formatter, Result};
 use core::iter::Sum;
@@ -25,6 +26,9 @@ impl I128 {
     pub const fn to_le_bytes(self) -> [u8; 16] {
         self.0.to_le_bytes()
     }
+    pub const fn to_be_bytes(self) -> [u8; 16] {
+        self.0.to_be_bytes()
+    }
 
     pub const fn raw(self) -> i128 {
         self.0
@@ -45,6 +49,9 @@ impl U128 {
 
     pub const fn to_le_bytes(self) -> [u8; 16] {
         self.0.to_le_bytes()
+    }
+    pub const fn to_be_bytes(self) -> [u8; 16] {
+        self.0.to_be_bytes()
     }
 
     pub const fn raw(self) -> u128 {
@@ -270,6 +277,15 @@ impl U256 {
 
     pub fn from_little_endian(slice: &[u8]) -> Self {
         U256(u256::U256::from_little_endian(slice))
+    }
+    pub fn from_big_endian(slice: &[u8]) -> Self {
+        U256(u256::U256::from_big_endian(slice))
+    }
+
+    pub fn to_be_bytes(self) -> [u8; 32] {
+        let mut buf = [0; 32];
+        self.0.to_big_endian(&mut buf);
+        buf
     }
 
     pub fn to_le_bytes(&self) -> [u8; 32] {

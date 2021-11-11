@@ -6,6 +6,7 @@ mod env {
         pub fn ontio_block_height() -> u32;
         pub fn ontio_self_address(dest: *mut u8);
         pub fn ontio_caller_address(dest: *mut u8);
+        pub fn ontio_gas_info(dest: *mut u8);
         pub fn ontio_entry_address(dest: *mut u8);
         pub fn ontio_check_witness(addr: *const u8) -> u32;
         pub fn ontio_return(ptr: *const u8, len: u32) -> !;
@@ -318,6 +319,26 @@ pub fn caller() -> Address {
     }
     addr
 }
+
+///return gas info
+/// # Example
+///
+/// ```no_run
+/// # use ontio_std::runtime;
+/// let (gas_left, gas_price) = runtime::gas_info();
+/// ```
+pub fn gas_info() -> (u64, u64) {
+    let mut buffer = [0u8; 16];
+    unsafe {
+        env::ontio_gas_info(buffer.as_mut().as_mut_ptr());
+    }
+    let mut gas_left = [0u8; 8];
+    let mut gas_price = [0u8; 8];
+    gas_left.copy_from_slice(&buffer[0..8]);
+    gas_price.copy_from_slice(&buffer[8..16]);
+    (u64::from_le_bytes(gas_left), u64::from_le_bytes(gas_price))
+}
+
 /// return the entry address
 /// # Example
 ///

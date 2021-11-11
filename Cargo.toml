@@ -15,7 +15,8 @@ members = [
     "examples/notify-test",
     "examples/call_native",
     "examples/oracle",
-    "examples/gov"
+    "examples/gov",
+    "examples/bridge"
 ]
 
 [profile.release]

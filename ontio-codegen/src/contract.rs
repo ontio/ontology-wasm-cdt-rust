@@ -101,10 +101,10 @@ impl ContractAction {
 
 #[derive(Debug)]
 struct ContractEvent {
-    name: syn::Ident,
+    _name: syn::Ident,
     method_sig: syn::Signature,
     params: Vec<(Box<syn::Pat>, Box<syn::Type>)>,
-    default: Option<syn::Block>,
+    _default: Option<syn::Block>,
 }
 
 impl ContractEvent {
@@ -119,10 +119,10 @@ impl ContractEvent {
             })
             .collect();
         ContractEvent {
-            name: method.sig.ident.clone(),
+            _name: method.sig.ident.clone(),
             method_sig: method.sig,
             params,
-            default: method.default,
+            _default: method.default,
         }
     }
 }
@@ -134,7 +134,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
                 let args = action.params.iter().map(|&(_, ref ty)| {
-                    let ty :&syn::Type = &ty;
+                    let ty :&syn::Type = ty;
                     match ty {
                         syn::Type::Reference(refer) => {
                             let mutability = refer.mutability.as_ref();
