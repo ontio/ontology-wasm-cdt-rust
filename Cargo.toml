@@ -15,6 +15,7 @@ members = [
     "examples/notify-test",
     "examples/call_native",
     "examples/oracle",
+    "examples/gov",
     "examples/bridge"
 ]
 

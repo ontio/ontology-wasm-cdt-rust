@@ -1,5 +1,186 @@
 use crate::prelude::*;
 
+pub mod governance {
+    use crate::abi::{Encoder, Sink, Source};
+    use crate::macros::base58;
+    use crate::prelude::*;
+    use crate::runtime::call_contract;
+    use crate::types::u128_to_neo_bytes;
+
+    const VERSION: u8 = 0;
+    pub const GOV_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbviEH9ugK");
+
+    pub struct AuthorizeForPeerParam<'a> {
+        addr: &'a Address,
+        peer_pubkey_list: &'a [&'a str],
+        pos_list: &'a [u32],
+    }
+
+    impl<'a> AuthorizeForPeerParam<'a> {
+        pub fn new(addr: &'a Address, pos_list: &'a [u32], peer_pub_key: &'a [&str]) -> Self {
+            AuthorizeForPeerParam { addr, peer_pubkey_list: peer_pub_key, pos_list }
+        }
+    }
+
+    impl<'a> Encoder for AuthorizeForPeerParam<'a> {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write_var_bytes(self.addr.as_bytes());
+            sink.write_native_varuint(self.peer_pubkey_list.len() as u64);
+            for &pk in self.peer_pubkey_list.iter() {
+                sink.write(pk);
+            }
+            sink.write_native_varuint(self.pos_list.len() as u64);
+            for pos in self.pos_list.iter() {
+                sink.write(u128_to_neo_bytes(U128::new(*pos as u128)));
+            }
+        }
+    }
+
+    pub fn authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
+        let mut sink = Sink::new(64);
+        let pos_list = vec![amt.raw() as u32];
+        let peer_pub_key = &[peer_pub_key];
+        let a = AuthorizeForPeerParam::new(addr, pos_list.as_slice(), peer_pub_key);
+        sink.write(a);
+
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("authorizeForPeer");
+        sink_param.write(sink.bytes());
+
+        let output = call_contract(&GOV_CONTRACT_ADDRESS, sink_param.bytes());
+        let mut source = Source::new(output.as_slice());
+        source.read_bool().unwrap_or_default()
+    }
+
+    //Authorize for a node by depositing ONT in this governance contract, used by contracts
+    pub fn authorize_for_peer_transfer_from(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
+        let mut sink = Sink::new(64);
+        let pos_list = &[amt.raw() as u32];
+        let peer_pub_key = &[peer_pub_key];
+        let a = AuthorizeForPeerParam::new(addr, pos_list, peer_pub_key);
+        sink.write(a);
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("authorizeForPeerTransferFrom");
+        sink_param.write(sink.bytes());
+
+        let output = call_contract(&GOV_CONTRACT_ADDRESS, sink_param.bytes());
+        let mut source = Source::new(output.as_slice());
+        source.read_bool().unwrap_or_default()
+    }
+
+    //UnAuthorize for a node by redeeming ONT from this governance contract
+    pub fn un_authorize_for_peer(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
+        let mut sink = Sink::new(64);
+        let pos_list = vec![amt.raw() as u32];
+        let peer_pub_key = &[peer_pub_key];
+        let a = AuthorizeForPeerParam::new(addr, pos_list.as_slice(), peer_pub_key);
+        sink.write(a);
+
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("unAuthorizeForPeer");
+        sink_param.write(sink.bytes());
+
+        let output = call_contract(&GOV_CONTRACT_ADDRESS, sink_param.bytes());
+        let mut source = Source::new(output.as_slice());
+        source.read_bool().unwrap_or_default()
+    }
+
+    struct WithdrawParam<'a> {
+        addr: &'a Address,
+        peer_pubkey_list: &'a [&'a str],
+        withdraw_list: &'a [u32],
+    }
+    impl<'a> Encoder for WithdrawParam<'a> {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write_var_bytes(self.addr.as_bytes());
+            sink.write_var_bytes(
+                u128_to_neo_bytes(U128::new(self.peer_pubkey_list.len() as u128)).as_slice(),
+            );
+            self.peer_pubkey_list.iter().for_each(|peer_pubkey| sink.write(peer_pubkey));
+            sink.write_var_bytes(
+                u128_to_neo_bytes(U128::new(self.withdraw_list.len() as u128)).as_slice(),
+            );
+            self.withdraw_list.iter().for_each(|withdraw| {
+                sink.write_var_bytes(u128_to_neo_bytes(U128::new(*withdraw as u128)).as_slice())
+            });
+        }
+    }
+
+    //Withdraw unfreezed ONT deposited in this governance contract.
+    pub fn withdraw(addr: &Address, amt: U128, peer_pub_key: &str) -> bool {
+        let mut sink = Sink::new(80);
+        sink.write(WithdrawParam {
+            addr,
+            peer_pubkey_list: &[peer_pub_key],
+            withdraw_list: &[amt.raw() as u32],
+        });
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("withdraw");
+        sink_param.write(sink.bytes());
+
+        let output = call_contract(&GOV_CONTRACT_ADDRESS, sink_param.bytes());
+        let mut source = Source::new(output.as_slice());
+        source.read_bool().unwrap_or_default()
+    }
+
+    struct WithdrawOngParam<'a> {
+        addr: &'a Address,
+    }
+    impl<'a> Encoder for WithdrawOngParam<'a> {
+        fn encode(&self, sink: &mut Sink) {
+            sink.write_var_bytes(self.addr.as_bytes())
+        }
+    }
+
+    //Withdraw unbounded ONG according to deposit ONT in this governance contract
+    pub fn withdraw_ong(addr: &Address) -> bool {
+        let mut sink = Sink::new(64);
+        sink.write(WithdrawOngParam { addr });
+        let mut sink_param = Sink::new(64);
+        sink_param.write(VERSION);
+        sink_param.write("withdrawOng");
+        sink_param.write(sink.bytes());
+
+        let output = call_contract(&GOV_CONTRACT_ADDRESS, sink_param.bytes());
+        let mut source = Source::new(output.as_slice());
+        source.read_bool().unwrap_or_default()
+    }
+
+    #[test]
+    pub fn test_struct() {
+        let data = [
+            0x1b, 0x25, 0xfb, 0x79, 0xe6, 0x1d, 0x58, 0x60, 0x97, 0xef, 0xd9, 0xee, 0x89, 0xa5,
+            0xab, 0xbf, 0x22, 0x27, 0xa2, 0xba,
+        ];
+        let ap = AuthorizeForPeerParam {
+            addr: &Address::new(data),
+            peer_pubkey_list: &[&"test".to_string()],
+            pos_list: &[128u32],
+        };
+        let mut sink = Sink::new(64);
+        sink.write(ap);
+        println!("AuthorizeForPeerParam:{}", hexutil::to_hex(sink.bytes()));
+
+        let wp = WithdrawParam {
+            addr: &Address::repeat_byte(2),
+            peer_pubkey_list: &["test"],
+            withdraw_list: &[128u32],
+        };
+        let mut sink = Sink::new(64);
+        sink.write(wp);
+        println!("WithdrawParam:{}", hexutil::to_hex(sink.bytes()));
+
+        let wp = WithdrawOngParam { addr: &Address::repeat_byte(2) };
+        let mut sink = Sink::new(64);
+        sink.write(wp);
+        println!("WithdrawOngParam:{}", hexutil::to_hex(sink.bytes()));
+    }
+}
+
 pub mod neo {
     use crate::prelude::*;
 
