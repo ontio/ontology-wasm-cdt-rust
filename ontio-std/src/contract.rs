@@ -312,14 +312,6 @@ pub mod ont {
     pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
     }
-}
-
-///This module provides the operation API related to ont assets, such as balanceof, transfer, etc.
-pub mod ont_v2 {
-    use crate::macros::base58;
-    use crate::prelude::*;
-
-    const ONT_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhUMqNMV");
 
     ///Transfer method of ont assets, Transfer ont assets from the from address to the to address
     /// # Example
@@ -330,9 +322,9 @@ pub mod ont_v2 {
     ///   let input= input();
     ///   let mut source = Source::new(&input);
     ///   let (from, to, amount) = source.read().unwrap();
-    ///   ont::transfer(from,to, amount);
+    ///   ont::transfer_v2(from,to, amount);
     /// ```
-    pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+    pub fn transfer_v2(from: &Address, to: &Address, val: U128) -> bool {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, state.as_ref())
     }
@@ -356,9 +348,9 @@ pub mod ont_v2 {
     ///         };
     ///         ts.push(trans)
     ///     }
-    ///     ont::transfer_multi(ts.as_slice());
+    ///     ont::transfer_multi_v2(ts.as_slice());
     /// ```
-    pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
+    pub fn transfer_multi_v2(transfer: &[TransferParam]) -> bool {
         super::util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, transfer)
     }
 
@@ -371,9 +363,9 @@ pub mod ont_v2 {
     ///   let input = input();
     ///   let mut source = Source::new(&input);
     ///   let (from,to,amount) = source.read().unwrap();
-    ///   ont::approve(from, to, amount);
+    ///   ont::approve_v2(from, to, amount);
     /// ```
-    pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
+    pub fn approve_v2(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner_v2(&ONT_CONTRACT_ADDRESS, from, to, amount)
     }
 
@@ -386,9 +378,9 @@ pub mod ont_v2 {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
-    ///     ont::balance_of(addr);
+    ///     ont::balance_of_v2(addr);
     /// ```
-    pub fn balance_of(address: &Address) -> U128 {
+    pub fn balance_of_v2(address: &Address) -> U128 {
         super::util::balance_of_inner_v2(&ONT_CONTRACT_ADDRESS, address)
     }
 
@@ -401,9 +393,9 @@ pub mod ont_v2 {
     ///   let input= input();
     ///   let mut source = Source::new(&input);
     ///   let (from, to) = source.read().unwrap();
-    ///   ont::allowance(from,to);
+    ///   ont::allowance_v2(from,to);
     /// ```
-    pub fn allowance(from: &Address, to: &Address) -> U128 {
+    pub fn allowance_v2(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner_v2(&ONT_CONTRACT_ADDRESS, from, to)
     }
 
@@ -416,9 +408,9 @@ pub mod ont_v2 {
     ///   let input= input();
     ///   let mut source = Source::new(&input);
     ///   let (spender, from, to, amount) = source.read().unwrap();
-    ///   ont::transfer_from(spender, from, to, amount);
+    ///   ont::transfer_from_v2(spender, from, to, amount);
     /// ```
-    pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
+    pub fn transfer_from_v2(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner_v2(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
     }
 }
@@ -531,16 +523,6 @@ pub mod ong {
     pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
     }
-}
-
-///This module provides the operation API related to ong assets, such as balanceof, transfer, etc.
-pub mod ong_v2 {
-    use crate::prelude::*;
-
-    use crate::macros::base58;
-    use crate::types::{Address, U128};
-
-    const ONG_CONTRACT_ADDRESS: Address = base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhfRZMHJ");
 
     ///Transfer method of ong assets, Transfer ont assets from the from address to the to address
     /// # Example
@@ -551,9 +533,9 @@ pub mod ong_v2 {
     ///   let input = input();
     ///   let mut source = Source::new(&input);
     ///   let (from, to, amount) = source.read().unwrap();
-    ///   ong::transfer(from,to, amount);
+    ///   ong::transfer_v2(from,to, amount);
     /// ```
-    pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+    pub fn transfer_v2(from: &Address, to: &Address, val: U128) -> bool {
         let state = [TransferParam { from: *from, to: *to, amount: val }];
         super::util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, state.as_ref())
     }
@@ -576,9 +558,9 @@ pub mod ong_v2 {
     ///             amount:tr.2,
     ///         })
     ///     }
-    ///     ong::transfer_multi(transfers.as_slice());
+    ///     ong::transfer_multi_v2(transfers.as_slice());
     /// ```
-    pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
+    pub fn transfer_multi_v2(transfer: &[super::TransferParam]) -> bool {
         super::util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, transfer)
     }
 
@@ -591,9 +573,9 @@ pub mod ong_v2 {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let addr = source.read().unwrap();
-    ///     ong::balance_of(addr);
+    ///     ong::balance_of_v2(addr);
     /// ```
-    pub fn balance_of(address: &Address) -> U128 {
+    pub fn balance_of_v2(address: &Address) -> U128 {
         super::util::balance_of_inner_v2(&ONG_CONTRACT_ADDRESS, address)
     }
 
@@ -606,9 +588,9 @@ pub mod ong_v2 {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (from,to,amount) = source.read().unwrap();
-    ///     ong::approve(from, to, amount);
+    ///     ong::approve_v2(from, to, amount);
     /// ```
-    pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
+    pub fn approve_v2(from: &Address, to: &Address, amount: U128) -> bool {
         super::util::approve_inner_v2(&ONG_CONTRACT_ADDRESS, from, to, amount)
     }
 
@@ -621,9 +603,9 @@ pub mod ong_v2 {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (from, to) = source.read().unwrap();
-    ///     ong::allowance(from,to);
+    ///     ong::allowance_v2(from,to);
     /// ```
-    pub fn allowance(from: &Address, to: &Address) -> U128 {
+    pub fn allowance_v2(from: &Address, to: &Address) -> U128 {
         super::util::allowance_inner_v2(&ONG_CONTRACT_ADDRESS, from, to)
     }
 
@@ -636,9 +618,9 @@ pub mod ong_v2 {
     ///     let input = input();
     ///     let mut source = Source::new(&input);
     ///     let (spender, from, to, amount) = source.read().unwrap();
-    ///     ong::transfer_from(spender, from, to, amount);
+    ///     ong::transfer_from_v2(spender, from, to, amount);
     /// ```
-    pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
+    pub fn transfer_from_v2(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
         super::util::transfer_from_inner_v2(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
     }
 }
