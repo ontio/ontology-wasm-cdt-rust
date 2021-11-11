@@ -313,105 +313,110 @@ pub mod ont {
         super::util::transfer_from_inner(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
     }
 
-    ///Transfer method of ont assets, Transfer ont assets from the from address to the to address
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::ont;
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///   let input= input();
-    ///   let mut source = Source::new(&input);
-    ///   let (from, to, amount) = source.read().unwrap();
-    ///   ont::transfer_v2(from,to, amount);
-    /// ```
-    pub fn transfer_v2(from: &Address, to: &Address, val: U128) -> bool {
-        let state = [TransferParam { from: *from, to: *to, amount: val }];
-        super::util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, state.as_ref())
-    }
+    pub mod v2 {
+        use super::*;
+        use crate::contract::util;
 
-    ///transfer_multi method of ont assets,Multiple transfers in one transaction
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ont,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    /// # use ontio_std::types::{Address, U128};
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
-    ///     let mut ts = Vec::<TransferParam>::new();
-    ///     for tr in trs.iter() {
-    ///         let trans = TransferParam{
-    ///            from:tr.0,
-    ///            to:tr.1,
-    ///            amount:tr.2,
-    ///         };
-    ///         ts.push(trans)
-    ///     }
-    ///     ont::transfer_multi_v2(ts.as_slice());
-    /// ```
-    pub fn transfer_multi_v2(transfer: &[TransferParam]) -> bool {
-        super::util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, transfer)
-    }
+        ///Transfer method of ont assets, Transfer ont assets from the from address to the to address
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::ont;
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///   let input= input();
+        ///   let mut source = Source::new(&input);
+        ///   let (from, to, amount) = source.read().unwrap();
+        ///   ont::transfer(from,to, amount);
+        /// ```
+        pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+            let state = [TransferParam { from: *from, to: *to, amount: val }];
+            util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, state.as_ref())
+        }
 
-    ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ont,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///   let input = input();
-    ///   let mut source = Source::new(&input);
-    ///   let (from,to,amount) = source.read().unwrap();
-    ///   ont::approve_v2(from, to, amount);
-    /// ```
-    pub fn approve_v2(from: &Address, to: &Address, amount: U128) -> bool {
-        super::util::approve_inner_v2(&ONT_CONTRACT_ADDRESS, from, to, amount)
-    }
+        ///transfer_multi method of ont assets,Multiple transfers in one transaction
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ont,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        /// # use ontio_std::types::{Address, U128};
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
+        ///     let mut ts = Vec::<TransferParam>::new();
+        ///     for tr in trs.iter() {
+        ///         let trans = TransferParam{
+        ///            from:tr.0,
+        ///            to:tr.1,
+        ///            amount:tr.2,
+        ///         };
+        ///         ts.push(trans)
+        ///     }
+        ///     ont::transfer_multi(ts.as_slice());
+        /// ```
+        pub fn transfer_multi(transfer: &[TransferParam]) -> bool {
+            util::transfer_inner_v2(&ONT_CONTRACT_ADDRESS, transfer)
+        }
 
-    ///Query the balance of ont assets
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ont,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let addr = source.read().unwrap();
-    ///     ont::balance_of_v2(addr);
-    /// ```
-    pub fn balance_of_v2(address: &Address) -> U128 {
-        super::util::balance_of_inner_v2(&ONT_CONTRACT_ADDRESS, address)
-    }
+        ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ont,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///   let input = input();
+        ///   let mut source = Source::new(&input);
+        ///   let (from,to,amount) = source.read().unwrap();
+        ///   ont::approve(from, to, amount);
+        /// ```
+        pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
+            util::approve_inner_v2(&ONT_CONTRACT_ADDRESS, from, to, amount)
+        }
 
-    ///This method is used in conjunction with the approve method to query the number of approve
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ont,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///   let input= input();
-    ///   let mut source = Source::new(&input);
-    ///   let (from, to) = source.read().unwrap();
-    ///   ont::allowance_v2(from,to);
-    /// ```
-    pub fn allowance_v2(from: &Address, to: &Address) -> U128 {
-        super::util::allowance_inner_v2(&ONT_CONTRACT_ADDRESS, from, to)
-    }
+        ///Query the balance of ont assets
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ont,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let addr = source.read().unwrap();
+        ///     ont::balance_of(addr);
+        /// ```
+        pub fn balance_of(address: &Address) -> U128 {
+            util::balance_of_inner_v2(&ONT_CONTRACT_ADDRESS, address)
+        }
 
-    ///Spender transfers a certain amount of ont from from-address to to-address
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ont,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///   let input= input();
-    ///   let mut source = Source::new(&input);
-    ///   let (spender, from, to, amount) = source.read().unwrap();
-    ///   ont::transfer_from_v2(spender, from, to, amount);
-    /// ```
-    pub fn transfer_from_v2(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
-        super::util::transfer_from_inner_v2(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
+        ///This method is used in conjunction with the approve method to query the number of approve
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ont,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///   let input= input();
+        ///   let mut source = Source::new(&input);
+        ///   let (from, to) = source.read().unwrap();
+        ///   ont::allowance(from,to);
+        /// ```
+        pub fn allowance(from: &Address, to: &Address) -> U128 {
+            util::allowance_inner_v2(&ONT_CONTRACT_ADDRESS, from, to)
+        }
+
+        ///Spender transfers a certain amount of ont from from-address to to-address
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ont,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///   let input= input();
+        ///   let mut source = Source::new(&input);
+        ///   let (spender, from, to, amount) = source.read().unwrap();
+        ///   ont::transfer_from(spender, from, to, amount);
+        /// ```
+        pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
+            util::transfer_from_inner_v2(&ONT_CONTRACT_ADDRESS, sender, from, to, amount)
+        }
     }
 }
 
@@ -524,104 +529,109 @@ pub mod ong {
         super::util::transfer_from_inner(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
     }
 
-    ///Transfer method of ong assets, Transfer ont assets from the from address to the to address
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::ong;
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///   let input = input();
-    ///   let mut source = Source::new(&input);
-    ///   let (from, to, amount) = source.read().unwrap();
-    ///   ong::transfer_v2(from,to, amount);
-    /// ```
-    pub fn transfer_v2(from: &Address, to: &Address, val: U128) -> bool {
-        let state = [TransferParam { from: *from, to: *to, amount: val }];
-        super::util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, state.as_ref())
-    }
+    pub mod v2 {
+        use super::*;
+        use crate::contract::util;
 
-    ///transfer_multi method of ong assets,Multiple transfers in one transaction
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ong,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    /// # use ontio_std::types::{Address,U128};
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
-    ///     let mut transfers = Vec::<TransferParam>::new();
-    ///     for tr in trs.iter() {
-    ///         transfers.push(TransferParam{
-    ///             from:tr.0,
-    ///             to:tr.1,
-    ///             amount:tr.2,
-    ///         })
-    ///     }
-    ///     ong::transfer_multi_v2(transfers.as_slice());
-    /// ```
-    pub fn transfer_multi_v2(transfer: &[super::TransferParam]) -> bool {
-        super::util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, transfer)
-    }
+        ///Transfer method of ong assets, Transfer ont assets from the from address to the to address
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::ong;
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///   let input = input();
+        ///   let mut source = Source::new(&input);
+        ///   let (from, to, amount) = source.read().unwrap();
+        ///   ong::transfer(from,to, amount);
+        /// ```
+        pub fn transfer(from: &Address, to: &Address, val: U128) -> bool {
+            let state = [TransferParam { from: *from, to: *to, amount: val }];
+            util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, state.as_ref())
+        }
 
-    ///Query the balance of ong assets
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ong,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let addr = source.read().unwrap();
-    ///     ong::balance_of_v2(addr);
-    /// ```
-    pub fn balance_of_v2(address: &Address) -> U128 {
-        super::util::balance_of_inner_v2(&ONG_CONTRACT_ADDRESS, address)
-    }
+        ///transfer_multi method of ong assets,Multiple transfers in one transaction
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ong,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        /// # use ontio_std::types::{Address,U128};
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let trs: Vec<(Address,Address,U128)> = source.read().unwrap();
+        ///     let mut transfers = Vec::<TransferParam>::new();
+        ///     for tr in trs.iter() {
+        ///         transfers.push(TransferParam{
+        ///             from:tr.0,
+        ///             to:tr.1,
+        ///             amount:tr.2,
+        ///         })
+        ///     }
+        ///     ong::transfer_multi(transfers.as_slice());
+        /// ```
+        pub fn transfer_multi(transfer: &[super::TransferParam]) -> bool {
+            util::transfer_inner_v2(&ONG_CONTRACT_ADDRESS, transfer)
+        }
 
-    ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ong,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from,to,amount) = source.read().unwrap();
-    ///     ong::approve_v2(from, to, amount);
-    /// ```
-    pub fn approve_v2(from: &Address, to: &Address, amount: U128) -> bool {
-        super::util::approve_inner_v2(&ONG_CONTRACT_ADDRESS, from, to, amount)
-    }
+        ///Query the balance of ong assets
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ong,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let addr = source.read().unwrap();
+        ///     ong::balance_of(addr);
+        /// ```
+        pub fn balance_of(address: &Address) -> U128 {
+            util::balance_of_inner_v2(&ONG_CONTRACT_ADDRESS, address)
+        }
 
-    ///This method is used in conjunction with the approve method to query the number of approve
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ong};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let (from, to) = source.read().unwrap();
-    ///     ong::allowance_v2(from,to);
-    /// ```
-    pub fn allowance_v2(from: &Address, to: &Address) -> U128 {
-        super::util::allowance_inner_v2(&ONG_CONTRACT_ADDRESS, from, to)
-    }
+        ///from-address can allow to-address to transfer a certain amount of assets from  from-address.
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ong,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let (from,to,amount) = source.read().unwrap();
+        ///     ong::approve(from, to, amount);
+        /// ```
+        pub fn approve(from: &Address, to: &Address, amount: U128) -> bool {
+            util::approve_inner_v2(&ONG_CONTRACT_ADDRESS, from, to, amount)
+        }
 
-    ///Spender transfers a certain amount of ong from from-address to to-address
-    /// # Example
-    /// ```no_run
-    /// # use ontio_std::contract::{ong,TransferParam};
-    /// # use ontio_std::abi::{Sink, Source};
-    /// # use ontio_std::runtime::input;
-    ///     let input = input();
-    ///     let mut source = Source::new(&input);
-    ///     let (spender, from, to, amount) = source.read().unwrap();
-    ///     ong::transfer_from_v2(spender, from, to, amount);
-    /// ```
-    pub fn transfer_from_v2(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
-        super::util::transfer_from_inner_v2(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
+        ///This method is used in conjunction with the approve method to query the number of approve
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ong};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let (from, to) = source.read().unwrap();
+        ///     ong::allowance(from,to);
+        /// ```
+        pub fn allowance(from: &Address, to: &Address) -> U128 {
+            util::allowance_inner_v2(&ONG_CONTRACT_ADDRESS, from, to)
+        }
+
+        ///Spender transfers a certain amount of ong from from-address to to-address
+        /// # Example
+        /// ```no_run
+        /// # use ontio_std::contract::{ong,TransferParam};
+        /// # use ontio_std::abi::{Sink, Source};
+        /// # use ontio_std::runtime::input;
+        ///     let input = input();
+        ///     let mut source = Source::new(&input);
+        ///     let (spender, from, to, amount) = source.read().unwrap();
+        ///     ong::transfer_from(spender, from, to, amount);
+        /// ```
+        pub fn transfer_from(sender: &Address, from: &Address, to: &Address, amount: U128) -> bool {
+            util::transfer_from_inner_v2(&ONG_CONTRACT_ADDRESS, sender, from, to, amount)
+        }
     }
 }
 

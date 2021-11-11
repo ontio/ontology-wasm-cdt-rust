@@ -17,44 +17,44 @@ pub fn invoke() {
     match action {
         b"ontTransferV2" => {
             let (from, to, amount) = source.read().unwrap();
-            sink.write(ont::transfer_v2(from, to, amount));
+            sink.write(ont::v2::transfer(from, to, amount));
         }
         b"ontBalanceOfV2" => {
             let from = source.read().unwrap();
-            sink.write(ont::balance_of_v2(from));
+            sink.write(ont::v2::balance_of(from));
         }
         b"ontApproveV2" => {
             let (from, to, amount) = source.read().unwrap();
-            sink.write(ont::approve_v2(from, to, amount));
+            sink.write(ont::v2::approve(from, to, amount));
         }
         b"ontAllowanceV2" => {
             let (from, to) = source.read().unwrap();
-            sink.write(ont::allowance_v2(from, to));
+            sink.write(ont::v2::allowance(from, to));
         }
         b"ontTransferFromV2" => {
             let (spender, from, to, amount) = source.read().unwrap();
-            sink.write(ont::transfer_from_v2(spender, from, to, amount));
+            sink.write(ont::v2::transfer_from(spender, from, to, amount));
         }
 
         b"ongTransferV2" => {
             let (from, to, amount) = source.read().unwrap();
-            sink.write(ong::transfer_v2(from, to, amount));
+            sink.write(ong::v2::transfer(from, to, amount));
         }
         b"ongBalanceOfV2" => {
             let from = source.read().unwrap();
-            sink.write(ong::balance_of_v2(from));
+            sink.write(ong::v2::balance_of(from));
         }
         b"ongApproveV2" => {
             let (from, to, amount) = source.read().unwrap();
-            sink.write(ong::approve_v2(from, to, amount));
+            sink.write(ong::v2::approve(from, to, amount));
         }
         b"ongAllowanceV2" => {
             let (from, to) = source.read().unwrap();
-            sink.write(ong::allowance_v2(from, to));
+            sink.write(ong::v2::allowance(from, to));
         }
         b"ongTransferFromV2" => {
             let (spender, from, to, amount) = source.read().unwrap();
-            sink.write(ong::transfer_from_v2(spender, from, to, amount));
+            sink.write(ong::v2::transfer_from(spender, from, to, amount));
         }
         _ => panic("unsupported action!"),
     }
