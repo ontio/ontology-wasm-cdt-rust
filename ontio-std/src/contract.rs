@@ -24,7 +24,7 @@ pub mod governance {
 
     impl<'a> Encoder for AuthorizeForPeerParam<'a> {
         fn encode(&self, sink: &mut Sink) {
-            sink.write_var_bytes(&self.addr.as_bytes());
+            sink.write_var_bytes(self.addr.as_bytes());
             sink.write_native_varuint(self.peer_pubkey_list.len() as u64);
             for &pk in self.peer_pubkey_list.iter() {
                 sink.write(pk);
