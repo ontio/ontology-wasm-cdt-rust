@@ -6,6 +6,7 @@
 #![feature(exclusive_range_pattern)]
 #![feature(proc_macro_hygiene)]
 #![feature(panic_info_message)]
+#![feature(alloc_error_handler)]
 
 //#![feature(trace_macros)]
 
@@ -45,7 +46,7 @@ cfg_if::cfg_if! {
         extern "C" fn eh_personality() {}
 
         /// Overrides the default oom
-        #[lang = "oom"]
+        #[alloc_error_handler]
         #[no_mangle]
         pub fn oom(_: core::alloc::Layout) -> ! {
             core::intrinsics::abort()
