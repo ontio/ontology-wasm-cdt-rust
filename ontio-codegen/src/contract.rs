@@ -189,8 +189,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
 
     let contract_name = &contract.name;
 
-    let dispatcher_name =
-        syn::Ident::new(&format!("{contract_name}Dispatcher"), Span::call_site());
+    let dispatcher_name = syn::Ident::new(&format!("{contract_name}Dispatcher"), Span::call_site());
 
     quote! {
         pub struct #dispatcher_name<T:#contract_name> {
