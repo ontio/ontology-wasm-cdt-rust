@@ -43,7 +43,7 @@ fn create_red_envlope(owner: Address, pack_count: U128, amount: U128, token_addr
     let key = [SENT_PREFIX.as_bytes(), owner.as_ref()].concat();
     let mut sent_count = database::get(&key).unwrap_or(0u64);
     sent_count += 1;
-    database::put(&key, sent_count);
+    database::put(key, sent_count);
     let hash_key = [owner.as_ref(), format!("{}", sent_count).as_bytes()].concat();
     let hash = format!("{:?}", runtime::sha256(hash_key));
     let hash_bytes = hash.as_bytes();
@@ -75,7 +75,7 @@ fn create_red_envlope(owner: Address, pack_count: U128, amount: U128, token_addr
         remain_package_count: pack_count,
         records: Vec::new(),
     };
-    database::put(&re_key, es);
+    database::put(re_key, es);
     create_red_envlope_event(owner.as_ref(), pack_count, amount, token_addr.as_ref());
     true
 }

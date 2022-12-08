@@ -41,7 +41,7 @@ impl MyToken for MyTokenInstance {
             return false;
         }
         database::put(KEY_TOTAL_SUPPLY, TOTAL_SUPPLY);
-        database::put(&utils::gen_balance_key(owner), TOTAL_SUPPLY);
+        database::put(utils::gen_balance_key(owner), TOTAL_SUPPLY);
         true
     }
 
@@ -50,7 +50,7 @@ impl MyToken for MyTokenInstance {
     }
 
     fn balance_of(&self, owner: &Address) -> U128 {
-        database::get(&utils::gen_balance_key(owner)).unwrap_or_default()
+        database::get(utils::gen_balance_key(owner)).unwrap_or_default()
     }
 
     fn transfer(&mut self, from: &Address, to: &Address, amount: U128) -> bool {
@@ -64,8 +64,8 @@ impl MyToken for MyTokenInstance {
         } else {
             frmbal -= amount;
             tobal += amount;
-            database::put(&utils::gen_balance_key(from), &frmbal);
-            database::put(&utils::gen_balance_key(to), &tobal);
+            database::put(utils::gen_balance_key(from), frmbal);
+            database::put(utils::gen_balance_key(to), tobal);
             self.Transfer(from, to, amount);
             true
         }
@@ -90,7 +90,7 @@ impl MyToken for MyTokenInstance {
         if apprbal < amount {
             false
         } else {
-            database::put(&utils::gen_approve_key(approves, receiver), amount);
+            database::put(utils::gen_approve_key(approves, receiver), amount);
             self.Approve(approves, receiver, amount);
             true
         }
@@ -117,7 +117,7 @@ impl MyToken for MyTokenInstance {
         true
     }
     fn allowance(&mut self, approves: &Address, receiver: &Address) -> U128 {
-        database::get(&utils::gen_approve_key(approves, receiver)).unwrap_or_default()
+        database::get(utils::gen_approve_key(approves, receiver)).unwrap_or_default()
     }
 
     fn total_supply(&self) -> U128 {

@@ -52,25 +52,25 @@ impl Oep5Token for Oep5TokenInstance {
         database::get(KEY_TOTAL_SUPPLY).unwrap_or_default()
     }
     fn query_token_id_by_index(&self, idx: U128) -> String {
-        database::get(&utils::concat(PREFIX_INDEX, &idx)).unwrap_or_default()
+        database::get(utils::concat(PREFIX_INDEX, idx)).unwrap_or_default()
     }
     fn query_token_by_id(&self, token_id: String) -> String {
         let (_, _, image, _): (String, String, String, String) =
-            database::get(&utils::concat(PREFIX_TOKEN_ID, &token_id)).unwrap_or_default();
+            database::get(utils::concat(PREFIX_TOKEN_ID, token_id)).unwrap_or_default();
         image
     }
     fn balance_of(&self, address: &Address) -> U128 {
-        database::get(&utils::concat(PREFIX_BALANCE, address)).unwrap_or_default()
+        database::get(utils::concat(PREFIX_BALANCE, address)).unwrap_or_default()
     }
     fn owner_of(&self, token_id: String) -> Address {
-        database::get(&utils::concat(PREFIX_OWNER, &token_id)).unwrap_or_else(Address::zero)
+        database::get(utils::concat(PREFIX_OWNER, token_id)).unwrap_or_else(Address::zero)
     }
     fn transfer(&mut self, to: &Address, token_id: String) -> bool {
         let owner = self.owner_of(token_id.clone());
         if !runtime::check_witness(&owner) {
             return false;
         }
-        database::put(&utils::concat(PREFIX_OWNER, &token_id), to);
+        database::put(utils::concat(PREFIX_OWNER, &token_id), to);
         true
     }
     fn transfer_multi(&mut self, states: &[(Address, String)]) -> bool {
@@ -89,18 +89,18 @@ impl Oep5Token for Oep5TokenInstance {
         if !runtime::check_witness(&owner) {
             return false;
         }
-        database::put(&utils::concat(PREFIX_APPROVE, &token_id), to);
+        database::put(utils::concat(PREFIX_APPROVE, &token_id), to);
         true
     }
     fn get_approved(&mut self, token_id: String) -> Address {
-        database::get(&utils::concat(PREFIX_APPROVE, token_id)).unwrap_or_default()
+        database::get(utils::concat(PREFIX_APPROVE, token_id)).unwrap_or_default()
     }
     fn take_ownership(&mut self, token_id: String) -> bool {
         let to = self.get_approved(token_id.clone());
         if !runtime::check_witness(&to) {
             return false;
         }
-        database::put(&utils::concat(PREFIX_OWNER, &token_id), to);
+        database::put(utils::concat(PREFIX_OWNER, &token_id), to);
         true
     }
     fn create_multi_tokens(&mut self, owner: &Address) -> bool {
@@ -120,16 +120,16 @@ impl Oep5Token for Oep5TokenInstance {
     ) -> bool {
         let mut total_supply: U128 = database::get(KEY_TOTAL_SUPPLY).unwrap_or_default();
         total_supply += 1;
-        database::put(KEY_TOTAL_SUPPLY, &total_supply);
-        let tmp = utils::concat(owner, &total_supply);
-        let token_id = runtime::sha256(&tmp).hex_string();
+        database::put(KEY_TOTAL_SUPPLY, total_supply);
+        let tmp = utils::concat(owner, total_supply);
+        let token_id = runtime::sha256(tmp).hex_string();
         let token = (token_id.clone(), name, url, token_type);
-        database::put(&utils::concat(PREFIX_INDEX, &total_supply), &token_id);
-        database::put(&utils::concat(PREFIX_OWNER, &token_id), owner);
-        database::put(&utils::concat(PREFIX_TOKEN_ID, &token_id), token);
+        database::put(utils::concat(PREFIX_INDEX, total_supply), &token_id);
+        database::put(utils::concat(PREFIX_OWNER, &token_id), owner);
+        database::put(utils::concat(PREFIX_TOKEN_ID, &token_id), token);
         let mut balance = self.balance_of(owner);
         balance += 1;
-        database::put(&utils::concat(PREFIX_BALANCE, owner), balance);
+        database::put(utils::concat(PREFIX_BALANCE, owner), balance);
         true
     }
 }

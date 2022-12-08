@@ -56,16 +56,16 @@ impl Oep8Token for Oep8TokenInstance {
         true
     }
     fn name(&self, token_id: String) -> String {
-        database::get(&utils::concat(token_id, NAME)).unwrap_or_default()
+        database::get(utils::concat(token_id, NAME)).unwrap_or_default()
     }
     fn symbol(&self, token_id: String) -> String {
-        database::get(&utils::concat(token_id, SYMBOL)).unwrap_or_default()
+        database::get(utils::concat(token_id, SYMBOL)).unwrap_or_default()
     }
     fn total_supply(&self, token_id: String) -> U128 {
-        database::get(&utils::concat(token_id, TOTAL_SUPPLY)).unwrap_or_default()
+        database::get(utils::concat(token_id, TOTAL_SUPPLY)).unwrap_or_default()
     }
     fn balance_of(&self, address: &Address, token_id: String) -> U128 {
-        database::get(&utils::concat(token_id, (BALANCE, address))).unwrap_or_default()
+        database::get(utils::concat(token_id, (BALANCE, address))).unwrap_or_default()
     }
     fn transfer(&mut self, from: &Address, to: &Address, amount: U128, token_id: String) -> bool {
         assert!(self.check_token_id(token_id.clone()));
@@ -83,7 +83,7 @@ impl Oep8Token for Oep8TokenInstance {
         }
         let to_key = utils::concat(&balance_key, to);
         let to_balance: U128 = database::get(&to_key).unwrap_or_default();
-        database::put(&to_key, amount + to_balance);
+        database::put(to_key, amount + to_balance);
         self.Transfer(from, to, amount, token_id);
         true
     }
@@ -110,13 +110,13 @@ impl Oep8Token for Oep8TokenInstance {
         assert!(owner_balance >= amount);
         assert!(amount.raw() > 0);
         let approve_key = utils::concat(token_id.clone(), (APPROVE, owner, spender));
-        database::put(&approve_key, amount);
+        database::put(approve_key, amount);
         self.Approve(owner, spender, amount, token_id);
         true
     }
     fn allowance(&mut self, owner: &Address, spender: &Address, token_id: String) -> U128 {
         let approve_key = utils::concat(token_id, (APPROVE, owner, spender));
-        database::get(&approve_key).unwrap_or_default()
+        database::get(approve_key).unwrap_or_default()
     }
     fn transfer_from(
         &mut self, spender: &Address, from: &Address, to: &Address, amount: U128, token_id: String,
@@ -126,11 +126,11 @@ impl Oep8Token for Oep8TokenInstance {
         let approval = self.allowance(from, spender, token_id.clone());
         assert!(amount <= approval);
         let fromval = self.balance_of(from, token_id.clone());
-        database::put(&utils::concat(token_id.clone(), (BALANCE, from)), fromval - amount);
+        database::put(utils::concat(token_id.clone(), (BALANCE, from)), fromval - amount);
         let toval = self.balance_of(to, token_id.clone());
-        database::put(&utils::concat(token_id.clone(), (BALANCE, to)), toval + amount);
+        database::put(utils::concat(token_id.clone(), (BALANCE, to)), toval + amount);
         let approve_key = utils::concat(token_id, (APPROVE, from, spender));
-        database::put(&approve_key, approval - amount);
+        database::put(approve_key, approval - amount);
         true
     }
     fn approve_multi(&mut self, obj: &[(Address, Address, U128, String)]) -> bool {
@@ -178,16 +178,16 @@ impl Oep8Token for Oep8TokenInstance {
             let token_symbol = token_symbol_list[index];
             let token_total_supply = U128::new(token_supply_list[index]);
             let token_id = format!("{}", index + 1);
-            database::put(&utils::concat(token_id.clone(), NAME), token_name);
-            database::put(&utils::concat(token_id.clone(), SYMBOL), token_symbol);
-            database::put(&utils::concat(token_id.clone(), TOTAL_SUPPLY), token_total_supply);
-            database::put(&utils::concat(token_id.clone(), (BALANCE, ADMIN)), token_total_supply);
+            database::put(utils::concat(token_id.clone(), NAME), token_name);
+            database::put(utils::concat(token_id.clone(), SYMBOL), token_symbol);
+            database::put(utils::concat(token_id.clone(), TOTAL_SUPPLY), token_total_supply);
+            database::put(utils::concat(token_id.clone(), (BALANCE, ADMIN)), token_total_supply);
             self.Transfer(&ADMIN, &ADMIN, token_total_supply, token_id);
         }
         true
     }
     fn check_token_id(&self, token_id: String) -> bool {
-        database::get::<_, String>(&utils::concat(token_id, NAME)).is_some()
+        database::get::<_, String>(utils::concat(token_id, NAME)).is_some()
     }
 }
 
