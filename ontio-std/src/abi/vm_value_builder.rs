@@ -23,7 +23,7 @@ pub struct NestedVmValueBuilder<'a> {
     current: VmValueBuilderCommon,
 }
 
-impl<'a> NestedVmValueBuilder<'_> {
+impl NestedVmValueBuilder<'_> {
     pub fn finish(self) {
         let mut buf = self.current.sink.into();
         buf[1..5].copy_from_slice(&self.current.num_entry.to_le_bytes());

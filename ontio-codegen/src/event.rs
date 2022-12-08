@@ -26,7 +26,7 @@ pub fn quote(method_name: String, func: &syn::ItemFn) -> proc_macro2::TokenStrea
     };
     let body = params.iter().map(|&(ref pat, ref ty)| {
         let mut param_type = ty.into_token_stream().to_string();
-        param_type = param_type.replace(" ", "");
+        param_type = param_type.replace(' ', "");
         match param_type.as_str() {
             "Address" | "&Address" => quote! {es = es.address(#pat)},
             "U128" => quote! {es = es.number(#pat)},

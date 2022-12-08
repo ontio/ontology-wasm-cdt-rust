@@ -32,7 +32,7 @@ pub fn event(metadata: TokenStream, input: TokenStream) -> TokenStream {
             } else {
                 method_name = metadata.to_string();
                 method_name = method_name.replace("name", "");
-                method_name = method_name.replace("=", "");
+                method_name = method_name.replace('=', "");
             }
             method_name = method_name.to_mixed_case();
             let stream = event::quote(method_name, func);
