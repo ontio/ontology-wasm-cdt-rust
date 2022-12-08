@@ -89,7 +89,7 @@ impl ApiTest for ApiTestInstance {
     fn call_wasm_name(&self, contract: &Address) -> String {
         let mut sink = Sink::new(16);
         sink.write("name".to_string());
-        console::debug(&format!("{:?}", contract));
+        console::debug(&format!("{contract:?}"));
         let res = runtime::call_contract(contract, sink.bytes());
         let s = str::from_utf8(res.as_slice()).unwrap();
         console::debug(s);

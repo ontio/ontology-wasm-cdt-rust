@@ -133,7 +133,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
             ContractField::Action(ref action) => {
                 let action_name = &action.name;
                 let action_literal = syn::LitStr::new(&action_name.to_string(), proc_macro2::Span::call_site());
-                let args = action.params.iter().map(|&(_, ref ty)| {
+                let args = action.params.iter().map(|(_, ty)| {
                     let ty :&syn::Type = ty;
                     match ty {
                         syn::Type::Reference(refer) => {
@@ -190,7 +190,7 @@ fn generate_dispatcher(contract: &Contract) -> proc_macro2::TokenStream {
     let contract_name = &contract.name;
 
     let dispatcher_name =
-        syn::Ident::new(&format!("{}Dispatcher", contract_name), Span::call_site());
+        syn::Ident::new(&format!("{contract_name}Dispatcher"), Span::call_site());
 
     quote! {
         pub struct #dispatcher_name<T:#contract_name> {
@@ -230,8 +230,8 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
             ContractField::Event(ref event) => {
                 let event_sig = &event.method_sig;
                 let event_body = {
-                    let args_type = event.params.iter().map(|&(_, ref ty)| quote! { #ty });
-                    let args_name = event.params.iter().map(|&(ref pat, _)| quote! { #pat });
+                    let args_type = event.params.iter().map(|(_, ty)| quote! { #ty });
+                    let args_name = event.params.iter().map(|(pat, _)| quote! { #pat });
                     quote! { {
                         let mut sink = ontio_std::abi::Sink::new(16);
                         #(sink.write::<#args_type>(#args_name);)*
@@ -244,11 +244,11 @@ fn generate_event(contract: &Contract) -> proc_macro2::TokenStream {
                     #event_body
                 }
             }
-            &ContractField::Action(ref action) => {
+            ContractField::Action(action) => {
                 let method = &action.method;
                 quote! { #method }
             }
-            &ContractField::Unhandle(ref item) => quote! { #item },
+            ContractField::Unhandle(item) => quote! { #item },
         })
         .collect();
 

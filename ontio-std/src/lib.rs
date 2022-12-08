@@ -30,7 +30,7 @@ cfg_if::cfg_if! {
         #[no_mangle]
         #[panic_handler]
         pub fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
-            let msg = info.message().map(|msg| format!("{}", msg)).unwrap_or_default();
+            let msg = info.message().map(|msg| format!("{msg}")).unwrap_or_default();
             let (file, line) = if let Some(loc) = info.location() {
                 (loc.file(), loc.line())
             } else {
@@ -38,7 +38,7 @@ cfg_if::cfg_if! {
             };
 
 
-            let panic_msg = format!("{} at {}:{}", msg, file, line);
+            let panic_msg = format!("{msg} at {file}:{line}");
             runtime::panic(&panic_msg)
         }
 

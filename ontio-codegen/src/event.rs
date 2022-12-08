@@ -24,7 +24,7 @@ pub fn quote(method_name: String, func: &syn::ItemFn) -> proc_macro2::TokenStrea
         let mut es = ontio_std::abi::EventBuilder::new();
         es = es.string(#method_name);
     };
-    let body = params.iter().map(|&(ref pat, ref ty)| {
+    let body = params.iter().map(|(pat, ty)| {
         let mut param_type = ty.into_token_stream().to_string();
         param_type = param_type.replace(' ', "");
         match param_type.as_str() {

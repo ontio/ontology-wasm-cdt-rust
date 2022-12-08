@@ -46,7 +46,7 @@ pub fn decode_base58(val: &str) -> Result<[u8; 20], String> {
     let mut bigint: BigUint = Zero::zero();
     for c in new_val.chars() {
         match CHARS.find(c) {
-            None => return Err(format!("invalid char: {}", c)),
+            None => return Err(format!("invalid char: {c}")),
             Some(x) => {
                 bigint = bigint * &b58 + x.to_biguint().unwrap();
             }
