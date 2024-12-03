@@ -112,7 +112,7 @@ where
                     index >= end
                 })
                 .count();
-            let mut bulk = &mut self.index_size[ind];
+            let bulk = &mut self.index_size[ind];
             let start = end - bulk.1;
             //if data in cache
             let val = if let Some(x) = self.cache.get_mut(&bulk.0) {
@@ -155,7 +155,7 @@ where
             self.next_key_id += 1;
         } else {
             //update the last index_count and the last key->data
-            let mut last_index_count = self.index_size.last_mut().unwrap();
+            let last_index_count = self.index_size.last_mut().unwrap();
             //if data not in cache
             let keyn: Vec<u8> = gen_key(self.key.as_slice(), last_index_count.0);
             self.cache.entry(last_index_count.0).or_insert_with(|| {

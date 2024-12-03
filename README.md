@@ -5,9 +5,9 @@
 English | [中文](README_CN.md)
 
 A suite of tools for ontology WebAssembly smart contract development using `rust`.
- 
+
 ## Features
- 
+
  - Runtime api for blockchain interaction
  - Contract level storage management
  - Contract testing framwork
@@ -150,7 +150,7 @@ fn notify<T: Encoder>(msg: T) {
 4. compile contract：
 since the default stack size is 1M, which is too large for contract, we need reduce it, 32kb is enough for most usecase.
 ```
-RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
+RUSTFLAGS="-Ctarget-cpu=mvp -Clink-arg=-zstack-size=32768" cargo build -Zbuild-std=panic_abort,core,alloc --release --target wasm32-unknown-unknown
 ```
 
 ## Procedural Macros
