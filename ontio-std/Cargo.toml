@@ -12,7 +12,7 @@ description = "development library for ontology wasm contract"
 wee_alloc = "0.4"
 ontio-bump-alloc = {version = "0.1", path = "../ontio-bump-alloc", optional = true}
 fixed-hash = { version = "0.4", default-features = false }
-cfg-if = { version = "0.1", default-features = false }
+cfg-if = { version = "1", default-features = false }
 byteorder = { version = "1", default-features= false, features = ["i128"] }
 ontio-codegen = { version = "0.2.1",  path = "../ontio-codegen"}
 ontio-derive-codec = { version = "0.2", path = "../ontio-derive-codec"}

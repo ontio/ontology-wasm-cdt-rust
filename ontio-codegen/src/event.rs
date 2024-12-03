@@ -12,10 +12,10 @@ pub fn quote(method_name: String, func: &syn::ItemFn) -> proc_macro2::TokenStrea
         .sig
         .inputs
         .iter()
-        .filter_map(|i| {
+        .map(|i| {
             match i {
                 // https://docs.rs/syn/1.0.1/syn/struct.PatType.html
-                FnArg::Typed(ref val) => Some((val.pat.clone(), val.ty.clone())),
+                FnArg::Typed(ref val) => (val.pat.clone(), val.ty.clone()),
                 _ => unreachable!("it's not gonna happen."),
             }
         })

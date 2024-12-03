@@ -423,12 +423,12 @@ fn mock_test() {
         let mut array = Vec::new();
         for _i in 0..100 {
             match rand::random::<u8>() {
-                0..50 => {
+                0..=50 => {
                     let val = rand::random();
                     list.push(val);
                     array.push(val);
                 }
-                51..100 => {
+                51..=100 => {
                     if array.len() != 0 {
                         let val = rand::random();
                         let pos = rand::random::<usize>() % array.len();
@@ -436,21 +436,21 @@ fn mock_test() {
                         array.insert(pos, val);
                     }
                 }
-                101..150 => {
+                101..=150 => {
                     if array.len() != 0 {
                         let pos = rand::random::<usize>() % array.len();
                         let val = list.get(pos as u32);
                         assert_eq!(val, array.get(pos as usize));
                     }
                 }
-                151..180 => {
+                151..=180 => {
                     if array.len() != 0 {
                         let pos = rand::random::<usize>() % array.len();
                         list.remove(pos as u32);
                         array.remove(pos);
                     }
                 }
-                181..200 => {
+                181..=200 => {
                     let mut temp = Vec::new();
                     let mut iter = list.iter();
                     while let Some(val) = iter.next() {
