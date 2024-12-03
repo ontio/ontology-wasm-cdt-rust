@@ -4,6 +4,7 @@ set -x
 
 if rustup component add clippy;
 then
+	echo 'Run clippy';
 #	cargo clippy --all -- -Dwarnings;
 else
 	echo 'Skipping clippy';
