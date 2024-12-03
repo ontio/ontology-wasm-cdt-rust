@@ -26,7 +26,7 @@ impl BumpAlloc {
 
 impl Default for BumpAlloc {
     fn default() -> Self {
-       Self::new()
+        Self::new()
     }
 }
 

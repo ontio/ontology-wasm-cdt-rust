@@ -88,7 +88,6 @@ pub fn build_runtime() -> RuntimeHandle {
     let rt = Runtime { inner: inner.clone() };
     setup_runtime(rt);
 
-    
     RuntimeHandle { inner }
 }
 
