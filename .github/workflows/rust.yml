@@ -20,7 +20,7 @@ jobs:
       with:
           toolchain: nightly
     - run: rustup default nightly
-    - run: rustup component add rustfmt
+    - run: rustup component add rustfmt rust-src clippy
     - run: rustup target add wasm32-unknown-unknown
     - name: Cargo Fmt
       run: cargo fmt --all -- --check
