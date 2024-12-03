@@ -12,12 +12,14 @@ construct_fixed_hash! {
 ///   let tx_hash:H256 = runtime::current_txhash();
 ///   let hash:H256 = runtime::sha256("test");
 /// ```
+    #[allow(unexpected_cfgs, unused_must_use)]
     pub struct H256(32);
 }
 
 construct_fixed_hash! {
 /// A byte array of length 20 representing the Address.
 ///
+    #[allow(unexpected_cfgs, unused_must_use)]
     pub struct H160(20);
 }
 

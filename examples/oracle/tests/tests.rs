@@ -11,7 +11,7 @@ use oracle::storage;
 fn test_oracle() {
     let runtime = &build_runtime();
     let admin = Address::repeat_byte(1);
-    runtime.witness(&[admin.clone()]);
+    runtime.witness([admin]);
     method::initialize(&admin);
     storage::put_decimal(9);
     assert_eq!(9, storage::get_decimal());
@@ -30,7 +30,7 @@ fn test_oracle() {
 fn test_init_twice() {
     let runtime = &build_runtime();
     let admin = Address::repeat_byte(1);
-    runtime.witness(&[admin.clone()]);
+    runtime.witness([admin]);
     method::initialize(&admin);
     method::initialize(&admin);
 }
@@ -39,7 +39,7 @@ fn test_init_twice() {
 fn test_set_decimal_twice() {
     let runtime = &build_runtime();
     let admin = Address::repeat_byte(1);
-    runtime.witness(&[admin.clone()]);
+    runtime.witness([admin]);
     method::initialize(&admin);
     storage::put_decimal(9);
     storage::put_decimal(7);

@@ -24,6 +24,12 @@ impl BumpAlloc {
     }
 }
 
+impl Default for BumpAlloc {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 fn align_to(size: usize, align: usize) -> usize {
     (size + align - 1) & !(align - 1)
 }
@@ -35,7 +41,7 @@ unsafe impl GlobalAlloc for BumpAlloc {
         let need_bytes = align_to(layout.size(), layout.align());
         let pos = align_to(inner.pos as usize, layout.align());
         if pos + need_bytes > inner.size {
-            let need_page = (pos + need_bytes - inner.size + PAGE_SIZE - 1) / PAGE_SIZE;
+            let need_page = (pos + need_bytes - inner.size).div_ceil(PAGE_SIZE);
             match alloc_pages(need_page) {
                 Some(p) => {
                     if inner.pos.is_null() {

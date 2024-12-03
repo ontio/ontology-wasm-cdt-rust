@@ -1,11 +1,7 @@
-#![feature(lang_items)]
-#![feature(core_intrinsics)]
 #![feature(allocator_api)]
 #![feature(slice_concat_ext)]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(exclusive_range_pattern)]
 #![feature(proc_macro_hygiene)]
-#![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
 //#![feature(trace_macros)]
@@ -30,7 +26,7 @@ cfg_if::cfg_if! {
         #[no_mangle]
         #[panic_handler]
         pub fn panic_fmt(info: &core::panic::PanicInfo) -> ! {
-            let msg = info.message().map(|msg| format!("{msg}")).unwrap_or_default();
+            let msg = info.message();
             let (file, line) = if let Some(loc) = info.location() {
                 (loc.file(), loc.line())
             } else {
@@ -42,14 +38,11 @@ cfg_if::cfg_if! {
             runtime::panic(&panic_msg)
         }
 
-        #[lang = "eh_personality"]
-        extern "C" fn eh_personality() {}
-
         /// Overrides the default oom
         #[alloc_error_handler]
         #[no_mangle]
         pub fn oom(_: core::alloc::Layout) -> ! {
-            core::intrinsics::abort()
+            runtime::panic("out of memory");
         }
     }
 

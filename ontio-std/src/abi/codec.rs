@@ -101,7 +101,7 @@ impl<'a> Decoder<'a> for &'a H256 {
 
 impl<'a> Decoder<'a> for H256 {
     fn decode(source: &mut Source<'a>) -> Result<Self, Error> {
-        source.read_h256().map(H256::clone)
+        source.read_h256().copied()
     }
 }
 

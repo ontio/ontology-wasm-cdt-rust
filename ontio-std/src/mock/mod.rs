@@ -47,30 +47,30 @@ impl RuntimeHandle {
     }
 
     pub fn address(&self, addr: &Address) -> &Self {
-        self.inner.borrow_mut().self_addr = addr.clone();
+        self.inner.borrow_mut().self_addr = *addr;
         self
     }
 
     pub fn caller(&self, caller: &Address) -> &Self {
-        self.inner.borrow_mut().caller = caller.clone();
+        self.inner.borrow_mut().caller = *caller;
         self
     }
     pub fn entry_address(&self, entry: &Address) -> &Self {
-        self.inner.borrow_mut().entry_address = entry.clone();
+        self.inner.borrow_mut().entry_address = *entry;
         self
     }
 
     pub fn current_blockhash(&self, block_hash: &H256) -> &Self {
-        self.inner.borrow_mut().block_hash = block_hash.clone();
+        self.inner.borrow_mut().block_hash = *block_hash;
         self
     }
     pub fn current_txhash(&self, tx_hash: &H256) -> &Self {
-        self.inner.borrow_mut().tx_hash = tx_hash.clone();
+        self.inner.borrow_mut().tx_hash = *tx_hash;
         self
     }
 
     pub fn witness<T: AsRef<Address>, I: IntoIterator<Item = T>>(&self, addr: I) -> &Self {
-        self.inner.borrow_mut().witness = addr.into_iter().map(|a| a.as_ref().clone()).collect();
+        self.inner.borrow_mut().witness = addr.into_iter().map(|a| *a.as_ref()).collect();
         self
     }
 
@@ -88,8 +88,7 @@ pub fn build_runtime() -> RuntimeHandle {
     let rt = Runtime { inner: inner.clone() };
     setup_runtime(rt);
 
-    let handle = RuntimeHandle { inner: inner };
-    handle
+    RuntimeHandle { inner }
 }
 
 #[test]

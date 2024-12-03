@@ -112,7 +112,7 @@ where
                     index >= end
                 })
                 .count();
-            let mut bulk = &mut self.index_size[ind];
+            let bulk = &mut self.index_size[ind];
             let start = end - bulk.1;
             //if data in cache
             let val = if let Some(x) = self.cache.get_mut(&bulk.0) {
@@ -155,7 +155,7 @@ where
             self.next_key_id += 1;
         } else {
             //update the last index_count and the last key->data
-            let mut last_index_count = self.index_size.last_mut().unwrap();
+            let last_index_count = self.index_size.last_mut().unwrap();
             //if data not in cache
             let keyn: Vec<u8> = gen_key(self.key.as_slice(), last_index_count.0);
             self.cache.entry(last_index_count.0).or_insert_with(|| {
@@ -313,7 +313,7 @@ where
     list: &'a mut ListStore<T>,
 }
 
-impl<'a, T> Iterator<'a, T>
+impl<T> Iterator<'_, T>
 where
     for<'b> T: Decoder<'b> + Encoder,
 {
@@ -411,7 +411,7 @@ fn clear() {
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
-    assert_eq!(list.contains(&format!("hello{}", 0)), true);
+    assert!(list.contains(&format!("hello{}", 0)));
     assert_eq!(list.size, 90);
     list.clear();
     assert_eq!(list.size, 0);
@@ -423,34 +423,34 @@ fn mock_test() {
         let mut array = Vec::new();
         for _i in 0..100 {
             match rand::random::<u8>() {
-                0..50 => {
+                0..=50 => {
                     let val = rand::random();
                     list.push(val);
                     array.push(val);
                 }
-                51..100 => {
-                    if array.len() != 0 {
+                51..=100 => {
+                    if !array.is_empty() {
                         let val = rand::random();
                         let pos = rand::random::<usize>() % array.len();
                         list.insert(pos as u32, val);
                         array.insert(pos, val);
                     }
                 }
-                101..150 => {
-                    if array.len() != 0 {
+                101..=150 => {
+                    if !array.is_empty() {
                         let pos = rand::random::<usize>() % array.len();
                         let val = list.get(pos as u32);
                         assert_eq!(val, array.get(pos as usize));
                     }
                 }
-                151..180 => {
-                    if array.len() != 0 {
+                151..=180 => {
+                    if !array.is_empty() {
                         let pos = rand::random::<usize>() % array.len();
                         list.remove(pos as u32);
                         array.remove(pos);
                     }
                 }
-                181..200 => {
+                181..=200 => {
                     let mut temp = Vec::new();
                     let mut iter = list.iter();
                     while let Some(val) = iter.next() {

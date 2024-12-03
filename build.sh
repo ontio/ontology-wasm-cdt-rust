@@ -16,8 +16,8 @@ fi
 # clean origial build 
 rm -rf ./target/wasm32-unknown-unknown/release/*.wasm
 
-# clean origial build 
-RUSTFLAGS="-C link-arg=-zstack-size=32768" cargo build --release --target wasm32-unknown-unknown
+# clean origial build
+RUSTFLAGS="-Ctarget-cpu=mvp -C link-arg=-zstack-size=32768" cargo build -Zbuild-std=panic_abort,core,alloc --release --target wasm32-unknown-unknown
 
 for wasm in ./target/wasm32-unknown-unknown/release/*.wasm ; do
 	ontio-wasm-build $wasm $wasm
