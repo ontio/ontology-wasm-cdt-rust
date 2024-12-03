@@ -559,7 +559,7 @@ mod tests {
     #[test]
     fn smoke() {
         for _ in 0..100000 {
-            let b = u128::max_value();
+            let b = u128::MAX;
             let (a, c): (u128, u128) = rand::random();
             let sum = U256::from(a) + U256::from(b);
             let b2 = sum - a;
@@ -589,7 +589,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_as_u128_overflow() {
-        let val = U256::from(u128::max_value()) + 1000;
+        let val = U256::from(u128::MAX) + 1000;
         let _ = val.as_u128();
     }
 

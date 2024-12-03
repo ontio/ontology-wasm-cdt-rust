@@ -65,7 +65,7 @@ fn format_amount(amt: U128) -> [u8; 32] {
 #[test]
 fn test() {
     let addr = &Address::repeat_byte(1);
-    println!("{:?}", format_addr(&addr).as_ref());
+    println!("{:?}", format_addr(addr).as_ref());
     let data = gen_eth_transfer_data(addr, U128::new(1000));
     println!("{:?}", data.as_slice());
 }

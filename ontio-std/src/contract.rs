@@ -22,7 +22,7 @@ pub mod governance {
         }
     }
 
-    impl<'a> Encoder for AuthorizeForPeerParam<'a> {
+    impl Encoder for AuthorizeForPeerParam<'_> {
         fn encode(&self, sink: &mut Sink) {
             sink.write_var_bytes(self.addr.as_bytes());
             sink.write_native_varuint(self.peer_pubkey_list.len() as u64);
@@ -93,7 +93,7 @@ pub mod governance {
         peer_pubkey_list: &'a [&'a str],
         withdraw_list: &'a [u32],
     }
-    impl<'a> Encoder for WithdrawParam<'a> {
+    impl Encoder for WithdrawParam<'_> {
         fn encode(&self, sink: &mut Sink) {
             sink.write_var_bytes(self.addr.as_bytes());
             sink.write_var_bytes(
@@ -130,7 +130,7 @@ pub mod governance {
     struct WithdrawOngParam<'a> {
         addr: &'a Address,
     }
-    impl<'a> Encoder for WithdrawOngParam<'a> {
+    impl Encoder for WithdrawOngParam<'_> {
         fn encode(&self, sink: &mut Sink) {
             sink.write_var_bytes(self.addr.as_bytes())
         }
@@ -158,7 +158,7 @@ pub mod governance {
         ];
         let ap = AuthorizeForPeerParam {
             addr: &Address::new(data),
-            peer_pubkey_list: &[&"test".to_string()],
+            peer_pubkey_list: &["test"],
             pos_list: &[128u32],
         };
         let mut sink = Sink::new(64);

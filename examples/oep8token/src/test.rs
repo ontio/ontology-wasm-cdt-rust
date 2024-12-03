@@ -6,7 +6,7 @@ use ontio_std::types::{Address, U128};
 fn init() {
     let mut token = Oep8TokenInstance;
     let owner: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
-    build_runtime().witness(&[owner]);
+    build_runtime().witness([owner]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     let token_id_2 = format!("{}", 2);
@@ -38,7 +38,7 @@ fn init() {
 fn transfer() {
     let mut token = Oep8TokenInstance;
     let owner: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
-    build_runtime().witness(&[owner]);
+    build_runtime().witness([owner]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     let alice = Address::random();
@@ -47,7 +47,7 @@ fn transfer() {
     assert_eq!(token.balance_of(&alice, token_id_1.clone()), U128::new(10));
     let bob = Address::random();
     let states = [
-        (owner.clone(), alice, U128::new(1000), token_id_1.clone()),
+        (owner, alice, U128::new(1000), token_id_1.clone()),
         (owner, bob, U128::new(1000), token_id_1.clone()),
     ];
     assert!(token.transfer_multi(&states));
@@ -59,7 +59,7 @@ fn approve() {
     let mut token = Oep8TokenInstance;
     let owner: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     let alice = Address::random();
-    build_runtime().witness(&[owner, alice]);
+    build_runtime().witness([owner, alice]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     assert!(token.approve(&owner, &alice, U128::new(10), token_id_1.clone()));
@@ -74,7 +74,7 @@ fn approve_multi() {
     let mut token = Oep8TokenInstance;
     let owner: Address = ostd::macros::base58!("AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM");
     let alice = Address::random();
-    build_runtime().witness(&[owner, alice]);
+    build_runtime().witness([owner, alice]);
     assert!(token.init());
     let token_id_1 = format!("{}", 1);
     let states = [(owner, alice, U128::new(10000), token_id_1.clone())];

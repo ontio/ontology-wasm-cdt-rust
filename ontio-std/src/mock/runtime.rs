@@ -57,27 +57,27 @@ impl Runtime {
     }
 
     fn address(&self) -> Address {
-        self.inner.borrow().self_addr.clone()
+        self.inner.borrow().self_addr
     }
 
     fn caller(&self) -> Address {
-        self.inner.borrow().caller.clone()
+        self.inner.borrow().caller
     }
 
     fn check_witness(&self, addr: &Address) -> bool {
-        self.inner.borrow().witness.iter().position(|wit| wit == addr).is_some()
+        self.inner.borrow().witness.iter().any(|wit| wit == addr)
     }
 
     fn entry_address(&self) -> Address {
-        self.inner.borrow().entry_address.clone()
+        self.inner.borrow().entry_address
     }
 
     fn current_blockhash(&self) -> H256 {
-        self.inner.borrow().block_hash.clone()
+        self.inner.borrow().block_hash
     }
 
     fn current_txhash(&self) -> H256 {
-        self.inner.borrow().tx_hash.clone()
+        self.inner.borrow().tx_hash
     }
 
     fn notify(&self, msg: &[u8]) {

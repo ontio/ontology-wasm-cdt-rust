@@ -313,7 +313,7 @@ where
     list: &'a mut ListStore<T>,
 }
 
-impl<'a, T> Iterator<'a, T>
+impl<T> Iterator<'_, T>
 where
     for<'b> T: Decoder<'b> + Encoder,
 {
@@ -411,7 +411,7 @@ fn clear() {
     for x in 0..90 {
         list.push(format!("hello{}", x));
     }
-    assert_eq!(list.contains(&format!("hello{}", 0)), true);
+    assert!(list.contains(&format!("hello{}", 0)));
     assert_eq!(list.size, 90);
     list.clear();
     assert_eq!(list.size, 0);
@@ -429,7 +429,7 @@ fn mock_test() {
                     array.push(val);
                 }
                 51..=100 => {
-                    if array.len() != 0 {
+                    if !array.is_empty() {
                         let val = rand::random();
                         let pos = rand::random::<usize>() % array.len();
                         list.insert(pos as u32, val);
@@ -437,14 +437,14 @@ fn mock_test() {
                     }
                 }
                 101..=150 => {
-                    if array.len() != 0 {
+                    if !array.is_empty() {
                         let pos = rand::random::<usize>() % array.len();
                         let val = list.get(pos as u32);
                         assert_eq!(val, array.get(pos as usize));
                     }
                 }
                 151..=180 => {
-                    if array.len() != 0 {
+                    if !array.is_empty() {
                         let pos = rand::random::<usize>() % array.len();
                         list.remove(pos as u32);
                         array.remove(pos);

@@ -31,7 +31,7 @@ impl NestedVmValueBuilder<'_> {
     }
 }
 
-impl<'a> Deref for NestedVmValueBuilder<'a> {
+impl Deref for NestedVmValueBuilder<'_> {
     type Target = VmValueBuilderCommon;
 
     fn deref(&self) -> &Self::Target {
@@ -39,7 +39,7 @@ impl<'a> Deref for NestedVmValueBuilder<'a> {
     }
 }
 
-impl<'a> DerefMut for NestedVmValueBuilder<'a> {
+impl DerefMut for NestedVmValueBuilder<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.current
     }
@@ -194,7 +194,7 @@ mod tests {
         sink.write_byte(TYPE_LIST); // second param
         sink.write_u32(1);
         sink.write_byte(TYPE_ADDRESS); // first param
-        sink.write(&addr);
+        sink.write(addr);
         assert_eq!(builder.bytes(), sink.into());
     }
 }
